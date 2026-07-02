@@ -1,0 +1,33 @@
+.DS_Store
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+venv/
+
+# Node / frontend
+node_modules/
+dist/
+build/
+.vite/
+coverage/
+
+# Local databases and generated files
+*.sqlite
+*.sqlite3
+*.db
+storage/*
+!storage/.gitkeep
+
+# Logs
+*.log
+logs/
