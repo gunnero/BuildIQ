@@ -26,12 +26,14 @@ The backend currently includes:
 - Project status history and timeline event endpoints
 - Room and measurement engine
 - Room opening, measurement set, and measurement item endpoints
+- Calculation engine framework
+- Placeholder calculation engine registry and auditable calculation run endpoints
 - Local development seed command
 
 The backend intentionally does not include:
 
 - Frontend implementation
-- Calculation, payment, supplier, estimate, or other business modules
+- Painting, tiles, knauf, flooring, concrete, facade, payment, supplier, estimate, or other business modules
 - PDF generation
 - AI features
 - OpenAI, Anthropic, Gemini, LangChain, LlamaIndex, or other LLM/provider SDKs
@@ -150,6 +152,14 @@ Room and measurement endpoints:
 - `PATCH /api/v1/measurement-items/{measurement_item_id}`
 - `POST /api/v1/measurement-items/{measurement_item_id}/archive`
 
+Calculation framework endpoints:
+
+- `GET /api/v1/calculation-engines`
+- `POST /api/v1/calculations/run`
+- `GET /api/v1/calculations`
+- `GET /api/v1/calculations/{calculation_run_id}`
+- `POST /api/v1/calculations/{calculation_run_id}/archive`
+
 ## Run Tests
 
 ```bash
@@ -167,7 +177,8 @@ Current migration status:
 - Customer and property tables exist.
 - Project and task tables exist.
 - Room and measurement tables exist.
-- No calculation, payment, supplier, estimate, or PDF tables exist yet.
+- Calculation framework tables exist.
+- No concrete calculator formulas, payment, supplier, estimate, or PDF tables exist yet.
 
 Migration commands:
 

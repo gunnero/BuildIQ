@@ -38,14 +38,31 @@ Calculation outputs may include:
 - Calculation warnings
 - Result snapshot
 
-## Calculator Types
+## Engine Framework
 
-V1 calculator types:
+The backend exposes a calculation engine framework before concrete formulas are implemented.
+
+Sprint 6 registers placeholder engines only. Placeholder engines are deterministic and return a stored `engine_not_implemented` result instead of running construction formulas.
+
+Registered engine types:
 
 - `painting`
-- `tile`
+- `tiles`
 - `knauf`
 - `flooring`
+- `concrete`
+- `facade`
+
+Concrete formulas for these engines must be implemented in later calculator sprints.
+
+## Calculation Run Statuses
+
+Supported calculation run statuses:
+
+- `draft`
+- `completed`
+- `failed`
+- `archived`
 
 ## Calculation Run Record
 
@@ -53,13 +70,22 @@ Every run should store:
 
 - `company_id`
 - `project_id`
+- `project_task_id`
 - `room_id`
-- `calculator_type`
-- `calculator_version`
-- `input_snapshot`
-- `result_snapshot`
-- `created_by_employee_id`
+- `measurement_set_id`
+- `engine_type`
+- `engine_version`
+- `status`
+- `created_by_user_id`
 - `created_at`
+
+Inputs, outputs, and line items are stored as separate auditable records linked to the calculation run:
+
+- `calculation_inputs`
+- `calculation_outputs`
+- `calculation_line_items`
+
+New inputs must create a new calculation run. Existing calculation run inputs and outputs must not be overwritten. The archive endpoint changes only the run status to `archived`.
 
 ## Painting Calculator
 

@@ -1,3 +1,9 @@
+from app.models.calculation import (
+    CalculationInput,
+    CalculationLineItem,
+    CalculationOutput,
+    CalculationRun,
+)
 from app.models.customer import (
     Customer,
     CustomerContact,
@@ -18,6 +24,10 @@ from app.models.subscription import Subscription, SubscriptionPlan
 
 __all__ = [
     "AuditLog",
+    "CalculationInput",
+    "CalculationLineItem",
+    "CalculationOutput",
+    "CalculationRun",
     "Company",
     "Customer",
     "CustomerContact",

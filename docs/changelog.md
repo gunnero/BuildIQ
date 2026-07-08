@@ -2,6 +2,9 @@
 
 ## 2026-07-08
 
+- Implemented Sprint 6 backend Calculation Engine Framework.
+- Added company-scoped calculation run, input, output, and line item models with Alembic migration.
+- Added tenant-isolated calculation framework APIs, placeholder engine registry, auditable stored input/output snapshots, archive endpoint, and tests.
 - Implemented Sprint 5 backend Room and Measurement Engine.
 - Added company-scoped room, room opening, measurement set, and measurement item models with Alembic migration.
 - Added tenant-isolated room/opening/measurement APIs, backend-owned room area calculations, archive endpoints, and tests.
