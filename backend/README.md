@@ -20,12 +20,14 @@ The backend currently includes:
 - Current user and current company dependencies
 - Role and permission helper structure
 - Company subscription read model
+- Customer and property engine
+- Customer/property contact and property note endpoints
 - Local development seed command
 
 The backend intentionally does not include:
 
 - Frontend implementation
-- Customer, project, calculation, payment, supplier, estimate, or other business modules
+- Project, room, calculation, payment, supplier, estimate, or other business modules
 - PDF generation
 - AI features
 - OpenAI, Anthropic, Gemini, LangChain, LlamaIndex, or other LLM/provider SDKs
@@ -89,6 +91,25 @@ Authentication endpoints:
 - `GET /api/v1/companies/me`
 - `GET /api/v1/subscription/me`
 
+Customer and property endpoints:
+
+- `POST /api/v1/customers`
+- `GET /api/v1/customers`
+- `GET /api/v1/customers/{customer_id}`
+- `PATCH /api/v1/customers/{customer_id}`
+- `POST /api/v1/customers/{customer_id}/archive`
+- `POST /api/v1/customers/{customer_id}/contacts`
+- `GET /api/v1/customers/{customer_id}/contacts`
+- `POST /api/v1/properties`
+- `GET /api/v1/properties`
+- `GET /api/v1/properties/{property_id}`
+- `PATCH /api/v1/properties/{property_id}`
+- `POST /api/v1/properties/{property_id}/archive`
+- `POST /api/v1/properties/{property_id}/contacts`
+- `GET /api/v1/properties/{property_id}/contacts`
+- `POST /api/v1/properties/{property_id}/notes`
+- `GET /api/v1/properties/{property_id}/notes`
+
 ## Run Tests
 
 ```bash
@@ -103,7 +124,8 @@ Alembic is configured for PostgreSQL.
 Current migration status:
 
 - Identity and tenant foundation tables exist.
-- No customer, project, calculation, payment, supplier, estimate, or PDF tables exist yet.
+- Customer and property tables exist.
+- No project, room, calculation, payment, supplier, estimate, or PDF tables exist yet.
 
 Migration commands:
 

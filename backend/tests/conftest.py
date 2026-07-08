@@ -119,6 +119,9 @@ def seeded_identity(db_session: Session) -> dict[str, str]:
         "owner_user_id": owner_user.id,
         "owner_email": owner_user.email,
         "owner_password": "correct-password",
+        "other_user_id": other_user.id,
+        "other_email": other_user.email,
+        "other_password": "other-password",
         "subscription_id": subscription.id,
     }
 

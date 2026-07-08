@@ -2,6 +2,9 @@
 
 ## 2026-07-08
 
+- Implemented Sprint 3 backend Customer and Property Engine.
+- Added company-scoped customer, customer contact, property, property contact, and property note models with Alembic migration.
+- Added tenant-isolated customer/property APIs with soft archive support and tests.
 - Implemented Sprint 2 backend identity and tenant foundation.
 - Added company, user, role, permission, subscription, feature flag, and audit log models with Alembic migration.
 - Added password hashing, JWT login, current user, current company, role/permission helpers, and current subscription endpoints.
