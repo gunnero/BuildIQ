@@ -23,6 +23,9 @@ class Settings(BaseSettings):
     api_v1_prefix: str = "/api/v1"
     database_url: str = "postgresql+psycopg://buildiq:buildiq@localhost:5432/buildiq"
     log_level: str = "INFO"
+    jwt_secret_key: str = "change-me-in-local-development-secret-key"
+    jwt_algorithm: str = "HS256"
+    access_token_expire_minutes: int = 60
 
 
 @lru_cache
