@@ -2,6 +2,8 @@
 
 ## 2026-07-08
 
+- Implemented Sprint 14 frontend authentication and dashboard wiring.
+- Connected the login flow to backend auth, added current user/company/subscription session hydration, global 401 token clearing, protected route loading states, real dashboard identity data, Macedonian first-step guidance, and frontend auth/dashboard tests.
 - Implemented Sprint 13 frontend foundation.
 - Added React, TypeScript, Vite, TailwindCSS, React Router, TanStack Query, React Hook Form, Zod, API client, auth token storage, protected route shell, Macedonian navigation, login page, empty states, frontend tests, and frontend README.
 - Implemented Sprint 12 backend stabilization and API contract.

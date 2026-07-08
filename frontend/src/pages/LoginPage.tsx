@@ -22,7 +22,7 @@ type LocationState = {
 };
 
 export function LoginPage() {
-  const { isAuthenticated, login } = useAuth();
+  const { isAuthenticated, isLoadingSession, login, sessionError } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const state = location.state as LocationState | null;
@@ -47,14 +47,25 @@ export function LoginPage() {
     },
   });
 
-  if (isAuthenticated) {
+  if (isAuthenticated && !isLoadingSession) {
     return <Navigate to={destination} replace />;
   }
 
+  if (isAuthenticated && isLoadingSession) {
+    return (
+      <main className="grid min-h-screen place-items-center bg-paper px-4 text-ink">
+        <p className="rounded-md border border-line bg-white px-4 py-3 text-sm font-semibold shadow-sm">
+          Се вчитува сесијата...
+        </p>
+      </main>
+    );
+  }
+
   const errorMessage =
-    loginMutation.error instanceof ApiError
-      ? loginMutation.error.message
+    loginMutation.error instanceof ApiError && loginMutation.error.status === 401
+      ? "Е-поштата или лозинката не се точни."
       : "Најавата не успеа. Проверете ги податоците и обидете се повторно.";
+  const visibleErrorMessage = loginMutation.isError ? errorMessage : sessionError;
 
   return (
     <main className="grid min-h-screen place-items-center bg-paper px-4 py-10 text-ink">
@@ -96,9 +107,9 @@ export function LoginPage() {
             {errors.password ? <p className="mt-2 text-sm text-red-700">{errors.password.message}</p> : null}
           </div>
 
-          {loginMutation.isError ? (
+          {visibleErrorMessage ? (
             <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
-              {errorMessage}
+              {visibleErrorMessage}
             </div>
           ) : null}
 

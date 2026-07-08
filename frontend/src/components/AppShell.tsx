@@ -14,6 +14,7 @@ import {
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../auth/useAuth";
+import { formatSubscriptionStatus } from "../utils/statusLabels";
 
 const navigationItems = [
   { to: "/dashboard", label: "Контролна табла", icon: LayoutDashboard },
@@ -29,8 +30,10 @@ const navigationItems = [
 ];
 
 export function AppShell() {
-  const { logout } = useAuth();
+  const { company, currentUser, logout, subscription } = useAuth();
   const navigate = useNavigate();
+  const companyName = company?.name ?? "BuildIQ";
+  const subscriptionLabel = formatSubscriptionStatus(subscription?.status);
 
   function handleLogout() {
     logout();
@@ -43,8 +46,8 @@ export function AppShell() {
         <aside className="border-b border-line bg-white lg:border-b-0 lg:border-r">
           <div className="flex min-h-16 items-center justify-between gap-4 border-b border-line px-5">
             <div>
-              <p className="text-lg font-bold tracking-normal">BuildIQ</p>
-              <p className="text-xs text-slate-500">Градежна платформа</p>
+              <p className="text-lg font-bold tracking-normal">{companyName}</p>
+              <p className="text-xs text-slate-500">BuildIQ</p>
             </div>
           </div>
           <nav aria-label="Главна навигација" className="grid gap-1 p-3">
@@ -74,8 +77,10 @@ export function AppShell() {
         <div className="flex min-w-0 flex-col">
           <header className="flex min-h-16 items-center justify-between gap-4 border-b border-line bg-white px-5">
             <div>
-              <p className="text-sm font-semibold text-slate-700">BuildIQ</p>
-              <p className="text-xs text-slate-500">Податоците и пресметките ги обезбедува серверот.</p>
+              <p className="text-sm font-semibold text-slate-700">{currentUser?.name ?? "Корисник"}</p>
+              <p className="text-xs text-slate-500">
+                {companyName} - Претплата: {subscriptionLabel}
+              </p>
             </div>
             <button
               type="button"

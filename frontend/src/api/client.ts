@@ -1,4 +1,4 @@
-import { getToken } from "../auth/tokenStorage";
+import { clearToken, getToken } from "../auth/tokenStorage";
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8000";
 
@@ -12,9 +12,15 @@ export class ApiError extends Error {
   }
 }
 
-type ApiRequestOptions = RequestInit & {
+export type ApiRequestOptions = RequestInit & {
   token?: string | null;
 };
+
+let unauthorizedHandler: (() => void) | null = null;
+
+export function setUnauthorizedHandler(handler: (() => void) | null): void {
+  unauthorizedHandler = handler;
+}
 
 function buildUrl(path: string): string {
   const normalizedBaseUrl = API_BASE_URL.replace(/\/$/, "");
@@ -27,6 +33,10 @@ function resolveErrorMessage(payload: unknown): string {
     const detail = (payload as { detail?: unknown }).detail;
     if (typeof detail === "string") {
       return detail;
+    }
+
+    if (Array.isArray(detail)) {
+      return "Проверете ги внесените податоци.";
     }
   }
 
@@ -53,6 +63,11 @@ export async function apiRequest<T>(path: string, options: ApiRequestOptions = {
   const payload = response.status === 204 ? null : await response.json().catch(() => null);
 
   if (!response.ok) {
+    if (response.status === 401) {
+      clearToken();
+      unauthorizedHandler?.();
+    }
+
     throw new ApiError(resolveErrorMessage(payload), response.status);
   }
 
