@@ -2,6 +2,9 @@
 
 ## 2026-07-08
 
+- Implemented Sprint 11 backend Payment and Expense Engine.
+- Added company-scoped payment, payment allocation, expense category, and expense models with Alembic migration.
+- Added tenant-isolated payment/expense APIs, reversal/archive endpoints, positive amount validation, project agreed-price fallback, and backend-owned project financial summaries.
 - Implemented Sprint 10 backend Estimate Engine.
 - Added company-scoped estimate, estimate revision, and estimate item models with Alembic migration.
 - Added tenant-isolated estimate APIs, backend-owned revision totals, status and archive endpoints, immutable sent/accepted revisions, and estimate creation from completed calculation runs.

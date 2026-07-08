@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Date, DateTime, ForeignKey, String, Text
+from sqlalchemy import Column, Date, DateTime, Float, ForeignKey, String, Text
 from sqlalchemy.orm import relationship
 
 from app.db.base import Base
@@ -15,6 +15,7 @@ class Project(IdMixin, TimestampMixin, Base):
     description = Column(Text, nullable=True)
     address = Column(String(500), nullable=True)
     status = Column(String(50), nullable=False, default="draft")
+    agreed_project_price = Column(Float, nullable=True)
     start_date = Column(Date, nullable=True)
     due_date = Column(Date, nullable=True)
     archived_at = Column(DateTime(timezone=True), nullable=True)

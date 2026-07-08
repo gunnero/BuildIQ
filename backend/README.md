@@ -35,12 +35,14 @@ The backend currently includes:
 - Supplier, supplier contact, supplier agreement, price book, price book item, project price override, and resolved price endpoints
 - Estimate engine
 - Estimate, estimate revision, estimate item, status, archive, and from-calculation endpoints
+- Payment and expense engine
+- Payment, payment allocation, expense category, expense, reversal, archive, and project financial summary endpoints
 - Local development seed command
 
 The backend intentionally does not include:
 
 - Frontend implementation
-- Tiles, knauf, flooring, concrete, facade, payment, expense, or other business modules
+- Tiles, knauf, flooring, concrete, facade, or other business modules
 - Online payments or payment provider integrations
 - PDF generation
 - AI features
@@ -263,6 +265,26 @@ Estimate endpoints:
 
 Estimate revision totals are calculated by the backend from active items. Sent and accepted revisions are immutable; changes after those statuses require a new revision workflow in a later sprint.
 
+Payment and expense endpoints:
+
+- `POST /api/v1/payments`
+- `GET /api/v1/payments`
+- `GET /api/v1/payments/{payment_id}`
+- `POST /api/v1/payments/{payment_id}/reverse`
+- `POST /api/v1/payments/{payment_id}/archive`
+- `GET /api/v1/projects/{project_id}/financial-summary`
+- `POST /api/v1/expense-categories`
+- `GET /api/v1/expense-categories`
+- `PATCH /api/v1/expense-categories/{category_id}`
+- `POST /api/v1/expense-categories/{category_id}/archive`
+- `POST /api/v1/expenses`
+- `GET /api/v1/expenses`
+- `GET /api/v1/expenses/{expense_id}`
+- `POST /api/v1/expenses/{expense_id}/reverse`
+- `POST /api/v1/expenses/{expense_id}/archive`
+
+Payments and expenses preserve financial history. Payments are append-only after creation except reversal/archive status changes. Project financial summaries are calculated by the backend from accepted estimate totals, agreed project price, received/pending/reversed payments, and recorded/reversed expenses.
+
 ## Run Tests
 
 ```bash
@@ -285,7 +307,8 @@ Current migration status:
 - Material catalog and material consumption rule tables exist.
 - Procurement tables exist.
 - Estimate tables exist.
-- No tiles, knauf, flooring, concrete, facade, payment, expense, online payment, or PDF tables exist yet.
+- Payment and expense tables exist.
+- No tiles, knauf, flooring, concrete, facade, online payment, or PDF tables exist yet.
 
 Migration commands:
 

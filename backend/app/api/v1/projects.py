@@ -43,6 +43,7 @@ def project_response(project: Project) -> ProjectResponse:
         description=project.description,
         address=project.address,
         status=project.status,
+        agreed_project_price=project.agreed_project_price,
         start_date=project.start_date,
         due_date=project.due_date,
         archived_at=project.archived_at,
@@ -109,6 +110,7 @@ def create_project(
         name=payload.name,
         description=payload.description,
         address=payload.address,
+        agreed_project_price=payload.agreed_project_price,
         start_date=payload.start_date,
         due_date=payload.due_date,
     )

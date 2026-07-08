@@ -5,6 +5,7 @@ from app.api.v1.calculations import router as calculations_router
 from app.api.v1.companies import router as companies_router
 from app.api.v1.customers import router as customers_router
 from app.api.v1.estimates import router as estimates_router
+from app.api.v1.financial import router as financial_router
 from app.api.v1.health import router as health_router
 from app.api.v1.materials import router as materials_router
 from app.api.v1.measurements import router as measurements_router
@@ -21,6 +22,7 @@ api_router.include_router(calculations_router)
 api_router.include_router(companies_router)
 api_router.include_router(customers_router)
 api_router.include_router(estimates_router)
+api_router.include_router(financial_router)
 api_router.include_router(health_router)
 api_router.include_router(materials_router)
 api_router.include_router(measurements_router)

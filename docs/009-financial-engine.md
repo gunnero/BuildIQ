@@ -28,7 +28,7 @@ Formula:
 Allowed values:
 
 - `cash`
-- `bank`
+- `bank_transfer`
 - `card`
 - `other`
 
@@ -36,10 +36,20 @@ Allowed values:
 
 Allowed values:
 
+- `received`
+- `pending`
+- `reversed`
+- `archived`
+
+## Project Financial Summary Payment Statuses
+
+Allowed values:
+
 - `unpaid`
 - `partially_paid`
 - `paid`
-- `overdue`
+- `overpaid`
+- `unknown`
 
 ## Payment History
 
@@ -119,7 +129,27 @@ Sprint 10 implements the backend Estimate Engine foundation:
 - Estimate creation from completed calculation runs by copying calculation line items into historical estimate items.
 - Archive endpoints instead of hard deletes.
 
-Sprint 10 does not implement payments, expenses, invoices, online payments, PDF generation, or project agreed-price updates. Those remain later Financial and Document Engine work.
+At the end of Sprint 10, payments, expenses, invoices, online payments, PDF generation, and project agreed-price updates were still future Financial and Document Engine work.
+
+## Payment and Expense Implementation Status
+
+Sprint 11 implements the backend Payment and Expense Engine foundation:
+
+- Company-scoped payments, payment allocations, expense categories, and expenses.
+- Payment methods: `cash`, `bank_transfer`, `card`, and `other`.
+- Payment statuses: `received`, `pending`, `reversed`, and `archived`.
+- Expense statuses: `recorded`, `reimbursed`, `reversed`, and `archived`.
+- Positive amount validation for payments, allocations, and expenses.
+- Append-only payment records after creation, with reversal and archive endpoints.
+- Expense reversal and archive endpoints instead of hard delete.
+- Project financial summaries using accepted estimate total first, then agreed project price, then unknown revenue basis.
+- Summary totals for received, pending, and reversed payments.
+- Summary totals for recorded and reversed expenses.
+- Backend-calculated outstanding balance, estimated profit, and project payment status.
+
+Sprint 11 also adds a nullable `agreed_project_price` field to projects so financial summaries can fall back to an agreed price when no accepted estimate exists.
+
+Sprint 11 does not implement invoices, online payments, PDF generation, or payment provider integrations.
 
 ## Voiding Rules
 

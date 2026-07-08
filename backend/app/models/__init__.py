@@ -12,6 +12,7 @@ from app.models.customer import (
     PropertyNote,
 )
 from app.models.estimate import Estimate, EstimateItem, EstimateRevision
+from app.models.financial import Expense, ExpenseCategory, Payment, PaymentAllocation
 from app.models.identity import Company, Permission, Role, RolePermission, User, UserRole
 from app.models.kernel import AuditLog, FeatureFlag
 from app.models.material import (
@@ -50,6 +51,8 @@ __all__ = [
     "Estimate",
     "EstimateItem",
     "EstimateRevision",
+    "Expense",
+    "ExpenseCategory",
     "FeatureFlag",
     "Material",
     "MaterialCategory",
@@ -59,6 +62,8 @@ __all__ = [
     "MeasurementItem",
     "MeasurementSet",
     "Permission",
+    "Payment",
+    "PaymentAllocation",
     "PriceBook",
     "PriceBookItem",
     "Project",

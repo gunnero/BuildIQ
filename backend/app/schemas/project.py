@@ -10,6 +10,7 @@ class ProjectCreate(BaseModel):
     name: str
     description: Optional[str] = None
     address: Optional[str] = None
+    agreed_project_price: Optional[float] = None
     start_date: Optional[date] = None
     due_date: Optional[date] = None
 
@@ -18,6 +19,7 @@ class ProjectUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
     address: Optional[str] = None
+    agreed_project_price: Optional[float] = None
     start_date: Optional[date] = None
     due_date: Optional[date] = None
 
@@ -36,6 +38,7 @@ class ProjectResponse(BaseModel):
     description: Optional[str]
     address: Optional[str]
     status: str
+    agreed_project_price: Optional[float]
     start_date: Optional[date]
     due_date: Optional[date]
     archived_at: Optional[datetime]
