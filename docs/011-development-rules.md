@@ -4,13 +4,13 @@
 
 BuildIQ V1 is standalone.
 
-BuildIQ is not OneFiveFour OS.
+BuildIQ is not Kalveri OS.
 
 V1 must not include AI features.
 
 ## AI Boundary
 
-BuildIQ must never call LLM providers directly.
+BuildIQ must never call OpenAI, Anthropic, Gemini, or any LLM provider directly. Future AI features must integrate only through Kalveri OS.
 
 Do not add:
 
@@ -23,7 +23,7 @@ Do not add:
 - AI chat features
 - AI estimate generation
 
-Future AI features must send work requests to OneFiveFour OS.
+Future AI features must send work requests only to Kalveri OS.
 
 ## Language Rules
 

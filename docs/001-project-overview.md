@@ -8,7 +8,7 @@ The product helps construction teams and small contractors move from room measur
 
 ## V1 Product Position
 
-BuildIQ V1 is standalone. It is not OneFiveFour OS and must not depend on OneFiveFour OS for core construction workflows.
+BuildIQ V1 is standalone. It is not Kalveri OS and must not depend on Kalveri OS for core construction workflows.
 
 V1 includes no AI features.
 
@@ -46,7 +46,7 @@ V1 includes no AI features.
 
 - AI assistants
 - Direct OpenAI, Anthropic, Gemini, or other provider integration
-- Multi-product OneFiveFour OS architecture
+- Multi-product Kalveri OS architecture
 - Complex enterprise procurement
 - Payroll
 - Inventory warehouse management

@@ -4,7 +4,7 @@ BuildIQ V1 must not include AI features.
 
 ## Rule
 
-BuildIQ must never call LLM providers directly.
+BuildIQ must never call OpenAI, Anthropic, Gemini, or any LLM provider directly. Future AI features must integrate only through Kalveri OS.
 
 Direct integration with the following is prohibited:
 
@@ -16,9 +16,9 @@ Direct integration with the following is prohibited:
 
 ## Future Integration Direction
 
-When AI features are introduced later, BuildIQ will send work requests to OneFiveFour OS.
+When AI features are introduced later, BuildIQ will send work requests only to Kalveri OS.
 
-OneFiveFour OS owns:
+Kalveri OS owns:
 
 - AI Employees
 - Knowledge
@@ -64,9 +64,9 @@ BuildIQ owns:
 Future AI requests must use a product boundary similar to this:
 
 1. BuildIQ creates a construction-domain request.
-2. BuildIQ sends the request to OneFiveFour OS.
-3. OneFiveFour OS chooses the AI Employee, Brain, Knowledge, Provider, Assignment, Brain Session, and Brain Response.
-4. OneFiveFour OS returns a response to BuildIQ.
+2. BuildIQ sends the request to Kalveri OS.
+3. Kalveri OS chooses the AI Employee, Brain, Knowledge, Provider, Assignment, Brain Session, and Brain Response.
+4. Kalveri OS returns a response to BuildIQ.
 5. BuildIQ stores only the construction-domain result needed by BuildIQ workflows.
 
 Provider details must not leak into BuildIQ.

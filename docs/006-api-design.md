@@ -122,4 +122,4 @@ Request and response field names are English. User-facing validation messages re
 
 ## AI Boundary
 
-No API route may call an LLM provider directly. V1 has no AI routes.
+BuildIQ must never call OpenAI, Anthropic, Gemini, or any LLM provider directly. Future AI features must integrate only through Kalveri OS. V1 has no AI routes.

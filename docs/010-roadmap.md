@@ -51,8 +51,8 @@ BuildIQ V1 is a standalone construction calculator and project/payment managemen
 - Generate Macedonian PDF offers/quotes.
 - Include company, customer, project, room, material, labor, total, payment, and note details.
 
-## Post-V1: OneFiveFour OS Integration
+## Post-V1: Kalveri OS Integration
 
-Future AI features must integrate through OneFiveFour OS.
+Future AI features must integrate only through Kalveri OS.
 
-BuildIQ must not integrate directly with OpenAI, Anthropic, Gemini, or any other LLM provider.
+BuildIQ must never call OpenAI, Anthropic, Gemini, or any LLM provider directly.

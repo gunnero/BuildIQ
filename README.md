@@ -40,6 +40,8 @@ Frontend stack planned for V1:
 
 V1 is a standalone product. It includes no AI features.
 
+BuildIQ Blueprint v1.0 is the implementation contract for the first backend and frontend build. Start with [docs/000-buildiq-constitution.md](docs/000-buildiq-constitution.md), then follow the domain, database, business rule, engine, API, UI, security, and backlog documents in `docs/`.
+
 V1 modules:
 
 1. Authentication
@@ -78,7 +80,7 @@ Core V1 workflow:
 
 BuildIQ V1 has no AI.
 
-BuildIQ must never call OpenAI, Anthropic, Gemini, or any other LLM provider directly. Future AI features must integrate through OneFiveFour OS. OneFiveFour OS owns AI Employees, Knowledge, Brains, Providers, Assignments, Brain Sessions, and Brain Responses.
+BuildIQ must never call OpenAI, Anthropic, Gemini, or any LLM provider directly. Future AI features must integrate only through Kalveri OS. Kalveri OS owns AI Employees, Knowledge, Brains, Providers, Assignments, Brain Sessions, and Brain Responses.
 
 BuildIQ owns construction workflows, calculations, customers, projects, payments, expenses, reports, and PDFs.
 
@@ -94,6 +96,31 @@ BuildIQ owns construction workflows, calculations, customers, projects, payments
 - V1 must remain standalone.
 - V1 must not include AI features.
 - BuildIQ must not include direct LLM provider SDKs, API keys, prompts, or provider-specific integrations.
+- Backend owns all business logic.
+- Frontend must never calculate construction quantities or prices.
+- All customer-owned data must be company-scoped with `company_id`.
+- Important business data must not be hard-deleted.
+- Estimates, price books, supplier agreements, and financial records must preserve history.
 - Construction calculations must be deterministic and auditable.
 - Payment tracking must store agreed project price, total paid, remaining amount, payment history, payment date, payment method, payment note, and payment status.
 - Backend and frontend implementation will be added after this documentation scaffold.
+
+## BuildIQ Blueprint v1.0
+
+Blueprint documents:
+
+- [BuildIQ Constitution](docs/000-buildiq-constitution.md)
+- [Domain Model](docs/003-domain-model.md)
+- [Entity Relationships](docs/004-entity-relationships.md)
+- [Database Blueprint](docs/005-database-blueprint.md)
+- [Business Rules](docs/006-business-rules.md)
+- [Calculation Engine Framework](docs/007-calculation-engine-framework.md)
+- [Procurement Engine](docs/008-procurement-engine.md)
+- [Financial Engine](docs/009-financial-engine.md)
+- [Subscription Engine](docs/010-subscription-engine.md)
+- [BuildIQ HQ](docs/011-buildiq-hq.md)
+- [API Principles](docs/012-api-principles.md)
+- [UI Specification](docs/013-ui-specification.md)
+- [Security](docs/014-security.md)
+- [Development Standards](docs/015-development-standards.md)
+- [Product Backlog](docs/018-product-backlog.md)

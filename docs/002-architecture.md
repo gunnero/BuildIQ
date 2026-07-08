@@ -57,7 +57,7 @@ BuildIQ owns:
 - Reports
 - PDFs
 
-OneFiveFour OS owns future AI capabilities:
+Kalveri OS owns future AI capabilities:
 
 - AI Employees
 - Knowledge
@@ -81,4 +81,4 @@ V1 uses JWT authentication. Users belong to companies. Access control must preve
 
 ## AI Boundary
 
-V1 has no AI. Future AI work requests must be sent to OneFiveFour OS instead of any LLM provider.
+BuildIQ must never call OpenAI, Anthropic, Gemini, or any LLM provider directly. Future AI features must integrate only through Kalveri OS.
