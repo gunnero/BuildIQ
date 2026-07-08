@@ -24,6 +24,7 @@ class Customer(IdMixin, TimestampMixin, Base):
         cascade="all, delete-orphan",
     )
     properties = relationship("Property", back_populates="customer")
+    projects = relationship("Project", back_populates="customer")
 
 
 class CustomerContact(IdMixin, TimestampMixin, Base):
@@ -66,6 +67,7 @@ class Property(IdMixin, TimestampMixin, Base):
         back_populates="property",
         cascade="all, delete-orphan",
     )
+    projects = relationship("Project", back_populates="property")
 
 
 class PropertyContact(IdMixin, TimestampMixin, Base):

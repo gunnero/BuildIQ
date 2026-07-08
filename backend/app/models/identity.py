@@ -21,6 +21,7 @@ class Company(IdMixin, TimestampMixin, Base):
     subscriptions = relationship("Subscription", back_populates="company")
     customers = relationship("Customer", back_populates="company")
     properties = relationship("Property", back_populates="company")
+    projects = relationship("Project", back_populates="company")
 
 
 class User(IdMixin, TimestampMixin, Base):

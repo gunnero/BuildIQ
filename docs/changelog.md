@@ -2,6 +2,9 @@
 
 ## 2026-07-08
 
+- Implemented Sprint 4 backend Project and Task Engine.
+- Added company-scoped project, project task, project status history, and project timeline event models with Alembic migration.
+- Added tenant-isolated project/task APIs with archive endpoints, project status history, project timeline events, and tests.
 - Implemented Sprint 3 backend Customer and Property Engine.
 - Added company-scoped customer, customer contact, property, property contact, and property note models with Alembic migration.
 - Added tenant-isolated customer/property APIs with soft archive support and tests.

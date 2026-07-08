@@ -22,12 +22,14 @@ The backend currently includes:
 - Company subscription read model
 - Customer and property engine
 - Customer/property contact and property note endpoints
+- Project and task engine
+- Project status history and timeline event endpoints
 - Local development seed command
 
 The backend intentionally does not include:
 
 - Frontend implementation
-- Project, room, calculation, payment, supplier, estimate, or other business modules
+- Room, measurement, calculation, payment, supplier, estimate, or other business modules
 - PDF generation
 - AI features
 - OpenAI, Anthropic, Gemini, LangChain, LlamaIndex, or other LLM/provider SDKs
@@ -110,6 +112,23 @@ Customer and property endpoints:
 - `POST /api/v1/properties/{property_id}/notes`
 - `GET /api/v1/properties/{property_id}/notes`
 
+Project and task endpoints:
+
+- `POST /api/v1/projects`
+- `GET /api/v1/projects`
+- `GET /api/v1/projects/{project_id}`
+- `PATCH /api/v1/projects/{project_id}`
+- `POST /api/v1/projects/{project_id}/archive`
+- `POST /api/v1/projects/{project_id}/status`
+- `GET /api/v1/projects/{project_id}/status-history`
+- `GET /api/v1/projects/{project_id}/timeline`
+- `POST /api/v1/projects/{project_id}/tasks`
+- `GET /api/v1/projects/{project_id}/tasks`
+- `GET /api/v1/tasks/{task_id}`
+- `PATCH /api/v1/tasks/{task_id}`
+- `POST /api/v1/tasks/{task_id}/archive`
+- `POST /api/v1/tasks/{task_id}/status`
+
 ## Run Tests
 
 ```bash
@@ -125,7 +144,8 @@ Current migration status:
 
 - Identity and tenant foundation tables exist.
 - Customer and property tables exist.
-- No project, room, calculation, payment, supplier, estimate, or PDF tables exist yet.
+- Project and task tables exist.
+- No room, measurement, calculation, payment, supplier, estimate, or PDF tables exist yet.
 
 Migration commands:
 
