@@ -33,12 +33,14 @@ The backend currently includes:
 - Material category, manufacturer, unit, material, and consumption rule endpoints
 - Procurement engine
 - Supplier, supplier contact, supplier agreement, price book, price book item, project price override, and resolved price endpoints
+- Estimate engine
+- Estimate, estimate revision, estimate item, status, archive, and from-calculation endpoints
 - Local development seed command
 
 The backend intentionally does not include:
 
 - Frontend implementation
-- Tiles, knauf, flooring, concrete, facade, payment, estimate, expense, or other business modules
+- Tiles, knauf, flooring, concrete, facade, payment, expense, or other business modules
 - Online payments or payment provider integrations
 - PDF generation
 - AI features
@@ -243,6 +245,24 @@ Procurement endpoints:
 - `GET /api/v1/materials/{material_id}/resolved-price`
 - `GET /api/v1/projects/{project_id}/materials/{material_id}/resolved-price`
 
+Estimate endpoints:
+
+- `POST /api/v1/estimates`
+- `GET /api/v1/estimates`
+- `GET /api/v1/estimates/{estimate_id}`
+- `PATCH /api/v1/estimates/{estimate_id}`
+- `POST /api/v1/estimates/{estimate_id}/archive`
+- `POST /api/v1/estimates/{estimate_id}/status`
+- `POST /api/v1/estimates/from-calculation/{calculation_run_id}`
+- `GET /api/v1/estimates/{estimate_id}/revisions`
+- `GET /api/v1/estimate-revisions/{revision_id}`
+- `POST /api/v1/estimate-revisions/{revision_id}/items`
+- `GET /api/v1/estimate-revisions/{revision_id}/items`
+- `PATCH /api/v1/estimate-items/{item_id}`
+- `POST /api/v1/estimate-items/{item_id}/archive`
+
+Estimate revision totals are calculated by the backend from active items. Sent and accepted revisions are immutable; changes after those statuses require a new revision workflow in a later sprint.
+
 ## Run Tests
 
 ```bash
@@ -264,7 +284,8 @@ Current migration status:
 - Painting calculation engine is implemented.
 - Material catalog and material consumption rule tables exist.
 - Procurement tables exist.
-- No tiles, knauf, flooring, concrete, facade, payment, expense, estimate, online payment, or PDF tables exist yet.
+- Estimate tables exist.
+- No tiles, knauf, flooring, concrete, facade, payment, expense, online payment, or PDF tables exist yet.
 
 Migration commands:
 

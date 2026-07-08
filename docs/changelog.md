@@ -2,6 +2,9 @@
 
 ## 2026-07-08
 
+- Implemented Sprint 10 backend Estimate Engine.
+- Added company-scoped estimate, estimate revision, and estimate item models with Alembic migration.
+- Added tenant-isolated estimate APIs, backend-owned revision totals, status and archive endpoints, immutable sent/accepted revisions, and estimate creation from completed calculation runs.
 - Implemented Sprint 9 backend Painting Engine.
 - Added deterministic room/measurement-set area sourcing, paint/primer quantity formulas, material coverage validation, procurement price resolution, labor cost calculation, and painting line items.
 - Updated calculation engine registry so painting is implemented while tiles, knauf, flooring, concrete, and facade remain placeholders.

@@ -11,6 +11,7 @@ from app.models.customer import (
     PropertyContact,
     PropertyNote,
 )
+from app.models.estimate import Estimate, EstimateItem, EstimateRevision
 from app.models.identity import Company, Permission, Role, RolePermission, User, UserRole
 from app.models.kernel import AuditLog, FeatureFlag
 from app.models.material import (
@@ -46,6 +47,9 @@ __all__ = [
     "Company",
     "Customer",
     "CustomerContact",
+    "Estimate",
+    "EstimateItem",
+    "EstimateRevision",
     "FeatureFlag",
     "Material",
     "MaterialCategory",

@@ -107,6 +107,20 @@ When a customer accepts an estimate revision, the backend may set the project ag
 
 The project must preserve a reference to the accepted estimate revision.
 
+## Estimate Engine Implementation Status
+
+Sprint 10 implements the backend Estimate Engine foundation:
+
+- Company-scoped estimates, estimate revisions, and estimate items.
+- Manual estimate creation for active company projects.
+- Backend-calculated revision totals from active estimate items.
+- Estimate status transitions for `draft`, `sent`, `accepted`, `rejected`, and `archived`.
+- Immutable sent and accepted revisions.
+- Estimate creation from completed calculation runs by copying calculation line items into historical estimate items.
+- Archive endpoints instead of hard deletes.
+
+Sprint 10 does not implement payments, expenses, invoices, online payments, PDF generation, or project agreed-price updates. Those remain later Financial and Document Engine work.
+
 ## Voiding Rules
 
 Payments and expenses may be voided with a reason.
