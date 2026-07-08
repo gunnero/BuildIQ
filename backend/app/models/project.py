@@ -25,6 +25,8 @@ class Project(IdMixin, TimestampMixin, Base):
     tasks = relationship("ProjectTask", back_populates="project")
     status_history = relationship("ProjectStatusHistory", back_populates="project")
     timeline_events = relationship("ProjectTimelineEvent", back_populates="project")
+    rooms = relationship("Room", back_populates="project")
+    measurement_sets = relationship("MeasurementSet", back_populates="project")
 
 
 class ProjectTask(IdMixin, TimestampMixin, Base):
@@ -42,6 +44,8 @@ class ProjectTask(IdMixin, TimestampMixin, Base):
 
     project = relationship("Project", back_populates="tasks")
     assigned_user = relationship("User")
+    rooms = relationship("Room", back_populates="project_task")
+    measurement_sets = relationship("MeasurementSet", back_populates="project_task")
 
 
 class ProjectStatusHistory(IdMixin, Base):

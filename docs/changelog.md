@@ -2,6 +2,9 @@
 
 ## 2026-07-08
 
+- Implemented Sprint 5 backend Room and Measurement Engine.
+- Added company-scoped room, room opening, measurement set, and measurement item models with Alembic migration.
+- Added tenant-isolated room/opening/measurement APIs, backend-owned room area calculations, archive endpoints, and tests.
 - Implemented Sprint 4 backend Project and Task Engine.
 - Added company-scoped project, project task, project status history, and project timeline event models with Alembic migration.
 - Added tenant-isolated project/task APIs with archive endpoints, project status history, project timeline events, and tests.

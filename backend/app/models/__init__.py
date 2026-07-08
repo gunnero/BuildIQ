@@ -7,6 +7,7 @@ from app.models.customer import (
 )
 from app.models.identity import Company, Permission, Role, RolePermission, User, UserRole
 from app.models.kernel import AuditLog, FeatureFlag
+from app.models.measurement import MeasurementItem, MeasurementSet, Room, RoomOpening
 from app.models.project import (
     Project,
     ProjectStatusHistory,
@@ -21,6 +22,8 @@ __all__ = [
     "Customer",
     "CustomerContact",
     "FeatureFlag",
+    "MeasurementItem",
+    "MeasurementSet",
     "Permission",
     "Project",
     "ProjectStatusHistory",
@@ -29,6 +32,8 @@ __all__ = [
     "Property",
     "PropertyContact",
     "PropertyNote",
+    "Room",
+    "RoomOpening",
     "Role",
     "RolePermission",
     "Subscription",

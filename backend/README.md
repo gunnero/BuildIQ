@@ -24,12 +24,14 @@ The backend currently includes:
 - Customer/property contact and property note endpoints
 - Project and task engine
 - Project status history and timeline event endpoints
+- Room and measurement engine
+- Room opening, measurement set, and measurement item endpoints
 - Local development seed command
 
 The backend intentionally does not include:
 
 - Frontend implementation
-- Room, measurement, calculation, payment, supplier, estimate, or other business modules
+- Calculation, payment, supplier, estimate, or other business modules
 - PDF generation
 - AI features
 - OpenAI, Anthropic, Gemini, LangChain, LlamaIndex, or other LLM/provider SDKs
@@ -129,6 +131,25 @@ Project and task endpoints:
 - `POST /api/v1/tasks/{task_id}/archive`
 - `POST /api/v1/tasks/{task_id}/status`
 
+Room and measurement endpoints:
+
+- `POST /api/v1/projects/{project_id}/rooms`
+- `GET /api/v1/projects/{project_id}/rooms`
+- `GET /api/v1/rooms/{room_id}`
+- `PATCH /api/v1/rooms/{room_id}`
+- `POST /api/v1/rooms/{room_id}/archive`
+- `POST /api/v1/rooms/{room_id}/openings`
+- `GET /api/v1/rooms/{room_id}/openings`
+- `PATCH /api/v1/openings/{opening_id}`
+- `POST /api/v1/openings/{opening_id}/archive`
+- `POST /api/v1/projects/{project_id}/measurement-sets`
+- `GET /api/v1/projects/{project_id}/measurement-sets`
+- `GET /api/v1/measurement-sets/{measurement_set_id}`
+- `POST /api/v1/measurement-sets/{measurement_set_id}/items`
+- `GET /api/v1/measurement-sets/{measurement_set_id}/items`
+- `PATCH /api/v1/measurement-items/{measurement_item_id}`
+- `POST /api/v1/measurement-items/{measurement_item_id}/archive`
+
 ## Run Tests
 
 ```bash
@@ -145,7 +166,8 @@ Current migration status:
 - Identity and tenant foundation tables exist.
 - Customer and property tables exist.
 - Project and task tables exist.
-- No room, measurement, calculation, payment, supplier, estimate, or PDF tables exist yet.
+- Room and measurement tables exist.
+- No calculation, payment, supplier, estimate, or PDF tables exist yet.
 
 Migration commands:
 
