@@ -7,6 +7,7 @@ import { AppShell } from "./components/AppShell";
 import { CustomersPage } from "./pages/CustomersPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { LoginPage } from "./pages/LoginPage";
+import { ProjectsPage } from "./pages/ProjectsPage";
 import { SectionPage } from "./pages/SectionPage";
 
 const queryClient = new QueryClient({
@@ -30,10 +31,7 @@ export function App() {
                 <Route index element={<Navigate to="/dashboard" replace />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/customers" element={<CustomersPage />} />
-                <Route
-                  path="/projects"
-                  element={<SectionPage title="Проекти" description="Овде ќе се прикажуваат проектите добиени од серверот." />}
-                />
+                <Route path="/projects" element={<ProjectsPage />} />
                 <Route
                   path="/materials"
                   element={<SectionPage title="Материјали" description="Овде ќе се прикажува каталогот на материјали од серверот." />}

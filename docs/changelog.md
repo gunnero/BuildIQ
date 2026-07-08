@@ -2,6 +2,8 @@
 
 ## 2026-07-08
 
+- Implemented Sprint 16 project, room, and measurement frontend.
+- Added backend-backed project list/create/detail/edit/archive views, project status badges, timeline/status history display, task create/edit/status/archive flows, room create/edit/archive flows, opening create/edit/archive flows, measurement set/item flows, typed project/room/measurement API helpers, Macedonian UI states, and frontend tests for project/room/measurement workflows.
 - Implemented Sprint 15 customer and property frontend.
 - Added backend-backed customer list/create/detail/edit/archive/contact flows, property list/create/detail/edit/archive/contact/note flows, typed customer/property API helpers, Macedonian customer/property UI states, and frontend tests for customer/property workflows.
 - Implemented Sprint 14 frontend authentication and dashboard wiring.

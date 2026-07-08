@@ -4,7 +4,7 @@ React, TypeScript, Vite, and TailwindCSS frontend for BuildIQ.
 
 ## Scope
 
-Sprint 15 wires the customer and property frontend to the backend customer/property endpoints:
+Sprint 16 wires the project, room, and measurement frontend to the backend project/task/room/measurement endpoints:
 
 - React app scaffold in `frontend/`
 - TailwindCSS styling
@@ -20,9 +20,15 @@ Sprint 15 wires the customer and property frontend to the backend customer/prope
 - Global 401 handling that clears the stored token
 - Customer list, create, detail, edit, archive, and contact creation from `/api/v1/customers`
 - Property list, create, detail, edit, archive, contact creation, and note creation from `/api/v1/properties`
+- Project list, create, detail, edit, archive, status badge, timeline, and status history from `/api/v1/projects`
+- Project task list, create, edit, status change, and archive actions from `/api/v1/projects/{project_id}/tasks` and `/api/v1/tasks`
+- Project room list, create, detail, edit, archive, and backend-computed room area display from `/api/v1/projects/{project_id}/rooms`
+- Room opening list, create, edit, and archive actions from `/api/v1/rooms/{room_id}/openings` and `/api/v1/openings`
+- Measurement set list, create, and detail display from `/api/v1/projects/{project_id}/measurement-sets`
+- Measurement item list, create, edit, and archive actions from `/api/v1/measurement-sets/{measurement_set_id}/items` and `/api/v1/measurement-items`
 - Macedonian layout, navigation, login page, and empty states
 
-The frontend does not calculate construction quantities, prices, payment statuses, outstanding balances, or business totals. Those values must come from backend API responses.
+The frontend does not calculate construction quantities, room areas, prices, payment statuses, outstanding balances, or business totals. Those values must come from backend API responses.
 
 ## Local Setup
 
@@ -70,6 +76,20 @@ The `/customers` route displays a backend-backed workspace for:
 - property list, creation linked to a customer, detail, editing, archive actions, property contacts, and property notes
 
 The page does not calculate quantities, prices, project totals, payment statuses, or derived business values.
+
+## Projects, Rooms, and Measurements
+
+The `/projects` route displays a backend-backed workspace ordered as:
+
+- overview
+- tasks
+- rooms
+- measurements
+- later placeholders for calculations, estimates, payments, photos, and documents
+
+The page supports project create/edit/archive, project status display, timeline and status history display, task create/edit/status/archive, room create/edit/archive, opening create/edit/archive, measurement set create/detail, and measurement item create/edit/archive.
+
+Room detail displays `floor_area`, `ceiling_area`, `wall_area_gross`, `wall_area_net`, and `total_paintable_area` returned by the backend. The frontend only formats those values for display.
 
 ## Authentication
 
