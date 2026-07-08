@@ -3,6 +3,16 @@ from typing import Any, Optional
 
 
 @dataclass(frozen=True)
+class CalculationExecutionContext:
+    db: Any
+    company_id: str
+    project_id: Optional[str] = None
+    project_task_id: Optional[str] = None
+    room_id: Optional[str] = None
+    measurement_set_id: Optional[str] = None
+
+
+@dataclass(frozen=True)
 class CalculationLineItemResult:
     name: str
     description: Optional[str] = None
@@ -27,7 +37,12 @@ class BaseCalculationEngine:
     def validate_input(self, input_payload: dict[str, Any]) -> dict[str, Any]:
         return input_payload
 
-    def execute(self, input_payload: dict[str, Any]) -> CalculationEngineResult:
+    def execute(
+        self,
+        input_payload: dict[str, Any],
+        context: Optional[CalculationExecutionContext] = None,
+    ) -> CalculationEngineResult:
+        _ = context
         validated_input = self.validate_input(input_payload)
         return CalculationEngineResult(
             status="failed",

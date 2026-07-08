@@ -28,6 +28,7 @@ The backend currently includes:
 - Room opening, measurement set, and measurement item endpoints
 - Calculation engine framework
 - Placeholder calculation engine registry and auditable calculation run endpoints
+- Painting calculation engine
 - Material engine
 - Material category, manufacturer, unit, material, and consumption rule endpoints
 - Procurement engine
@@ -37,7 +38,7 @@ The backend currently includes:
 The backend intentionally does not include:
 
 - Frontend implementation
-- Painting, tiles, knauf, flooring, concrete, facade, payment, estimate, expense, or other business modules
+- Tiles, knauf, flooring, concrete, facade, payment, estimate, expense, or other business modules
 - Online payments or payment provider integrations
 - PDF generation
 - AI features
@@ -165,6 +166,28 @@ Calculation framework endpoints:
 - `GET /api/v1/calculations/{calculation_run_id}`
 - `POST /api/v1/calculations/{calculation_run_id}/archive`
 
+Painting calculation example:
+
+```json
+{
+  "engine_type": "painting",
+  "project_id": "project-id",
+  "room_id": "room-id",
+  "input_payload": {
+    "include_ceiling": true,
+    "include_walls": true,
+    "coats": 2,
+    "primer_coats": 0,
+    "paint_material_id": "material-id",
+    "waste_percentage": 10,
+    "labor_rate_per_m2": 120,
+    "notes": "Interior repaint"
+  }
+}
+```
+
+Painting calculations use backend-computed room areas when `room_id` is provided. If no room is provided, a measurement set can provide `wall_area`, `ceiling_area`, or `paintable_area` measurement items in `m2`. Material costs use Procurement Engine price resolution when material IDs are supplied.
+
 Material endpoints:
 
 - `POST /api/v1/material-categories`
@@ -238,9 +261,10 @@ Current migration status:
 - Project and task tables exist.
 - Room and measurement tables exist.
 - Calculation framework tables exist.
+- Painting calculation engine is implemented.
 - Material catalog and material consumption rule tables exist.
 - Procurement tables exist.
-- No concrete calculator formulas, payment, expense, estimate, online payment, or PDF tables exist yet.
+- No tiles, knauf, flooring, concrete, facade, payment, expense, estimate, online payment, or PDF tables exist yet.
 
 Migration commands:
 

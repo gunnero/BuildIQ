@@ -4,6 +4,7 @@ from typing import Optional
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.calculations.base import CalculationExecutionContext
 from app.calculations.registry import calculation_engine_registry
 from app.models.calculation import (
     CalculationInput,
@@ -109,7 +110,17 @@ def execute_calculation_run(
         raise validation_error("Непознат тип на пресметка.")
 
     validate_calculation_links(db, company_id=company_id, payload=payload)
-    result = engine.execute(payload.input_payload)
+    result = engine.execute(
+        payload.input_payload,
+        context=CalculationExecutionContext(
+            db=db,
+            company_id=company_id,
+            project_id=payload.project_id,
+            project_task_id=payload.project_task_id,
+            room_id=payload.room_id,
+            measurement_set_id=payload.measurement_set_id,
+        ),
+    )
     validate_calculation_status(result.status)
 
     calculation_run = CalculationRun(

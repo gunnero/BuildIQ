@@ -53,7 +53,7 @@ def create_calculation_context(
     return project, task, room, measurement_set
 
 
-def test_engine_registry_lists_placeholder_engines(
+def test_engine_registry_lists_engines_with_painting_implemented(
     client: TestClient,
     seeded_identity: dict[str, str],
 ) -> None:
@@ -71,8 +71,17 @@ def test_engine_registry_lists_placeholder_engines(
         "concrete",
         "facade",
     }
-    assert all(engine["implemented"] is False for engine in engines)
-    assert all(engine["status"] == "placeholder" for engine in engines)
+    metadata = {engine["engine_type"]: engine for engine in engines}
+    assert metadata["painting"]["implemented"] is True
+    assert metadata["painting"]["status"] == "implemented"
+    assert all(
+        metadata[engine_type]["implemented"] is False
+        for engine_type in {"tiles", "knauf", "flooring", "concrete", "facade"}
+    )
+    assert all(
+        metadata[engine_type]["status"] == "placeholder"
+        for engine_type in {"tiles", "knauf", "flooring", "concrete", "facade"}
+    )
 
 
 def test_running_placeholder_engine_creates_failed_calculation_run_with_stored_input(
@@ -86,6 +95,7 @@ def test_running_placeholder_engine_creates_failed_calculation_run_with_stored_i
     created = run_calculation(
         client,
         headers,
+        engine_type="tiles",
         project_id=str(project["id"]),
         project_task_id=str(task["id"]),
         room_id=str(room["id"]),
@@ -94,7 +104,7 @@ def test_running_placeholder_engine_creates_failed_calculation_run_with_stored_i
     )
 
     assert created["company_id"] == seeded_identity["demo_company_id"]
-    assert created["engine_type"] == "painting"
+    assert created["engine_type"] == "tiles"
     assert created["engine_version"] == "placeholder-1"
     assert created["status"] == "failed"
     assert created["project_id"] == project["id"]

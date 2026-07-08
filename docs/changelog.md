@@ -2,6 +2,9 @@
 
 ## 2026-07-08
 
+- Implemented Sprint 9 backend Painting Engine.
+- Added deterministic room/measurement-set area sourcing, paint/primer quantity formulas, material coverage validation, procurement price resolution, labor cost calculation, and painting line items.
+- Updated calculation engine registry so painting is implemented while tiles, knauf, flooring, concrete, and facade remain placeholders.
 - Implemented Sprint 8 backend Procurement Engine.
 - Added company-scoped supplier, supplier contact, supplier agreement, price book, price book item, and project material price override models with Alembic migration.
 - Added tenant-isolated procurement APIs, archive endpoints, backend-owned price resolution priority, validity date handling, cross-company link validation, and tests.

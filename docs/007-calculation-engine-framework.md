@@ -40,20 +40,20 @@ Calculation outputs may include:
 
 ## Engine Framework
 
-The backend exposes a calculation engine framework before concrete formulas are implemented.
+The backend exposes a calculation engine framework for deterministic calculators.
 
-Sprint 6 registers placeholder engines only. Placeholder engines are deterministic and return a stored `engine_not_implemented` result instead of running construction formulas.
+Sprint 6 registered placeholder engines only. Sprint 9 implements the Painting Engine. Remaining placeholder engines are deterministic and return a stored `engine_not_implemented` result instead of running construction formulas.
 
 Registered engine types:
 
-- `painting`
-- `tiles`
-- `knauf`
-- `flooring`
-- `concrete`
-- `facade`
+- `painting` - implemented in Sprint 9
+- `tiles` - placeholder
+- `knauf` - placeholder
+- `flooring` - placeholder
+- `concrete` - placeholder
+- `facade` - placeholder
 
-Concrete formulas for these engines must be implemented in later calculator sprints.
+Concrete formulas for the remaining placeholder engines must be implemented in later calculator sprints.
 
 ## Calculation Run Statuses
 
@@ -89,27 +89,55 @@ New inputs must create a new calculation run. Existing calculation run inputs an
 
 ## Painting Calculator
 
-Common inputs:
+Implementation status: implemented in Sprint 9.
 
-- Room length
-- Room width
-- Room height
-- Opening area
-- Ceiling inclusion
-- Paint coverage
-- Primer coverage
-- Waste percentage
+Supported inputs:
 
-Common outputs:
+- `project_id`
+- Optional `project_task_id`
+- Optional `room_id`
+- Optional `measurement_set_id`
+- `include_ceiling`
+- `include_walls`
+- `coats`
+- `primer_coats`
+- Optional `paint_material_id`
+- Optional `primer_material_id`
+- Optional `waste_percentage`
+- Optional `labor_rate_per_m2`
+- Optional `notes`
 
-- Wall gross area
-- Wall net area
-- Ceiling area
-- Paint area
-- Paint liters
-- Primer liters
-- Labor quantity
-- Material list rows
+Area source priority:
+
+1. Backend-computed room values when `room_id` is provided.
+2. Measurement items named `wall_area`, `ceiling_area`, or `paintable_area` in `m2` when `measurement_set_id` is provided and no room is provided.
+
+Formula summary:
+
+- `selected_area_m2` is wall area, ceiling area, or both depending on inclusion flags.
+- Paint liters use selected area, coats, waste percentage, and material coverage in `m2/liter`.
+- Primer liters use selected area, primer coats, waste percentage, and primer material coverage in `m2/liter`.
+- Labor cost uses `selected_area_m2 * labor_rate_per_m2`.
+- Material costs use Procurement Engine resolved prices when material IDs are supplied.
+
+Stored outputs:
+
+- `selected_area_m2`
+- `wall_area_net_m2`
+- `ceiling_area_m2`
+- `coats`
+- `primer_coats`
+- `waste_percentage`
+- `paint_required_liters`
+- `primer_required_liters`
+- `paint_material_cost`
+- `primer_material_cost`
+- `labor_cost`
+- `total_cost`
+- `assumptions`
+- `warnings`
+
+Calculation line items are stored for paint material, primer material, and labor when those inputs are provided.
 
 ## Tile Calculator
 

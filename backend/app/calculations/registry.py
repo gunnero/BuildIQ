@@ -1,6 +1,7 @@
 from typing import Optional
 
 from app.calculations.base import BaseCalculationEngine
+from app.calculations.painting import PaintingCalculationEngine
 
 
 class PlaceholderCalculationEngine(BaseCalculationEngine):
@@ -23,9 +24,9 @@ class CalculationEngineRegistry:
 
 
 calculation_engine_registry = CalculationEngineRegistry()
+calculation_engine_registry.register(PaintingCalculationEngine())
 
 for registered_engine_type in (
-    "painting",
     "tiles",
     "knauf",
     "flooring",
