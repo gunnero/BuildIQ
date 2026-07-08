@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { App } from "./App";
@@ -49,6 +49,94 @@ const currentSubscription = {
   updated_at: now,
 };
 
+const customer = {
+  id: "customer-1",
+  company_id: "company-1",
+  name: "Ана Стојановска",
+  phone: "070111222",
+  email: "ana@example.com",
+  address: "Партизанска 10",
+  note: "Сака понуда по соби.",
+  status: "active",
+  archived_at: null,
+  created_at: now,
+  updated_at: now,
+};
+
+const createdCustomer = {
+  ...customer,
+  id: "customer-2",
+  name: "Петар Петров",
+  phone: "071333444",
+  email: null,
+  address: null,
+  note: null,
+};
+
+const customerContact = {
+  id: "customer-contact-1",
+  company_id: "company-1",
+  customer_id: "customer-1",
+  full_name: "Игор Стојановски",
+  phone: "075111222",
+  email: null,
+  role: "Сопруг",
+  note: null,
+  is_primary: true,
+  archived_at: null,
+  created_at: now,
+  updated_at: now,
+};
+
+const property = {
+  id: "property-1",
+  company_id: "company-1",
+  customer_id: "customer-1",
+  name: "Стан Центар",
+  address: "Македонија 12",
+  city: "Скопје",
+  note: "Трет кат.",
+  status: "active",
+  archived_at: null,
+  created_at: now,
+  updated_at: now,
+};
+
+const createdProperty = {
+  ...property,
+  id: "property-2",
+  name: "Куќа Кисела Вода",
+  address: "Народни херои 5",
+  city: "Скопје",
+  note: null,
+};
+
+const propertyContact = {
+  id: "property-contact-1",
+  company_id: "company-1",
+  property_id: "property-1",
+  full_name: "Марко Колев",
+  phone: "078555666",
+  email: null,
+  role: "Домар",
+  note: null,
+  is_primary: false,
+  archived_at: null,
+  created_at: now,
+  updated_at: now,
+};
+
+const propertyNote = {
+  id: "property-note-1",
+  company_id: "company-1",
+  property_id: "property-1",
+  content: "Потребна е проверка на влезната врата.",
+  created_by_user_id: "user-1",
+  archived_at: null,
+  created_at: now,
+  updated_at: now,
+};
+
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
@@ -74,6 +162,66 @@ function mockSessionFetch(token = "demo-token") {
     if (url.endsWith("/api/v1/subscription/me")) {
       expect(authorization).toBe(`Bearer ${token}`);
       return Promise.resolve(jsonResponse(currentSubscription));
+    }
+
+    return Promise.resolve(jsonResponse({ detail: "Not found" }, 404));
+  });
+}
+
+function mockCustomerPropertyFetch(token = "demo-token") {
+  return vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+    const url = String(input);
+    const method = init?.method ?? "GET";
+    const authorization = init?.headers instanceof Headers ? init.headers.get("Authorization") : null;
+
+    expect(authorization).toBe(`Bearer ${token}`);
+
+    if (url.endsWith("/api/v1/auth/me")) {
+      return Promise.resolve(jsonResponse(currentUser));
+    }
+
+    if (url.endsWith("/api/v1/companies/me")) {
+      return Promise.resolve(jsonResponse(currentCompany));
+    }
+
+    if (url.endsWith("/api/v1/subscription/me")) {
+      return Promise.resolve(jsonResponse(currentSubscription));
+    }
+
+    if (url.endsWith("/api/v1/customers") && method === "GET") {
+      return Promise.resolve(jsonResponse([customer]));
+    }
+
+    if (url.endsWith("/api/v1/customers") && method === "POST") {
+      return Promise.resolve(jsonResponse(createdCustomer, 201));
+    }
+
+    if (url.endsWith("/api/v1/customers/customer-1") && method === "GET") {
+      return Promise.resolve(jsonResponse(customer));
+    }
+
+    if (url.endsWith("/api/v1/customers/customer-1/contacts") && method === "GET") {
+      return Promise.resolve(jsonResponse([customerContact]));
+    }
+
+    if (url.endsWith("/api/v1/properties") && method === "GET") {
+      return Promise.resolve(jsonResponse([property]));
+    }
+
+    if (url.endsWith("/api/v1/properties") && method === "POST") {
+      return Promise.resolve(jsonResponse(createdProperty, 201));
+    }
+
+    if (url.endsWith("/api/v1/properties/property-1") && method === "GET") {
+      return Promise.resolve(jsonResponse(property));
+    }
+
+    if (url.endsWith("/api/v1/properties/property-1/contacts") && method === "GET") {
+      return Promise.resolve(jsonResponse([propertyContact]));
+    }
+
+    if (url.endsWith("/api/v1/properties/property-1/notes") && method === "GET") {
+      return Promise.resolve(jsonResponse([propertyNote]));
     }
 
     return Promise.resolve(jsonResponse({ detail: "Not found" }, 404));
@@ -169,5 +317,116 @@ describe("App", () => {
 
     await waitFor(() => expect(getToken()).toBeNull());
     expect(screen.getByRole("heading", { name: "Најава" })).toBeInTheDocument();
+  });
+
+  it("renders the customers workspace with Macedonian labels", async () => {
+    vi.stubGlobal("fetch", mockCustomerPropertyFetch());
+    saveToken("demo-token");
+    window.history.pushState(null, "", "/customers");
+
+    render(<App />);
+
+    expect(await screen.findByRole("heading", { name: "Клиенти" })).toBeInTheDocument();
+    expect(screen.getByLabelText("Име на клиент")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Додај клиент" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Објекти" })).toBeInTheDocument();
+    expect(screen.getByLabelText("Име на објект")).toBeInTheDocument();
+  });
+
+  it("calls the backend when creating a customer", async () => {
+    const fetchMock = mockCustomerPropertyFetch();
+    vi.stubGlobal("fetch", fetchMock);
+    saveToken("demo-token");
+    window.history.pushState(null, "", "/customers");
+
+    render(<App />);
+
+    fireEvent.change(await screen.findByLabelText("Име на клиент"), {
+      target: { value: "Петар Петров" },
+    });
+    fireEvent.change(screen.getByLabelText("Телефон на клиент"), {
+      target: { value: "071333444" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Додај клиент" }));
+
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        expect.stringContaining("/api/v1/customers"),
+        expect.objectContaining({
+          method: "POST",
+          body: JSON.stringify({
+            name: "Петар Петров",
+            phone: "071333444",
+            email: null,
+            address: null,
+            note: null,
+          }),
+        }),
+      ),
+    );
+  });
+
+  it("loads customer detail and contacts from the backend", async () => {
+    vi.stubGlobal("fetch", mockCustomerPropertyFetch());
+    saveToken("demo-token");
+    window.history.pushState(null, "", "/customers");
+
+    render(<App />);
+
+    const customersSection = await screen.findByRole("region", { name: "Клиенти" });
+    fireEvent.click(within(customersSection).getByRole("button", { name: /Ана Стојановска/ }));
+
+    expect(await screen.findByText("Партизанска 10")).toBeInTheDocument();
+    expect(screen.getAllByText("Сака понуда по соби.").length).toBeGreaterThan(0);
+    expect(screen.getByText("Игор Стојановски")).toBeInTheDocument();
+  });
+
+  it("loads the properties list from the backend", async () => {
+    vi.stubGlobal("fetch", mockCustomerPropertyFetch());
+    saveToken("demo-token");
+    window.history.pushState(null, "", "/customers");
+
+    render(<App />);
+
+    const propertiesSection = await screen.findByRole("region", { name: "Објекти" });
+
+    expect(within(propertiesSection).getByText("Стан Центар")).toBeInTheDocument();
+    expect(within(propertiesSection).getByText("Скопје")).toBeInTheDocument();
+  });
+
+  it("calls the backend when creating a property", async () => {
+    const fetchMock = mockCustomerPropertyFetch();
+    vi.stubGlobal("fetch", fetchMock);
+    saveToken("demo-token");
+    window.history.pushState(null, "", "/customers");
+
+    render(<App />);
+
+    fireEvent.change(await screen.findByLabelText("Клиент за објект"), {
+      target: { value: "customer-1" },
+    });
+    fireEvent.change(screen.getByLabelText("Име на објект"), {
+      target: { value: "Куќа Кисела Вода" },
+    });
+    fireEvent.change(screen.getByLabelText("Адреса на објект"), {
+      target: { value: "Народни херои 5" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Додај објект" }));
+
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        expect.stringContaining("/api/v1/properties"),
+        expect.objectContaining({
+          method: "POST",
+          body: JSON.stringify({
+            customer_id: "customer-1",
+            name: "Куќа Кисела Вода",
+            address: "Народни херои 5",
+            city: null,
+            note: null,
+          }),
+        }),
+      ),
+    );
   });
 });

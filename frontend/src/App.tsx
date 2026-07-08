@@ -4,6 +4,7 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./auth/AuthContext";
 import { ProtectedRoute } from "./auth/ProtectedRoute";
 import { AppShell } from "./components/AppShell";
+import { CustomersPage } from "./pages/CustomersPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { LoginPage } from "./pages/LoginPage";
 import { SectionPage } from "./pages/SectionPage";
@@ -28,10 +29,7 @@ export function App() {
               <Route element={<AppShell />}>
                 <Route index element={<Navigate to="/dashboard" replace />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
-                <Route
-                  path="/customers"
-                  element={<SectionPage title="Клиенти" description="Овде ќе се прикажуваат клиентите добиени од серверот." />}
-                />
+                <Route path="/customers" element={<CustomersPage />} />
                 <Route
                   path="/projects"
                   element={<SectionPage title="Проекти" description="Овде ќе се прикажуваат проектите добиени од серверот." />}
