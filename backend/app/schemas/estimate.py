@@ -106,3 +106,21 @@ class EstimateItemResponse(BaseModel):
     archived_at: Optional[datetime]
     created_at: datetime
     updated_at: datetime
+
+
+class EstimatePdfCreate(BaseModel):
+    revision_id: Optional[str] = None
+
+
+class EstimateDocumentResponse(BaseModel):
+    id: str
+    company_id: str
+    estimate_id: str
+    revision_id: str
+    document_type: str
+    file_path: str
+    generated_by_user_id: str
+    generated_at: datetime
+    archived_at: Optional[datetime]
+    created_at: datetime
+    updated_at: datetime

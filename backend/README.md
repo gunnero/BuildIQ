@@ -35,6 +35,8 @@ The backend currently includes:
 - Supplier, supplier contact, supplier agreement, price book, price book item, project price override, and resolved price endpoints
 - Estimate engine
 - Estimate, estimate revision, estimate item, status, archive, and from-calculation endpoints
+- Estimate PDF quote backend
+- Macedonian PDF offer generation, estimate document metadata, and PDF download endpoints
 - Payment and expense engine
 - Payment, payment allocation, expense category, expense, reversal, archive, and project financial summary endpoints
 - Backend API contract stabilization
@@ -47,7 +49,6 @@ The backend intentionally does not include:
 - Frontend implementation
 - Tiles, knauf, flooring, concrete, facade, or other business modules
 - Online payments or payment provider integrations
-- PDF generation
 - AI features
 - OpenAI, Anthropic, Gemini, LangChain, LlamaIndex, or other LLM/provider SDKs
 
@@ -64,6 +65,8 @@ python3 -m venv .venv
 cp .env.example .env
 docker compose up -d postgres
 ```
+
+Generated documents are stored under `BUILDIQ_STORAGE_PATH`, which defaults to the repository `storage/` directory.
 
 Create and migrate the database:
 
@@ -279,14 +282,19 @@ Estimate endpoints:
 - `POST /api/v1/estimates/{estimate_id}/archive`
 - `POST /api/v1/estimates/{estimate_id}/status`
 - `POST /api/v1/estimates/from-calculation/{calculation_run_id}`
+- `POST /api/v1/estimates/{estimate_id}/pdf`
 - `GET /api/v1/estimates/{estimate_id}/revisions`
 - `GET /api/v1/estimate-revisions/{revision_id}`
 - `POST /api/v1/estimate-revisions/{revision_id}/items`
 - `GET /api/v1/estimate-revisions/{revision_id}/items`
 - `PATCH /api/v1/estimate-items/{item_id}`
 - `POST /api/v1/estimate-items/{item_id}/archive`
+- `GET /api/v1/estimate-documents/{document_id}`
+- `GET /api/v1/estimate-documents/{document_id}/download`
 
 Estimate revision totals are calculated by the backend from active items. Sent and accepted revisions are immutable; changes after those statuses require a new revision workflow in a later sprint.
+
+Estimate PDFs are generated in Macedonian from stored estimate and selected revision data. The PDF renderer formats backend-owned totals and does not recalculate estimate totals.
 
 Payment and expense endpoints:
 
@@ -330,9 +338,10 @@ Current migration status:
 - Material catalog and material consumption rule tables exist.
 - Procurement tables exist.
 - Estimate tables exist.
+- Estimate document metadata table exists.
 - Payment and expense tables exist.
 - API contract export is available.
-- No tiles, knauf, flooring, concrete, facade, online payment, or PDF tables exist yet.
+- No tiles, knauf, flooring, concrete, facade, online payment, or invoice tables exist yet.
 
 Migration commands:
 

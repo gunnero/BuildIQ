@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     jwt_secret_key: str = "change-me-in-local-development-secret-key"
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60
+    storage_path: str = str(REPO_ROOT / "storage")
 
 
 @lru_cache

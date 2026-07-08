@@ -151,6 +151,19 @@ Sprint 11 also adds a nullable `agreed_project_price` field to projects so finan
 
 Sprint 11 does not implement invoices, online payments, PDF generation, or payment provider integrations.
 
+## Estimate PDF Implementation Status
+
+Sprint 20 implements the backend estimate PDF quote foundation:
+
+- Company-scoped estimate document metadata records.
+- Macedonian PDF quote generation from stored estimate and selected revision data.
+- Local generated PDF storage under `BUILDIQ_STORAGE_PATH`.
+- Tenant-isolated PDF metadata and download endpoints.
+- Archived estimate protection for new PDF generation.
+- PDF rendering that formats backend-owned estimate revision totals without recalculating totals in the PDF layer.
+
+Sprint 20 does not implement frontend PDF UI, invoices, online payments, or external document storage providers.
+
 ## Voiding Rules
 
 Payments and expenses may be voided with a reason.

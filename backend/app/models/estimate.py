@@ -96,3 +96,20 @@ class EstimateItem(IdMixin, TimestampMixin, Base):
     material = relationship("Material")
     source_calculation_run = relationship("CalculationRun")
     source_calculation_line_item = relationship("CalculationLineItem")
+
+
+class EstimateDocument(IdMixin, TimestampMixin, Base):
+    __tablename__ = "estimate_documents"
+
+    company_id = Column(String(36), ForeignKey("companies.id"), nullable=False, index=True)
+    estimate_id = Column(String(36), ForeignKey("estimates.id"), nullable=False, index=True)
+    revision_id = Column(String(36), ForeignKey("estimate_revisions.id"), nullable=False, index=True)
+    document_type = Column(String(100), nullable=False, index=True)
+    file_path = Column(String(1000), nullable=False)
+    generated_by_user_id = Column(String(36), ForeignKey("users.id"), nullable=False, index=True)
+    generated_at = Column(DateTime(timezone=True), nullable=False)
+    archived_at = Column(DateTime(timezone=True), nullable=True)
+
+    estimate = relationship("Estimate")
+    revision = relationship("EstimateRevision")
+    generated_by_user = relationship("User")

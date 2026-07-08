@@ -2,6 +2,8 @@
 
 ## 2026-07-08
 
+- Implemented Sprint 20 estimate PDF backend.
+- Added company-scoped estimate document metadata, Macedonian PDF quote generation from stored estimate revision data, local storage under `BUILDIQ_STORAGE_PATH`, tenant-isolated PDF metadata/download endpoints, and tests proving PDF access and totals formatting stay backend-owned.
 - Implemented Sprint 19 payments and expenses frontend.
 - Added backend-backed payment list/create/detail/reverse/archive flows, expense category list/create/edit/archive flows, expense list/create/detail/reverse/archive flows, project financial summary display, typed financial API helpers, Macedonian financial UI states, confirmation prompts, and frontend tests proving financial values come from backend responses.
 - Implemented Sprint 18 estimate frontend.

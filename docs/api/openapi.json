@@ -722,6 +722,160 @@
         ]
       }
     },
+    "/api/v1/estimates/{estimate_id}/pdf": {
+      "post": {
+        "tags": [
+          "estimates"
+        ],
+        "summary": "Create Estimate Pdf",
+        "operationId": "create_estimate_pdf_api_v1_estimates__estimate_id__pdf_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "estimate_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Estimate Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/EstimatePdfCreate"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Payload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EstimateDocumentResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/estimate-documents/{document_id}": {
+      "get": {
+        "tags": [
+          "estimates"
+        ],
+        "summary": "Read Estimate Document",
+        "operationId": "read_estimate_document_api_v1_estimate_documents__document_id__get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Document Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EstimateDocumentResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/estimate-documents/{document_id}/download": {
+      "get": {
+        "tags": [
+          "estimates"
+        ],
+        "summary": "Download Estimate Document",
+        "operationId": "download_estimate_document_api_v1_estimate_documents__document_id__download_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Document Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/pdf": {}
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/estimates/{estimate_id}": {
       "get": {
         "tags": [
@@ -7179,6 +7333,80 @@
         ],
         "title": "EstimateCreate"
       },
+      "EstimateDocumentResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "company_id": {
+            "type": "string",
+            "title": "Company Id"
+          },
+          "estimate_id": {
+            "type": "string",
+            "title": "Estimate Id"
+          },
+          "revision_id": {
+            "type": "string",
+            "title": "Revision Id"
+          },
+          "document_type": {
+            "type": "string",
+            "title": "Document Type"
+          },
+          "file_path": {
+            "type": "string",
+            "title": "File Path"
+          },
+          "generated_by_user_id": {
+            "type": "string",
+            "title": "Generated By User Id"
+          },
+          "generated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Generated At"
+          },
+          "archived_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Archived At"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "company_id",
+          "estimate_id",
+          "revision_id",
+          "document_type",
+          "file_path",
+          "generated_by_user_id",
+          "generated_at",
+          "archived_at",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "EstimateDocumentResponse"
+      },
       "EstimateFromCalculationCreate": {
         "properties": {
           "title": {
@@ -7488,6 +7716,23 @@
         },
         "type": "object",
         "title": "EstimateItemUpdate"
+      },
+      "EstimatePdfCreate": {
+        "properties": {
+          "revision_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revision Id"
+          }
+        },
+        "type": "object",
+        "title": "EstimatePdfCreate"
       },
       "EstimateResponse": {
         "properties": {

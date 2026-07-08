@@ -1,22 +1,34 @@
+from typing import Optional
+
 from fastapi import APIRouter, Depends, status
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_company, get_current_user
+from app.core.config import Settings, get_settings
+from app.core.errors import not_found
 from app.db.session import get_db
-from app.models.estimate import Estimate, EstimateItem, EstimateRevision
+from app.models.estimate import Estimate, EstimateDocument, EstimateItem, EstimateRevision
 from app.models.identity import Company, User
 from app.schemas.estimate import (
     EstimateCreate,
+    EstimateDocumentResponse,
     EstimateFromCalculationCreate,
     EstimateItemCreate,
     EstimateItemResponse,
     EstimateItemUpdate,
+    EstimatePdfCreate,
     EstimateResponse,
     EstimateRevisionResponse,
     EstimateStatusUpdate,
     EstimateUpdate,
 )
 from app.services.audit import record_audit_log
+from app.services.estimate_documents import (
+    create_estimate_pdf_document,
+    get_estimate_document_for_company,
+    resolve_storage_file_path,
+)
 from app.services.estimates import (
     archive_estimate,
     archive_estimate_item,
@@ -26,6 +38,7 @@ from app.services.estimates import (
     create_estimate_from_calculation,
     create_estimate_item,
     get_active_estimate_for_company,
+    get_estimate_for_company,
     get_item_for_company,
     get_revision_for_company,
     ensure_estimate_editable,
@@ -99,6 +112,22 @@ def item_response(item: EstimateItem) -> EstimateItemResponse:
     )
 
 
+def estimate_document_response(document: EstimateDocument) -> EstimateDocumentResponse:
+    return EstimateDocumentResponse(
+        id=document.id,
+        company_id=document.company_id,
+        estimate_id=document.estimate_id,
+        revision_id=document.revision_id,
+        document_type=document.document_type,
+        file_path=document.file_path,
+        generated_by_user_id=document.generated_by_user_id,
+        generated_at=document.generated_at,
+        archived_at=document.archived_at,
+        created_at=document.created_at,
+        updated_at=document.updated_at,
+    )
+
+
 @router.post("/estimates", response_model=EstimateResponse, status_code=status.HTTP_201_CREATED)
 def create_estimate_endpoint(
     payload: EstimateCreate,
@@ -109,6 +138,73 @@ def create_estimate_endpoint(
     db.commit()
     db.refresh(estimate)
     return estimate_response(estimate)
+
+
+@router.post(
+    "/estimates/{estimate_id}/pdf",
+    response_model=EstimateDocumentResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def create_estimate_pdf(
+    estimate_id: str,
+    payload: Optional[EstimatePdfCreate] = None,
+    company: Company = Depends(get_current_company),
+    current_user: User = Depends(get_current_user),
+    settings: Settings = Depends(get_settings),
+    db: Session = Depends(get_db),
+) -> EstimateDocumentResponse:
+    estimate = get_estimate_for_company(db, company_id=company.id, estimate_id=estimate_id)
+    document = create_estimate_pdf_document(
+        db,
+        company=company,
+        current_user=current_user,
+        estimate=estimate,
+        revision_id=payload.revision_id if payload is not None else None,
+        storage_path=settings.storage_path,
+    )
+    db.commit()
+    db.refresh(document)
+    return estimate_document_response(document)
+
+
+@router.get("/estimate-documents/{document_id}", response_model=EstimateDocumentResponse)
+def read_estimate_document(
+    document_id: str,
+    company: Company = Depends(get_current_company),
+    db: Session = Depends(get_db),
+) -> EstimateDocumentResponse:
+    document = get_estimate_document_for_company(
+        db,
+        company_id=company.id,
+        document_id=document_id,
+    )
+    return estimate_document_response(document)
+
+
+@router.get(
+    "/estimate-documents/{document_id}/download",
+    response_class=FileResponse,
+    responses={200: {"content": {"application/pdf": {}}}},
+)
+def download_estimate_document(
+    document_id: str,
+    company: Company = Depends(get_current_company),
+    settings: Settings = Depends(get_settings),
+    db: Session = Depends(get_db),
+) -> FileResponse:
+    document = get_estimate_document_for_company(
+        db,
+        company_id=company.id,
+        document_id=document_id,
+    )
+    file_path = resolve_storage_file_path(settings.storage_path, document.file_path)
+    if not file_path.exists():
+        raise not_found("PDF документот не е пронајден.")
+    return FileResponse(
+        file_path,
+        media_type="application/pdf",
+        filename=f"ponuda-{document.estimate_id}-{document.revision_id}.pdf",
+    )
 
 
 @router.get("/estimates", response_model=list[EstimateResponse])
