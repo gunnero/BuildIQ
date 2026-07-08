@@ -8,11 +8,14 @@
 # Python
 __pycache__/
 *.py[cod]
+*.egg-info/
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
 .venv/
 venv/
+.coverage
+htmlcov/
 
 # Node / frontend
 node_modules/

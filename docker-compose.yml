@@ -1,3 +1,21 @@
 name: buildiq
 
-services: {}
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: buildiq
+      POSTGRES_USER: buildiq
+      POSTGRES_PASSWORD: buildiq
+    ports:
+      - "5432:5432"
+    volumes:
+      - buildiq-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U buildiq -d buildiq"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  buildiq-postgres-data:
