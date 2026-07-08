@@ -1,8 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Play } from "lucide-react";
+import { FileText, Play } from "lucide-react";
 import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent, type ReactNode } from "react";
 
 import { getCalculation, listCalculationEngines, listCalculations, runCalculation } from "../api/calculations";
+import { createEstimateFromCalculation } from "../api/estimates";
 import { listMaterials } from "../api/materials";
 import { listMeasurementSets } from "../api/measurements";
 import { listProjectTasks, listProjects } from "../api/projects";
@@ -475,6 +476,22 @@ export function CalculationsPage() {
     },
   });
 
+  const createEstimateMutation = useMutation({
+    mutationFn: (calculationRunId: string) =>
+      createEstimateFromCalculation(calculationRunId, {
+        title: null,
+        description: null,
+      }),
+    onSuccess: () => {
+      setPageMessage({ text: "Понудата е креирана.", tone: "success" });
+      void queryClient.invalidateQueries({ queryKey: ["estimates"] });
+    },
+    onError: (error) => {
+      const message = localizedErrorMessage(error, "Понудата не беше креирана од пресметката.");
+      setPageMessage({ text: message, tone: "error" });
+    },
+  });
+
   function handleFormField(field: keyof PaintingFormState) {
     return (event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
       const value = event.target.value;
@@ -751,6 +768,7 @@ export function CalculationsPage() {
                 calculation={selectedCalculation}
                 materials={materials}
                 measurementSetLabel={measurementSetLabel}
+                onCreateEstimate={(calculationRunId) => createEstimateMutation.mutate(calculationRunId)}
                 projectLabel={projectLabel}
                 roomLabel={roomLabel}
                 taskLabel={taskLabel}
@@ -769,6 +787,7 @@ function CalculationDetail({
   calculation,
   materials,
   measurementSetLabel,
+  onCreateEstimate,
   projectLabel,
   roomLabel,
   taskLabel,
@@ -776,6 +795,7 @@ function CalculationDetail({
   calculation: CalculationRunResponse;
   materials: MaterialResponse[];
   measurementSetLabel: (measurementSetId: string | null) => string;
+  onCreateEstimate: (calculationRunId: string) => void;
   projectLabel: (projectId: string | null) => string;
   roomLabel: (roomId: string | null) => string;
   taskLabel: (taskId: string | null) => string;
@@ -794,7 +814,19 @@ function CalculationDetail({
             {projectLabel(calculation.project_id)} - {roomLabel(calculation.room_id)}
           </p>
         </div>
-        <StatusBadge status={calculation.status} />
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          {calculation.status === "completed" ? (
+            <button
+              type="button"
+              onClick={() => onCreateEstimate(calculation.id)}
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-line bg-white px-3 text-sm font-semibold text-slate-700 transition hover:border-brand hover:text-brand focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2"
+            >
+              <FileText aria-hidden="true" className="h-4 w-4" />
+              Креирај понуда
+            </button>
+          ) : null}
+          <StatusBadge status={calculation.status} />
+        </div>
       </div>
 
       <dl className="grid gap-4 rounded-md border border-line bg-slate-50 p-3 sm:grid-cols-2 xl:grid-cols-4">

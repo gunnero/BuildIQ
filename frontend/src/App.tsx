@@ -7,6 +7,7 @@ import { AppShell } from "./components/AppShell";
 import { CalculationsPage } from "./pages/CalculationsPage";
 import { CustomersPage } from "./pages/CustomersPage";
 import { DashboardPage } from "./pages/DashboardPage";
+import { EstimatesPage } from "./pages/EstimatesPage";
 import { LoginPage } from "./pages/LoginPage";
 import { ProjectsPage } from "./pages/ProjectsPage";
 import { SectionPage } from "./pages/SectionPage";
@@ -42,10 +43,7 @@ export function App() {
                   element={<SectionPage title="Добавувачи" description="Овде ќе се прикажуваат добавувачите и продавниците." />}
                 />
                 <Route path="/calculations" element={<CalculationsPage />} />
-                <Route
-                  path="/estimates"
-                  element={<SectionPage title="Понуди" description="Овде ќе се прикажуваат понудите и нивните ревизии." />}
-                />
+                <Route path="/estimates" element={<EstimatesPage />} />
                 <Route
                   path="/payments"
                   element={<SectionPage title="Уплати" description="Овде ќе се прикажуваат уплатите добиени од серверот." />}

@@ -407,3 +407,93 @@ export type CalculationRunCreateRequest = {
   measurement_set_id: string | null;
   input_payload: Record<string, unknown>;
 };
+
+export type EstimateResponse = {
+  id: string;
+  company_id: string;
+  customer_id: string;
+  property_id: string;
+  project_id: string;
+  estimate_number: string | null;
+  title: string;
+  description: string | null;
+  status: string;
+  source_calculation_run_id: string | null;
+  sent_at: string | null;
+  accepted_at: string | null;
+  rejected_at: string | null;
+  archived_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type EstimateCreateRequest = {
+  project_id: string;
+  customer_id: string | null;
+  property_id: string | null;
+  title: string;
+  description: string | null;
+};
+
+export type EstimateFromCalculationCreateRequest = {
+  title: string | null;
+  description: string | null;
+};
+
+export type EstimateStatusUpdateRequest = {
+  status: string;
+};
+
+export type EstimateRevisionResponse = {
+  id: string;
+  company_id: string;
+  estimate_id: string;
+  revision_number: number;
+  status: string;
+  notes: string | null;
+  terms: string | null;
+  source_calculation_run_id: string | null;
+  subtotal: number;
+  discount_total: number;
+  adjustment_total: number;
+  tax_total: number;
+  total: number;
+  sent_at: string | null;
+  accepted_at: string | null;
+  rejected_at: string | null;
+  archived_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type EstimateItemResponse = {
+  id: string;
+  company_id: string;
+  estimate_revision_id: string;
+  item_type: string;
+  name: string;
+  description: string | null;
+  material_id: string | null;
+  quantity: number;
+  unit: string | null;
+  unit_price: number;
+  total_price: number;
+  source_calculation_run_id: string | null;
+  source_calculation_line_item_id: string | null;
+  sort_order: number;
+  archived_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type EstimateItemCreateRequest = {
+  item_type: string;
+  name: string;
+  description: string | null;
+  material_id: string | null;
+  quantity: number;
+  unit: string | null;
+  unit_price: number;
+};
+
+export type EstimateItemUpdateRequest = Partial<EstimateItemCreateRequest>;

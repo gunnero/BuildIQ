@@ -438,6 +438,98 @@ const createdPaintingCalculationRun = {
   created_at: "2026-07-08T11:00:00Z",
 };
 
+const estimate = {
+  id: "estimate-1",
+  company_id: "company-1",
+  customer_id: "customer-1",
+  property_id: "property-1",
+  project_id: "project-1",
+  estimate_number: "EST-001",
+  title: "Понуда за бојадисување",
+  description: "Рачно внесена понуда.",
+  status: "draft",
+  source_calculation_run_id: null,
+  sent_at: null,
+  accepted_at: null,
+  rejected_at: null,
+  archived_at: null,
+  created_at: now,
+  updated_at: now,
+};
+
+const createdEstimate = {
+  ...estimate,
+  id: "estimate-2",
+  estimate_number: "EST-002",
+  title: "Рачна понуда",
+  description: "Понуда за дневна соба.",
+};
+
+const estimateFromCalculation = {
+  ...estimate,
+  id: "estimate-3",
+  estimate_number: "EST-003",
+  title: "Понуда од пресметка",
+  description: null,
+  source_calculation_run_id: "calculation-1",
+};
+
+const estimateRevision = {
+  id: "revision-1",
+  company_id: "company-1",
+  estimate_id: "estimate-1",
+  revision_number: 1,
+  status: "draft",
+  notes: null,
+  terms: null,
+  source_calculation_run_id: null,
+  subtotal: 30000,
+  discount_total: 2000,
+  adjustment_total: 500,
+  tax_total: 0,
+  total: 28500,
+  sent_at: null,
+  accepted_at: null,
+  rejected_at: null,
+  archived_at: null,
+  created_at: now,
+  updated_at: now,
+};
+
+const estimateItem = {
+  id: "estimate-item-1",
+  company_id: "company-1",
+  estimate_revision_id: "revision-1",
+  item_type: "material",
+  name: "Мат боја",
+  description: "Боја од пресметка.",
+  material_id: "material-paint-1",
+  quantity: 10,
+  unit: "liter",
+  unit_price: 300,
+  total_price: 3000,
+  source_calculation_run_id: null,
+  source_calculation_line_item_id: null,
+  sort_order: 1,
+  archived_at: null,
+  created_at: now,
+  updated_at: now,
+};
+
+const createdEstimateItem = {
+  ...estimateItem,
+  id: "estimate-item-2",
+  item_type: "service",
+  name: "Дополнителна услуга",
+  description: null,
+  material_id: null,
+  quantity: 2,
+  unit: "hour",
+  unit_price: 1500,
+  total_price: 3000,
+  sort_order: 2,
+};
+
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
@@ -733,6 +825,103 @@ function mockCalculationFetch(token = "demo-token") {
       return Promise.resolve(jsonResponse(createdPaintingCalculationRun, 201));
     }
 
+    if (url.endsWith("/api/v1/estimates/from-calculation/calculation-1") && method === "POST") {
+      return Promise.resolve(jsonResponse(estimateFromCalculation, 201));
+    }
+
+    return Promise.resolve(jsonResponse({ detail: "Not found" }, 404));
+  });
+}
+
+function mockEstimateFetch(token = "demo-token") {
+  return vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+    const url = String(input);
+    const method = init?.method ?? "GET";
+    const authorization = init?.headers instanceof Headers ? init.headers.get("Authorization") : null;
+
+    expect(authorization).toBe(`Bearer ${token}`);
+
+    if (url.endsWith("/api/v1/auth/me")) {
+      return Promise.resolve(jsonResponse(currentUser));
+    }
+
+    if (url.endsWith("/api/v1/companies/me")) {
+      return Promise.resolve(jsonResponse(currentCompany));
+    }
+
+    if (url.endsWith("/api/v1/subscription/me")) {
+      return Promise.resolve(jsonResponse(currentSubscription));
+    }
+
+    if (url.endsWith("/api/v1/customers") && method === "GET") {
+      return Promise.resolve(jsonResponse([customer]));
+    }
+
+    if (url.endsWith("/api/v1/properties") && method === "GET") {
+      return Promise.resolve(jsonResponse([property]));
+    }
+
+    if (url.endsWith("/api/v1/projects") && method === "GET") {
+      return Promise.resolve(jsonResponse([project]));
+    }
+
+    if (url.endsWith("/api/v1/materials") && method === "GET") {
+      return Promise.resolve(jsonResponse([paintMaterial, primerMaterial]));
+    }
+
+    if (url.endsWith("/api/v1/calculations") && method === "GET") {
+      return Promise.resolve(jsonResponse([paintingCalculationRun, failedCalculationRun]));
+    }
+
+    if (url.endsWith("/api/v1/estimates") && method === "GET") {
+      return Promise.resolve(jsonResponse([estimate]));
+    }
+
+    if (url.endsWith("/api/v1/estimates") && method === "POST") {
+      return Promise.resolve(jsonResponse(createdEstimate, 201));
+    }
+
+    if (url.endsWith("/api/v1/estimates/estimate-1") && method === "GET") {
+      return Promise.resolve(jsonResponse(estimate));
+    }
+
+    if (url.endsWith("/api/v1/estimates/estimate-1/archive") && method === "POST") {
+      return Promise.resolve(jsonResponse({ ...estimate, status: "archived", archived_at: now }));
+    }
+
+    if (url.endsWith("/api/v1/estimates/estimate-1/status") && method === "POST") {
+      const body = typeof init?.body === "string" ? JSON.parse(init.body) : {};
+      return Promise.resolve(jsonResponse({ ...estimate, status: body.status, [`${body.status}_at`]: now }));
+    }
+
+    if (url.endsWith("/api/v1/estimates/from-calculation/calculation-1") && method === "POST") {
+      return Promise.resolve(jsonResponse(estimateFromCalculation, 201));
+    }
+
+    if (url.endsWith("/api/v1/estimates/estimate-1/revisions") && method === "GET") {
+      return Promise.resolve(jsonResponse([estimateRevision]));
+    }
+
+    if (url.endsWith("/api/v1/estimate-revisions/revision-1") && method === "GET") {
+      return Promise.resolve(jsonResponse(estimateRevision));
+    }
+
+    if (url.endsWith("/api/v1/estimate-revisions/revision-1/items") && method === "GET") {
+      return Promise.resolve(jsonResponse([estimateItem]));
+    }
+
+    if (url.endsWith("/api/v1/estimate-revisions/revision-1/items") && method === "POST") {
+      return Promise.resolve(jsonResponse(createdEstimateItem, 201));
+    }
+
+    if (url.endsWith("/api/v1/estimate-items/estimate-item-1") && method === "PATCH") {
+      return Promise.resolve(jsonResponse({ ...estimateItem, name: "Мат боја премиум", quantity: 12, total_price: 3600 }));
+    }
+
+    if (url.endsWith("/api/v1/estimate-items/estimate-item-1/archive") && method === "POST") {
+      return Promise.resolve(jsonResponse({ ...estimateItem, archived_at: now }));
+    }
+
     return Promise.resolve(jsonResponse({ detail: "Not found" }, 404));
   });
 }
@@ -775,6 +964,15 @@ describe("App", () => {
 
   it("keeps calculations protected when unauthenticated", () => {
     window.history.pushState(null, "", "/calculations");
+
+    render(<App />);
+
+    expect(screen.getByRole("heading", { name: "Најава" })).toBeInTheDocument();
+    expect(window.location.pathname).toBe("/login");
+  });
+
+  it("keeps estimates protected when unauthenticated", () => {
+    window.history.pushState(null, "", "/estimates");
 
     render(<App />);
 
@@ -1337,7 +1535,7 @@ describe("App", () => {
     expect(screen.getByLabelText("Вклучи ѕидови")).toBeInTheDocument();
     expect(screen.getByLabelText("Вклучи таван")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Стартувај пресметка" })).toBeInTheDocument();
-    expect(screen.getByText("Бојадисување")).toBeInTheDocument();
+    expect(screen.getAllByText("Бојадисување").length).toBeGreaterThanOrEqual(1);
     expect(await screen.findByText("Имплементирано")).toBeInTheDocument();
     expect((await screen.findAllByText("Во подготовка")).length).toBeGreaterThanOrEqual(2);
     expect((await screen.findAllByText("Завршена")).length).toBeGreaterThanOrEqual(1);
@@ -1436,5 +1634,253 @@ describe("App", () => {
     expect(screen.getByText("Не е пронајдена цена за прајмер материјалот.")).toBeInTheDocument();
     expect(screen.getByText("Paint material")).toBeInTheDocument();
     expect(screen.getAllByText("Мат боја").length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("renders the estimates workspace with Macedonian labels and backend list data", async () => {
+    vi.stubGlobal("fetch", mockEstimateFetch());
+    saveToken("demo-token");
+    window.history.pushState(null, "", "/estimates");
+
+    render(<App />);
+
+    expect(await screen.findByRole("heading", { name: "Понуди" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Нова понуда" })).toBeInTheDocument();
+    expect(screen.getByLabelText("Проект за понуда")).toBeInTheDocument();
+    expect(screen.getByLabelText("Наслов на понуда")).toBeInTheDocument();
+    expect((await screen.findAllByText("Понуда за бојадисување")).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Ана Стојановска").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Реновирање стан").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Нацрт").length).toBeGreaterThan(0);
+    expect((await screen.findAllByText("28500 MKD")).length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("calls the backend when creating a manual estimate", async () => {
+    const fetchMock = mockEstimateFetch();
+    vi.stubGlobal("fetch", fetchMock);
+    saveToken("demo-token");
+    window.history.pushState(null, "", "/estimates");
+
+    render(<App />);
+
+    const createSection = await screen.findByRole("region", { name: "Нова понуда" });
+    fireEvent.change(within(createSection).getByLabelText("Проект за понуда"), {
+      target: { value: "project-1" },
+    });
+    fireEvent.change(within(createSection).getByLabelText("Наслов на понуда"), {
+      target: { value: "Рачна понуда" },
+    });
+    fireEvent.change(within(createSection).getByLabelText("Опис на понуда"), {
+      target: { value: "Понуда за дневна соба." },
+    });
+    fireEvent.click(within(createSection).getByRole("button", { name: "Креирај понуда" }));
+
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        expect.stringContaining("/api/v1/estimates"),
+        expect.objectContaining({
+          method: "POST",
+          body: JSON.stringify({
+            project_id: "project-1",
+            customer_id: null,
+            property_id: null,
+            title: "Рачна понуда",
+            description: "Понуда за дневна соба.",
+          }),
+        }),
+      ),
+    );
+  });
+
+  it("calls the backend when creating an estimate from a calculation", async () => {
+    const fetchMock = mockEstimateFetch();
+    vi.stubGlobal("fetch", fetchMock);
+    saveToken("demo-token");
+    window.history.pushState(null, "", "/estimates");
+
+    render(<App />);
+
+    const calculationSection = await screen.findByRole("region", { name: "Понуда од пресметка" });
+    fireEvent.change(within(calculationSection).getByLabelText("Пресметка за понуда"), {
+      target: { value: "calculation-1" },
+    });
+    fireEvent.change(within(calculationSection).getByLabelText("Наслов од пресметка"), {
+      target: { value: "Понуда од пресметка" },
+    });
+    fireEvent.click(within(calculationSection).getByRole("button", { name: "Креирај од пресметка" }));
+
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        expect.stringContaining("/api/v1/estimates/from-calculation/calculation-1"),
+        expect.objectContaining({
+          method: "POST",
+          body: JSON.stringify({
+            title: "Понуда од пресметка",
+            description: null,
+          }),
+        }),
+      ),
+    );
+  });
+
+  it("creates an estimate from the painting calculation detail action", async () => {
+    const fetchMock = mockCalculationFetch();
+    vi.stubGlobal("fetch", fetchMock);
+    saveToken("demo-token");
+    window.history.pushState(null, "", "/calculations");
+
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole("button", { name: "Креирај понуда" }));
+
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        expect.stringContaining("/api/v1/estimates/from-calculation/calculation-1"),
+        expect.objectContaining({
+          method: "POST",
+          body: JSON.stringify({
+            title: null,
+            description: null,
+          }),
+        }),
+      ),
+    );
+  });
+
+  it("displays estimate detail backend totals without local calculation", async () => {
+    vi.stubGlobal("fetch", mockEstimateFetch());
+    saveToken("demo-token");
+    window.history.pushState(null, "", "/estimates");
+
+    render(<App />);
+
+    expect(await screen.findByText("Меѓузбир")).toBeInTheDocument();
+    expect(screen.getByText("30000 MKD")).toBeInTheDocument();
+    expect(screen.getByText("2000 MKD")).toBeInTheDocument();
+    expect(screen.getByText("500 MKD")).toBeInTheDocument();
+    expect(screen.getByText("0 MKD")).toBeInTheDocument();
+    expect(screen.getAllByText("28500 MKD").length).toBeGreaterThanOrEqual(2);
+    expect(screen.getAllByText("Мат боја").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("3000 MKD").length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("calls item create, edit, and archive estimate APIs", async () => {
+    const fetchMock = mockEstimateFetch();
+    vi.stubGlobal("fetch", fetchMock);
+    saveToken("demo-token");
+    window.history.pushState(null, "", "/estimates");
+
+    render(<App />);
+
+    fireEvent.change(await screen.findByLabelText("Тип на ставка"), {
+      target: { value: "service" },
+    });
+    fireEvent.change(screen.getByLabelText("Име на ставка"), {
+      target: { value: "Дополнителна услуга" },
+    });
+    fireEvent.change(screen.getByLabelText("Количина на ставка"), {
+      target: { value: "2" },
+    });
+    fireEvent.change(screen.getByLabelText("Единица на ставка"), {
+      target: { value: "hour" },
+    });
+    fireEvent.change(screen.getByLabelText("Единечна цена"), {
+      target: { value: "1500" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Додај ставка" }));
+
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        expect.stringContaining("/api/v1/estimate-revisions/revision-1/items"),
+        expect.objectContaining({
+          method: "POST",
+          body: JSON.stringify({
+            item_type: "service",
+            name: "Дополнителна услуга",
+            description: null,
+            material_id: null,
+            quantity: 2,
+            unit: "hour",
+            unit_price: 1500,
+          }),
+        }),
+      ),
+    );
+
+    fireEvent.change(screen.getByLabelText("Име за уредување на ставка"), {
+      target: { value: "Мат боја премиум" },
+    });
+    fireEvent.change(screen.getByLabelText("Количина за уредување на ставка"), {
+      target: { value: "12" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Зачувај ставка" }));
+
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        expect.stringContaining("/api/v1/estimate-items/estimate-item-1"),
+        expect.objectContaining({
+          method: "PATCH",
+          body: JSON.stringify({
+            item_type: "material",
+            name: "Мат боја премиум",
+            description: "Боја од пресметка.",
+            material_id: "material-paint-1",
+            quantity: 12,
+            unit: "liter",
+            unit_price: 300,
+          }),
+        }),
+      ),
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Архивирај ставка" }));
+
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        expect.stringContaining("/api/v1/estimate-items/estimate-item-1/archive"),
+        expect.objectContaining({ method: "POST" }),
+      ),
+    );
+  });
+
+  it("calls estimate status and archive APIs", async () => {
+    const fetchMock = mockEstimateFetch();
+    vi.stubGlobal("fetch", fetchMock);
+    saveToken("demo-token");
+    window.history.pushState(null, "", "/estimates");
+
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole("button", { name: "Означи како испратена" }));
+    fireEvent.click(screen.getByRole("button", { name: "Означи како прифатена" }));
+    fireEvent.click(screen.getByRole("button", { name: "Означи како одбиена" }));
+    fireEvent.click(screen.getByRole("button", { name: "Архивирај понуда" }));
+
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        expect.stringContaining("/api/v1/estimates/estimate-1/status"),
+        expect.objectContaining({
+          method: "POST",
+          body: JSON.stringify({ status: "sent" }),
+        }),
+      ),
+    );
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining("/api/v1/estimates/estimate-1/status"),
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({ status: "accepted" }),
+      }),
+    );
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining("/api/v1/estimates/estimate-1/status"),
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({ status: "rejected" }),
+      }),
+    );
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining("/api/v1/estimates/estimate-1/archive"),
+      expect.objectContaining({ method: "POST" }),
+    );
   });
 });

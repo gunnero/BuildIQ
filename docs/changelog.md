@@ -2,6 +2,8 @@
 
 ## 2026-07-08
 
+- Implemented Sprint 18 estimate frontend.
+- Added backend-backed estimate list/create/detail/status/archive flows, create-from-calculation actions, revision and item display/edit/archive flows, typed estimate API helpers, Macedonian estimate UI states, and frontend tests proving estimate totals come from backend responses.
 - Implemented Sprint 17 painting calculation frontend.
 - Added backend-backed calculation run history, calculation engine status display, painting calculation submission, calculation detail output rendering, typed calculation/material API helpers, Macedonian calculation UI states, and frontend tests proving calculation values come from backend responses.
 - Implemented Sprint 16 project, room, and measurement frontend.

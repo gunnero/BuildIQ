@@ -4,7 +4,7 @@ React, TypeScript, Vite, and TailwindCSS frontend for BuildIQ.
 
 ## Scope
 
-Sprint 17 wires the painting calculation frontend to the backend calculation endpoints and keeps earlier customer, property, project, room, and measurement workflows available:
+Sprint 18 wires the estimate frontend to the backend estimate endpoints and keeps earlier customer, property, project, room, measurement, and calculation workflows available:
 
 - React app scaffold in `frontend/`
 - TailwindCSS styling
@@ -30,9 +30,14 @@ Sprint 17 wires the painting calculation frontend to the backend calculation end
 - Calculation run history and detail display from `/api/v1/calculations`
 - Painting calculation submission through `POST /api/v1/calculations/run`
 - Backend-returned painting output, assumptions, warnings, and line item display
+- Estimate list, manual creation, detail, status changes, and archive actions from `/api/v1/estimates`
+- Estimate creation from completed calculations through `/api/v1/estimates/from-calculation/{calculation_run_id}`
+- Estimate revision display from `/api/v1/estimates/{estimate_id}/revisions` and `/api/v1/estimate-revisions/{revision_id}`
+- Estimate item list, create, edit, and archive actions from `/api/v1/estimate-revisions/{revision_id}/items` and `/api/v1/estimate-items`
+- Backend-returned estimate totals and estimate item totals
 - Macedonian layout, navigation, login page, and empty states
 
-The frontend does not calculate construction quantities, room areas, selected areas, liters, material costs, labor costs, prices, payment statuses, outstanding balances, or business totals. Those values must come from backend API responses.
+The frontend does not calculate construction quantities, room areas, selected areas, liters, material costs, labor costs, estimate totals, prices, payment statuses, outstanding balances, or business totals. Those values must come from backend API responses.
 
 ## Local Setup
 
@@ -105,6 +110,21 @@ The `/calculations` route displays a backend-backed workspace for:
 - calculation detail with input payload, output payload, assumptions, warnings, and line items returned by the backend
 
 The painting form sends inputs to the backend with `engine_type=painting`. The frontend does not derive totals, liters, selected area, material cost, labor cost, or line item values locally.
+
+## Estimates
+
+The `/estimates` route displays a backend-backed workspace for:
+
+- estimate list with customer, project, status, created date, and latest revision total
+- manual estimate creation linked to a project
+- estimate creation from completed calculation runs
+- estimate metadata, revisions, selected revision detail, items, and backend totals
+- item create, edit, and archive actions when the backend allows the revision to be edited
+- status actions for sent, accepted, rejected, and archive
+
+The calculation detail page also exposes `Креирај понуда` for completed calculation runs. The action calls the backend estimate-from-calculation endpoint and does not copy, price, or total line items in the browser.
+
+Estimate totals shown in the UI come from `subtotal`, `discount_total`, `adjustment_total`, `tax_total`, and `total` on backend revision responses. Item totals come from backend `total_price` values.
 
 ## Authentication
 
