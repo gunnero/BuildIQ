@@ -2,6 +2,9 @@
 
 ## 2026-07-08
 
+- Implemented Sprint 7 backend Material Engine.
+- Added company-scoped material category, manufacturer, material, custom unit, and consumption rule models with Alembic migration.
+- Added global default material units, tenant-isolated material catalog APIs, archive endpoints, consumption rule validation, and tests.
 - Implemented Sprint 6 backend Calculation Engine Framework.
 - Added company-scoped calculation run, input, output, and line item models with Alembic migration.
 - Added tenant-isolated calculation framework APIs, placeholder engine registry, auditable stored input/output snapshots, archive endpoint, and tests.

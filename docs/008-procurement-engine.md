@@ -8,6 +8,14 @@ Construction pricing changes over time. BuildIQ must preserve enough procurement
 
 ## Core Concepts
 
+### Material Catalog Boundary
+
+The Material Engine owns material categories, manufacturers, materials, material units, and material consumption rules.
+
+The Procurement Engine starts after a material exists. It owns supplier relationships, supplier agreements, price books, retail prices, negotiated company prices, and project price overrides.
+
+Material records must not store supplier pricing history. Procurement records must snapshot and preserve pricing history when price books, agreements, overrides, material lists, or estimates are introduced.
+
 ### Suppliers / Stores
 
 Suppliers are companies that sell materials.

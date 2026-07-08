@@ -28,12 +28,15 @@ The backend currently includes:
 - Room opening, measurement set, and measurement item endpoints
 - Calculation engine framework
 - Placeholder calculation engine registry and auditable calculation run endpoints
+- Material engine
+- Material category, manufacturer, unit, material, and consumption rule endpoints
 - Local development seed command
 
 The backend intentionally does not include:
 
 - Frontend implementation
 - Painting, tiles, knauf, flooring, concrete, facade, payment, supplier, estimate, or other business modules
+- Supplier agreements, price books, retail prices, negotiated company prices, or project price overrides
 - PDF generation
 - AI features
 - OpenAI, Anthropic, Gemini, LangChain, LlamaIndex, or other LLM/provider SDKs
@@ -160,6 +163,29 @@ Calculation framework endpoints:
 - `GET /api/v1/calculations/{calculation_run_id}`
 - `POST /api/v1/calculations/{calculation_run_id}/archive`
 
+Material endpoints:
+
+- `POST /api/v1/material-categories`
+- `GET /api/v1/material-categories`
+- `PATCH /api/v1/material-categories/{category_id}`
+- `POST /api/v1/material-categories/{category_id}/archive`
+- `POST /api/v1/material-manufacturers`
+- `GET /api/v1/material-manufacturers`
+- `PATCH /api/v1/material-manufacturers/{manufacturer_id}`
+- `POST /api/v1/material-manufacturers/{manufacturer_id}/archive`
+- `GET /api/v1/material-units`
+- `POST /api/v1/material-units`
+- `POST /api/v1/materials`
+- `GET /api/v1/materials`
+- `GET /api/v1/materials/{material_id}`
+- `PATCH /api/v1/materials/{material_id}`
+- `POST /api/v1/materials/{material_id}/archive`
+- `POST /api/v1/material-consumption-rules`
+- `GET /api/v1/material-consumption-rules`
+- `GET /api/v1/materials/{material_id}/consumption-rules`
+- `PATCH /api/v1/material-consumption-rules/{rule_id}`
+- `POST /api/v1/material-consumption-rules/{rule_id}/archive`
+
 ## Run Tests
 
 ```bash
@@ -178,7 +204,8 @@ Current migration status:
 - Project and task tables exist.
 - Room and measurement tables exist.
 - Calculation framework tables exist.
-- No concrete calculator formulas, payment, supplier, estimate, or PDF tables exist yet.
+- Material catalog and material consumption rule tables exist.
+- No concrete calculator formulas, payment, supplier, supplier agreement, price book, estimate, or PDF tables exist yet.
 
 Migration commands:
 

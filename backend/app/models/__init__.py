@@ -13,6 +13,13 @@ from app.models.customer import (
 )
 from app.models.identity import Company, Permission, Role, RolePermission, User, UserRole
 from app.models.kernel import AuditLog, FeatureFlag
+from app.models.material import (
+    Material,
+    MaterialCategory,
+    MaterialConsumptionRule,
+    MaterialManufacturer,
+    MaterialUnit,
+)
 from app.models.measurement import MeasurementItem, MeasurementSet, Room, RoomOpening
 from app.models.project import (
     Project,
@@ -32,6 +39,11 @@ __all__ = [
     "Customer",
     "CustomerContact",
     "FeatureFlag",
+    "Material",
+    "MaterialCategory",
+    "MaterialConsumptionRule",
+    "MaterialManufacturer",
+    "MaterialUnit",
     "MeasurementItem",
     "MeasurementSet",
     "Permission",
