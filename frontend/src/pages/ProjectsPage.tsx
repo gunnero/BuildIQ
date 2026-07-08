@@ -12,6 +12,7 @@ import {
   listMeasurementSets,
   updateMeasurementItem,
 } from "../api/measurements";
+import { getProjectFinancialSummary } from "../api/financial";
 import {
   archiveProject,
   archiveProjectTask,
@@ -45,6 +46,7 @@ import type {
   MeasurementItemUpdateRequest,
   MeasurementSetCreateRequest,
   MeasurementSetResponse,
+  ProjectFinancialSummaryResponse,
   ProjectCreateRequest,
   ProjectResponse,
   ProjectTaskCreateRequest,
@@ -270,6 +272,14 @@ function formatNumber(value: number, minimumFractionDigits = 0): string {
   return value.toFixed(2).replace(/\.?0+$/, minimumFractionDigits > 0 && Number.isInteger(value) ? ".0" : "");
 }
 
+function formatMoney(value: number | null | undefined): string {
+  if (value === null || value === undefined) {
+    return "Не е вратено";
+  }
+
+  return `${formatNumber(value)} MKD`;
+}
+
 function formatSquareMeters(value: number, minimumFractionDigits = 0): string {
   return `${formatNumber(value, minimumFractionDigits)} m²`;
 }
@@ -292,6 +302,28 @@ function formatRoomType(roomType: string): string {
 
 function formatOpeningType(openingType: string): string {
   return openingTypes.find((item) => item.value === openingType)?.label ?? openingType;
+}
+
+function formatRevenueBasis(revenueBasis: string): string {
+  const labels: Record<string, string> = {
+    accepted_estimate: "Прифатена понуда",
+    agreed_project_price: "Договорена цена",
+    unknown: "Непознато",
+  };
+
+  return labels[revenueBasis] ?? revenueBasis;
+}
+
+function formatPaymentStatus(paymentStatus: string): string {
+  const labels: Record<string, string> = {
+    paid: "Платено",
+    partially_paid: "Делумно платено",
+    overpaid: "Преплатено",
+    unpaid: "Неплатено",
+    unknown: "Непознато",
+  };
+
+  return labels[paymentStatus] ?? paymentStatus;
 }
 
 function formatDate(value: string | null | undefined): string {
@@ -639,6 +671,42 @@ function AreaTile({ label, value }: { label: string; value: string }) {
   );
 }
 
+function FinancialSummary({
+  isError,
+  isLoading,
+  summary,
+}: {
+  isError: boolean;
+  isLoading: boolean;
+  summary: ProjectFinancialSummaryResponse | null;
+}) {
+  if (isLoading) {
+    return <Message>Се вчитуваат финансиските податоци.</Message>;
+  }
+
+  if (isError) {
+    return <Message tone="error">Финансиските податоци не може да се вчитаат.</Message>;
+  }
+
+  if (!summary) {
+    return <EmptyState>Нема финансиски податоци за избраниот проект.</EmptyState>;
+  }
+
+  return (
+    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+      <AreaTile label="Прифатена понуда" value={formatMoney(summary.accepted_estimate_total)} />
+      <AreaTile label="Договорена цена" value={formatMoney(summary.agreed_project_price)} />
+      <AreaTile label="Основа за приход" value={formatRevenueBasis(summary.revenue_basis)} />
+      <AreaTile label="Примени уплати" value={formatMoney(summary.total_received_payments)} />
+      <AreaTile label="Уплати во чекање" value={formatMoney(summary.total_pending_payments)} />
+      <AreaTile label="Преостанато" value={formatMoney(summary.outstanding_balance)} />
+      <AreaTile label="Евидентирани трошоци" value={formatMoney(summary.total_recorded_expenses)} />
+      <AreaTile label="Проценет профит" value={formatMoney(summary.estimated_profit)} />
+      <AreaTile label="Статус на плаќање" value={formatPaymentStatus(summary.payment_status)} />
+    </div>
+  );
+}
+
 export function ProjectsPage() {
   const queryClient = useQueryClient();
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
@@ -707,6 +775,12 @@ export function ProjectsPage() {
   const statusHistoryQuery = useQuery({
     queryKey: ["project-status-history", selectedProjectId],
     queryFn: () => listProjectStatusHistory(selectedProjectId ?? ""),
+    enabled: Boolean(selectedProjectId),
+  });
+
+  const financialSummaryQuery = useQuery({
+    queryKey: ["project-financial-summary", selectedProjectId],
+    queryFn: () => getProjectFinancialSummary(selectedProjectId ?? ""),
     enabled: Boolean(selectedProjectId),
   });
 
@@ -1645,6 +1719,18 @@ export function ProjectsPage() {
               </div>
             ) : (
               <EmptyState>Изберете проект или креирајте нов проект.</EmptyState>
+            )}
+          </Panel>
+
+          <Panel title="Финансии">
+            {selectedProject ? (
+              <FinancialSummary
+                isError={financialSummaryQuery.isError}
+                isLoading={financialSummaryQuery.isLoading}
+                summary={financialSummaryQuery.data ?? null}
+              />
+            ) : (
+              <EmptyState>Изберете проект за да ги видите финансиските податоци.</EmptyState>
             )}
           </Panel>
 

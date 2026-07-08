@@ -2,6 +2,8 @@
 
 ## 2026-07-08
 
+- Implemented Sprint 19 payments and expenses frontend.
+- Added backend-backed payment list/create/detail/reverse/archive flows, expense category list/create/edit/archive flows, expense list/create/detail/reverse/archive flows, project financial summary display, typed financial API helpers, Macedonian financial UI states, confirmation prompts, and frontend tests proving financial values come from backend responses.
 - Implemented Sprint 18 estimate frontend.
 - Added backend-backed estimate list/create/detail/status/archive flows, create-from-calculation actions, revision and item display/edit/archive flows, typed estimate API helpers, Macedonian estimate UI states, and frontend tests proving estimate totals come from backend responses.
 - Implemented Sprint 17 painting calculation frontend.

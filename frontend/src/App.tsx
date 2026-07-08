@@ -8,7 +8,9 @@ import { CalculationsPage } from "./pages/CalculationsPage";
 import { CustomersPage } from "./pages/CustomersPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { EstimatesPage } from "./pages/EstimatesPage";
+import { ExpensesPage } from "./pages/ExpensesPage";
 import { LoginPage } from "./pages/LoginPage";
+import { PaymentsPage } from "./pages/PaymentsPage";
 import { ProjectsPage } from "./pages/ProjectsPage";
 import { SectionPage } from "./pages/SectionPage";
 
@@ -44,14 +46,8 @@ export function App() {
                 />
                 <Route path="/calculations" element={<CalculationsPage />} />
                 <Route path="/estimates" element={<EstimatesPage />} />
-                <Route
-                  path="/payments"
-                  element={<SectionPage title="Уплати" description="Овде ќе се прикажуваат уплатите добиени од серверот." />}
-                />
-                <Route
-                  path="/expenses"
-                  element={<SectionPage title="Трошоци" description="Овде ќе се прикажуваат трошоците добиени од серверот." />}
-                />
+                <Route path="/payments" element={<PaymentsPage />} />
+                <Route path="/expenses" element={<ExpensesPage />} />
                 <Route
                   path="/settings"
                   element={<SectionPage title="Поставки" description="Овде ќе се прикажуваат поставките за компанијата и профилот." />}

@@ -4,7 +4,7 @@ React, TypeScript, Vite, and TailwindCSS frontend for BuildIQ.
 
 ## Scope
 
-Sprint 18 wires the estimate frontend to the backend estimate endpoints and keeps earlier customer, property, project, room, measurement, and calculation workflows available:
+Sprint 19 wires the payment and expense frontend to the backend financial endpoints and keeps earlier customer, property, project, room, measurement, calculation, and estimate workflows available:
 
 - React app scaffold in `frontend/`
 - TailwindCSS styling
@@ -35,9 +35,14 @@ Sprint 18 wires the estimate frontend to the backend estimate endpoints and keep
 - Estimate revision display from `/api/v1/estimates/{estimate_id}/revisions` and `/api/v1/estimate-revisions/{revision_id}`
 - Estimate item list, create, edit, and archive actions from `/api/v1/estimate-revisions/{revision_id}/items` and `/api/v1/estimate-items`
 - Backend-returned estimate totals and estimate item totals
+- Payment list, create, detail, reverse, and archive actions from `/api/v1/payments`
+- Expense category list, create, edit, and archive actions from `/api/v1/expense-categories`
+- Expense list, create, detail, reverse, and archive actions from `/api/v1/expenses`
+- Project financial summary display from `/api/v1/projects/{project_id}/financial-summary`
+- Backend-returned financial summary, payment, and expense values
 - Macedonian layout, navigation, login page, and empty states
 
-The frontend does not calculate construction quantities, room areas, selected areas, liters, material costs, labor costs, estimate totals, prices, payment statuses, outstanding balances, or business totals. Those values must come from backend API responses.
+The frontend does not calculate construction quantities, room areas, selected areas, liters, material costs, labor costs, estimate totals, payment totals, expense totals, prices, payment statuses, outstanding balances, profit, or business totals. Those values must come from backend API responses.
 
 ## Local Setup
 
@@ -91,6 +96,7 @@ The page does not calculate quantities, prices, project totals, payment statuses
 The `/projects` route displays a backend-backed workspace ordered as:
 
 - overview
+- finances
 - tasks
 - rooms
 - measurements
@@ -99,6 +105,8 @@ The `/projects` route displays a backend-backed workspace ordered as:
 The page supports project create/edit/archive, project status display, timeline and status history display, task create/edit/status/archive, room create/edit/archive, opening create/edit/archive, measurement set create/detail, and measurement item create/edit/archive.
 
 Room detail displays `floor_area`, `ceiling_area`, `wall_area_gross`, `wall_area_net`, and `total_paintable_area` returned by the backend. The frontend only formats those values for display.
+
+The finance section displays `accepted_estimate_total`, `agreed_project_price`, `revenue_basis`, `total_received_payments`, `total_pending_payments`, `outstanding_balance`, `total_recorded_expenses`, `estimated_profit`, and `payment_status` returned by the backend.
 
 ## Calculations
 
@@ -125,6 +133,29 @@ The `/estimates` route displays a backend-backed workspace for:
 The calculation detail page also exposes `Креирај понуда` for completed calculation runs. The action calls the backend estimate-from-calculation endpoint and does not copy, price, or total line items in the browser.
 
 Estimate totals shown in the UI come from `subtotal`, `discount_total`, `adjustment_total`, `tax_total`, and `total` on backend revision responses. Item totals come from backend `total_price` values.
+
+## Payments
+
+The `/payments` route displays a backend-backed workspace for:
+
+- payment list with customer, project, method, status, and amount
+- payment creation linked to customer, project, and optionally estimate
+- payment detail with backend amount, status, method, date, note, reversal, archive, and allocation data
+- reverse and archive actions with user confirmation
+
+Payment methods are displayed in Macedonian as `Кеш`, `Банкарски трансфер`, `Картичка`, and `Друго`.
+
+## Expenses
+
+The `/expenses` route displays a backend-backed workspace for:
+
+- expense category list, creation, editing, and archive actions
+- expense list with category, project, method, status, and amount
+- expense creation linked optionally to project, category, and material
+- expense detail with backend amount, status, method, date, note, reversal, and archive data
+- reverse and archive actions with user confirmation
+
+The frontend only formats payment and expense amounts returned by the backend. It does not derive project balance, status, or profit.
 
 ## Authentication
 

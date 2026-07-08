@@ -530,6 +530,117 @@ const createdEstimateItem = {
   sort_order: 2,
 };
 
+const payment = {
+  id: "payment-1",
+  company_id: "company-1",
+  customer_id: "customer-1",
+  project_id: "project-1",
+  estimate_id: "estimate-1",
+  amount: 20000,
+  currency: "MKD",
+  payment_method: "bank_transfer",
+  payment_date: "2026-07-08",
+  status: "received",
+  note: "Прва уплата.",
+  created_by_user_id: "user-1",
+  reversal_reason: null,
+  reversed_at: null,
+  reversed_by_user_id: null,
+  archived_at: null,
+  created_at: now,
+  updated_at: now,
+  allocations: [
+    {
+      id: "payment-allocation-1",
+      company_id: "company-1",
+      payment_id: "payment-1",
+      project_id: "project-1",
+      estimate_id: "estimate-1",
+      amount: 20000,
+      note: "Аванс.",
+      archived_at: null,
+      created_at: now,
+      updated_at: now,
+    },
+  ],
+};
+
+const createdPayment = {
+  ...payment,
+  id: "payment-2",
+  amount: 15000,
+  payment_method: "cash",
+  note: null,
+  allocations: [],
+};
+
+const expenseCategory = {
+  id: "expense-category-1",
+  company_id: "company-1",
+  name: "Материјали",
+  description: "Трошоци за материјали.",
+  archived_at: null,
+  created_at: now,
+  updated_at: now,
+};
+
+const createdExpenseCategory = {
+  ...expenseCategory,
+  id: "expense-category-2",
+  name: "Транспорт",
+  description: null,
+};
+
+const expense = {
+  id: "expense-1",
+  company_id: "company-1",
+  project_id: "project-1",
+  category_id: "expense-category-1",
+  supplier_id: null,
+  material_id: "material-paint-1",
+  description: "Купена боја",
+  amount: 12000,
+  currency: "MKD",
+  expense_date: "2026-07-08",
+  payment_method: "card",
+  status: "recorded",
+  note: "Фискална сметка.",
+  created_by_user_id: "user-1",
+  reversal_reason: null,
+  reversed_at: null,
+  reversed_by_user_id: null,
+  archived_at: null,
+  created_at: now,
+  updated_at: now,
+};
+
+const createdExpense = {
+  ...expense,
+  id: "expense-2",
+  description: "Превоз на материјали",
+  amount: 3000,
+  category_id: "expense-category-2",
+  material_id: null,
+  payment_method: "cash",
+  note: null,
+};
+
+const projectFinancialSummary = {
+  project_id: "project-1",
+  customer_id: "customer-1",
+  accepted_estimate_total: 50000,
+  agreed_project_price: 40000,
+  revenue_basis: "accepted_estimate",
+  total_received_payments: 12345,
+  total_pending_payments: 6789,
+  total_reversed_payments: 1000,
+  outstanding_balance: 33333,
+  total_recorded_expenses: 9876,
+  total_reversed_expenses: 500,
+  estimated_profit: 22222,
+  payment_status: "partially_paid",
+};
+
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
@@ -675,6 +786,10 @@ function mockProjectFetch(token = "demo-token") {
 
     if (url.endsWith("/api/v1/projects/project-1/timeline") && method === "GET") {
       return Promise.resolve(jsonResponse([projectTimelineEvent]));
+    }
+
+    if (url.endsWith("/api/v1/projects/project-1/financial-summary") && method === "GET") {
+      return Promise.resolve(jsonResponse(projectFinancialSummary));
     }
 
     if (url.endsWith("/api/v1/projects/project-1/tasks") && method === "GET") {
@@ -926,6 +1041,102 @@ function mockEstimateFetch(token = "demo-token") {
   });
 }
 
+function mockFinancialFetch(token = "demo-token") {
+  return vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+    const url = String(input);
+    const method = init?.method ?? "GET";
+    const authorization = init?.headers instanceof Headers ? init.headers.get("Authorization") : null;
+
+    expect(authorization).toBe(`Bearer ${token}`);
+
+    if (url.endsWith("/api/v1/auth/me")) {
+      return Promise.resolve(jsonResponse(currentUser));
+    }
+
+    if (url.endsWith("/api/v1/companies/me")) {
+      return Promise.resolve(jsonResponse(currentCompany));
+    }
+
+    if (url.endsWith("/api/v1/subscription/me")) {
+      return Promise.resolve(jsonResponse(currentSubscription));
+    }
+
+    if (url.endsWith("/api/v1/customers") && method === "GET") {
+      return Promise.resolve(jsonResponse([customer]));
+    }
+
+    if (url.endsWith("/api/v1/projects") && method === "GET") {
+      return Promise.resolve(jsonResponse([project]));
+    }
+
+    if (url.endsWith("/api/v1/materials") && method === "GET") {
+      return Promise.resolve(jsonResponse([paintMaterial, primerMaterial]));
+    }
+
+    if (url.endsWith("/api/v1/estimates") && method === "GET") {
+      return Promise.resolve(jsonResponse([estimate]));
+    }
+
+    if (url.endsWith("/api/v1/payments") && method === "GET") {
+      return Promise.resolve(jsonResponse([payment]));
+    }
+
+    if (url.endsWith("/api/v1/payments") && method === "POST") {
+      return Promise.resolve(jsonResponse(createdPayment, 201));
+    }
+
+    if (url.endsWith("/api/v1/payments/payment-1") && method === "GET") {
+      return Promise.resolve(jsonResponse(payment));
+    }
+
+    if (url.endsWith("/api/v1/payments/payment-1/reverse") && method === "POST") {
+      return Promise.resolve(jsonResponse({ ...payment, status: "reversed", reversal_reason: "Погрешна уплата.", reversed_at: now }));
+    }
+
+    if (url.endsWith("/api/v1/payments/payment-1/archive") && method === "POST") {
+      return Promise.resolve(jsonResponse({ ...payment, status: "archived", archived_at: now }));
+    }
+
+    if (url.endsWith("/api/v1/expense-categories") && method === "GET") {
+      return Promise.resolve(jsonResponse([expenseCategory, createdExpenseCategory]));
+    }
+
+    if (url.endsWith("/api/v1/expense-categories") && method === "POST") {
+      return Promise.resolve(jsonResponse(createdExpenseCategory, 201));
+    }
+
+    if (url.endsWith("/api/v1/expense-categories/expense-category-1") && method === "PATCH") {
+      return Promise.resolve(jsonResponse({ ...expenseCategory, name: "Материјали и алат" }));
+    }
+
+    if (url.endsWith("/api/v1/expense-categories/expense-category-1/archive") && method === "POST") {
+      return Promise.resolve(jsonResponse({ ...expenseCategory, archived_at: now }));
+    }
+
+    if (url.endsWith("/api/v1/expenses") && method === "GET") {
+      return Promise.resolve(jsonResponse([expense]));
+    }
+
+    if (url.endsWith("/api/v1/expenses") && method === "POST") {
+      return Promise.resolve(jsonResponse(createdExpense, 201));
+    }
+
+    if (url.endsWith("/api/v1/expenses/expense-1") && method === "GET") {
+      return Promise.resolve(jsonResponse(expense));
+    }
+
+    if (url.endsWith("/api/v1/expenses/expense-1/reverse") && method === "POST") {
+      return Promise.resolve(jsonResponse({ ...expense, status: "reversed", reversal_reason: "Погрешен трошок.", reversed_at: now }));
+    }
+
+    if (url.endsWith("/api/v1/expenses/expense-1/archive") && method === "POST") {
+      return Promise.resolve(jsonResponse({ ...expense, status: "archived", archived_at: now }));
+    }
+
+    return Promise.resolve(jsonResponse({ detail: "Not found" }, 404));
+  });
+}
+
 describe("App", () => {
   afterEach(() => {
     cleanup();
@@ -973,6 +1184,24 @@ describe("App", () => {
 
   it("keeps estimates protected when unauthenticated", () => {
     window.history.pushState(null, "", "/estimates");
+
+    render(<App />);
+
+    expect(screen.getByRole("heading", { name: "Најава" })).toBeInTheDocument();
+    expect(window.location.pathname).toBe("/login");
+  });
+
+  it("keeps payments protected when unauthenticated", () => {
+    window.history.pushState(null, "", "/payments");
+
+    render(<App />);
+
+    expect(screen.getByRole("heading", { name: "Најава" })).toBeInTheDocument();
+    expect(window.location.pathname).toBe("/login");
+  });
+
+  it("keeps expenses protected when unauthenticated", () => {
+    window.history.pushState(null, "", "/expenses");
 
     render(<App />);
 
@@ -1248,6 +1477,30 @@ describe("App", () => {
     expect(screen.getByText("Проектот е креиран.")).toBeInTheDocument();
     expect(screen.getByText("Демонтажа")).toBeInTheDocument();
     expect(screen.getByText("Почнато на терен.")).toBeInTheDocument();
+  });
+
+  it("displays project financial summary backend values without local totals", async () => {
+    const fetchMock = mockProjectFetch();
+    vi.stubGlobal("fetch", fetchMock);
+    saveToken("demo-token");
+    window.history.pushState(null, "", "/projects");
+
+    render(<App />);
+
+    expect(await screen.findByRole("heading", { name: "Финансии" })).toBeInTheDocument();
+    expect(await screen.findByText("50000 MKD")).toBeInTheDocument();
+    expect(screen.getByText("40000 MKD")).toBeInTheDocument();
+    expect(screen.getAllByText("Прифатена понуда").length).toBeGreaterThan(0);
+    expect(screen.getByText("12345 MKD")).toBeInTheDocument();
+    expect(screen.getByText("6789 MKD")).toBeInTheDocument();
+    expect(screen.getByText("33333 MKD")).toBeInTheDocument();
+    expect(screen.getByText("9876 MKD")).toBeInTheDocument();
+    expect(screen.getByText("22222 MKD")).toBeInTheDocument();
+    expect(screen.getByText("Делумно платено")).toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining("/api/v1/projects/project-1/financial-summary"),
+      expect.any(Object),
+    );
   });
 
   it("calls task create, status, and archive endpoints", async () => {
@@ -1880,6 +2133,249 @@ describe("App", () => {
     );
     expect(fetchMock).toHaveBeenCalledWith(
       expect.stringContaining("/api/v1/estimates/estimate-1/archive"),
+      expect.objectContaining({ method: "POST" }),
+    );
+  });
+
+  it("renders the payments workspace with Macedonian labels and backend data", async () => {
+    vi.stubGlobal("fetch", mockFinancialFetch());
+    saveToken("demo-token");
+    window.history.pushState(null, "", "/payments");
+
+    render(<App />);
+
+    expect(await screen.findByRole("heading", { name: "Уплати" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Нова уплата" })).toBeInTheDocument();
+    expect(screen.getByLabelText("Клиент за уплата")).toBeInTheDocument();
+    expect(screen.getByLabelText("Проект за уплата")).toBeInTheDocument();
+    expect(screen.getByLabelText("Начин на плаќање")).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Кеш" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Банкарски трансфер" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Картичка" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Друго" })).toBeInTheDocument();
+    expect((await screen.findAllByText("20000 MKD")).length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Банкарски трансфер").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Примена").length).toBeGreaterThan(0);
+  });
+
+  it("calls payment create, reverse, and archive APIs", async () => {
+    const fetchMock = mockFinancialFetch();
+    vi.stubGlobal("fetch", fetchMock);
+    vi.stubGlobal("confirm", vi.fn(() => true));
+    saveToken("demo-token");
+    window.history.pushState(null, "", "/payments");
+
+    render(<App />);
+
+    const createSection = await screen.findByRole("region", { name: "Нова уплата" });
+    fireEvent.change(within(createSection).getByLabelText("Клиент за уплата"), {
+      target: { value: "customer-1" },
+    });
+    fireEvent.change(within(createSection).getByLabelText("Проект за уплата"), {
+      target: { value: "project-1" },
+    });
+    fireEvent.change(within(createSection).getByLabelText("Понуда за уплата"), {
+      target: { value: "estimate-1" },
+    });
+    fireEvent.change(within(createSection).getByLabelText("Износ на уплата"), {
+      target: { value: "15000" },
+    });
+    fireEvent.change(within(createSection).getByLabelText("Начин на плаќање"), {
+      target: { value: "cash" },
+    });
+    fireEvent.change(within(createSection).getByLabelText("Датум на уплата"), {
+      target: { value: "2026-07-09" },
+    });
+    fireEvent.change(within(createSection).getByLabelText("Белешка за уплата"), {
+      target: { value: "Втора уплата." },
+    });
+    fireEvent.click(within(createSection).getByRole("button", { name: "Додај уплата" }));
+
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        expect.stringContaining("/api/v1/payments"),
+        expect.objectContaining({
+          method: "POST",
+          body: JSON.stringify({
+            customer_id: "customer-1",
+            project_id: "project-1",
+            estimate_id: "estimate-1",
+            amount: 15000,
+            payment_method: "cash",
+            payment_date: "2026-07-09",
+            status: "received",
+            note: "Втора уплата.",
+            allocations: [],
+          }),
+        }),
+      ),
+    );
+
+    fireEvent.change(screen.getByLabelText("Причина за сторно уплата"), {
+      target: { value: "Погрешна уплата." },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Сторнирај уплата" }));
+    fireEvent.click(screen.getByRole("button", { name: "Архивирај уплата" }));
+
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        expect.stringContaining("/api/v1/payments/payment-1/reverse"),
+        expect.objectContaining({
+          method: "POST",
+          body: JSON.stringify({ reason: "Погрешна уплата." }),
+        }),
+      ),
+    );
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining("/api/v1/payments/payment-1/archive"),
+      expect.objectContaining({ method: "POST" }),
+    );
+  });
+
+  it("renders the expenses workspace with Macedonian labels and backend data", async () => {
+    vi.stubGlobal("fetch", mockFinancialFetch());
+    saveToken("demo-token");
+    window.history.pushState(null, "", "/expenses");
+
+    render(<App />);
+
+    expect(await screen.findByRole("heading", { name: "Трошоци" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Категории на трошоци" })).toBeInTheDocument();
+    expect(screen.getByLabelText("Име на категорија")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Нов трошок" })).toBeInTheDocument();
+    expect(screen.getByLabelText("Опис на трошок")).toBeInTheDocument();
+    expect(screen.getByLabelText("Начин на плаќање за трошок")).toBeInTheDocument();
+    expect(screen.getAllByText("Материјали").length).toBeGreaterThan(0);
+    expect((await screen.findAllByText("Купена боја")).length).toBeGreaterThan(0);
+    expect(screen.getAllByText("12000 MKD").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Картичка").length).toBeGreaterThan(0);
+  });
+
+  it("calls expense category create, edit, and archive APIs", async () => {
+    const fetchMock = mockFinancialFetch();
+    vi.stubGlobal("fetch", fetchMock);
+    vi.stubGlobal("confirm", vi.fn(() => true));
+    saveToken("demo-token");
+    window.history.pushState(null, "", "/expenses");
+
+    render(<App />);
+
+    const categorySection = await screen.findByRole("region", { name: "Категории на трошоци" });
+    fireEvent.change(within(categorySection).getByLabelText("Име на категорија"), {
+      target: { value: "Транспорт" },
+    });
+    fireEvent.click(within(categorySection).getByRole("button", { name: "Додај категорија" }));
+
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        expect.stringContaining("/api/v1/expense-categories"),
+        expect.objectContaining({
+          method: "POST",
+          body: JSON.stringify({
+            name: "Транспорт",
+            description: null,
+          }),
+        }),
+      ),
+    );
+
+    fireEvent.click(within(categorySection).getByRole("button", { name: /Материјали/ }));
+    fireEvent.change(screen.getByLabelText("Име за уредување на категорија"), {
+      target: { value: "Материјали и алат" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Зачувај категорија" }));
+
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        expect.stringContaining("/api/v1/expense-categories/expense-category-1"),
+        expect.objectContaining({
+          method: "PATCH",
+          body: JSON.stringify({
+            name: "Материјали и алат",
+            description: "Трошоци за материјали.",
+          }),
+        }),
+      ),
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Архивирај категорија" }));
+
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        expect.stringContaining("/api/v1/expense-categories/expense-category-1/archive"),
+        expect.objectContaining({ method: "POST" }),
+      ),
+    );
+  });
+
+  it("calls expense create, reverse, and archive APIs", async () => {
+    const fetchMock = mockFinancialFetch();
+    vi.stubGlobal("fetch", fetchMock);
+    vi.stubGlobal("confirm", vi.fn(() => true));
+    saveToken("demo-token");
+    window.history.pushState(null, "", "/expenses");
+
+    render(<App />);
+
+    const expenseSection = await screen.findByRole("region", { name: "Нов трошок" });
+    fireEvent.change(within(expenseSection).getByLabelText("Проект за трошок"), {
+      target: { value: "project-1" },
+    });
+    fireEvent.change(within(expenseSection).getByLabelText("Категорија за трошок"), {
+      target: { value: "expense-category-2" },
+    });
+    fireEvent.change(within(expenseSection).getByLabelText("Опис на трошок"), {
+      target: { value: "Превоз на материјали" },
+    });
+    fireEvent.change(within(expenseSection).getByLabelText("Износ на трошок"), {
+      target: { value: "3000" },
+    });
+    fireEvent.change(within(expenseSection).getByLabelText("Датум на трошок"), {
+      target: { value: "2026-07-09" },
+    });
+    fireEvent.change(within(expenseSection).getByLabelText("Начин на плаќање за трошок"), {
+      target: { value: "cash" },
+    });
+    fireEvent.click(within(expenseSection).getByRole("button", { name: "Додај трошок" }));
+
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        expect.stringContaining("/api/v1/expenses"),
+        expect.objectContaining({
+          method: "POST",
+          body: JSON.stringify({
+            project_id: "project-1",
+            category_id: "expense-category-2",
+            supplier_id: null,
+            material_id: null,
+            description: "Превоз на материјали",
+            amount: 3000,
+            expense_date: "2026-07-09",
+            payment_method: "cash",
+            status: "recorded",
+            note: null,
+          }),
+        }),
+      ),
+    );
+
+    fireEvent.change(screen.getByLabelText("Причина за сторно трошок"), {
+      target: { value: "Погрешен трошок." },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Сторнирај трошок" }));
+    fireEvent.click(screen.getByRole("button", { name: "Архивирај трошок" }));
+
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        expect.stringContaining("/api/v1/expenses/expense-1/reverse"),
+        expect.objectContaining({
+          method: "POST",
+          body: JSON.stringify({ reason: "Погрешен трошок." }),
+        }),
+      ),
+    );
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining("/api/v1/expenses/expense-1/archive"),
       expect.objectContaining({ method: "POST" }),
     );
   });

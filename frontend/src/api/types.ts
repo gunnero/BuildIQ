@@ -497,3 +497,130 @@ export type EstimateItemCreateRequest = {
 };
 
 export type EstimateItemUpdateRequest = Partial<EstimateItemCreateRequest>;
+
+export type PaymentAllocationCreateRequest = {
+  project_id: string | null;
+  estimate_id: string | null;
+  amount: number;
+  note: string | null;
+};
+
+export type PaymentAllocationResponse = {
+  id: string;
+  company_id: string;
+  payment_id: string;
+  project_id: string | null;
+  estimate_id: string | null;
+  amount: number;
+  note: string | null;
+  archived_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type PaymentCreateRequest = {
+  customer_id: string;
+  project_id: string;
+  estimate_id: string | null;
+  amount: number;
+  payment_method: string;
+  payment_date: string;
+  status: string;
+  note: string | null;
+  allocations: PaymentAllocationCreateRequest[];
+};
+
+export type ReverseRequest = {
+  reason: string;
+};
+
+export type PaymentResponse = {
+  id: string;
+  company_id: string;
+  customer_id: string;
+  project_id: string;
+  estimate_id: string | null;
+  amount: number;
+  currency: string;
+  payment_method: string;
+  payment_date: string;
+  status: string;
+  note: string | null;
+  created_by_user_id: string;
+  reversal_reason: string | null;
+  reversed_at: string | null;
+  reversed_by_user_id: string | null;
+  archived_at: string | null;
+  created_at: string;
+  updated_at: string;
+  allocations: PaymentAllocationResponse[];
+};
+
+export type ExpenseCategoryCreateRequest = {
+  name: string;
+  description: string | null;
+};
+
+export type ExpenseCategoryUpdateRequest = Partial<ExpenseCategoryCreateRequest>;
+
+export type ExpenseCategoryResponse = {
+  id: string;
+  company_id: string;
+  name: string;
+  description: string | null;
+  archived_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ExpenseCreateRequest = {
+  project_id: string | null;
+  category_id: string | null;
+  supplier_id: string | null;
+  material_id: string | null;
+  description: string;
+  amount: number;
+  expense_date: string;
+  payment_method: string;
+  status: string;
+  note: string | null;
+};
+
+export type ExpenseResponse = {
+  id: string;
+  company_id: string;
+  project_id: string | null;
+  category_id: string | null;
+  supplier_id: string | null;
+  material_id: string | null;
+  description: string;
+  amount: number;
+  currency: string;
+  expense_date: string;
+  payment_method: string;
+  status: string;
+  note: string | null;
+  created_by_user_id: string;
+  reversal_reason: string | null;
+  reversed_at: string | null;
+  reversed_by_user_id: string | null;
+  archived_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ProjectFinancialSummaryResponse = {
+  project_id: string;
+  customer_id: string;
+  accepted_estimate_total: number | null;
+  agreed_project_price: number | null;
+  revenue_basis: string;
+  total_received_payments: number;
+  total_pending_payments: number;
+  total_reversed_payments: number;
+  outstanding_balance: number | null;
+  total_recorded_expenses: number;
+  total_reversed_expenses: number;
+  estimated_profit: number | null;
+  payment_status: string;
+};
