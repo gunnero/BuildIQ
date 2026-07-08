@@ -315,6 +315,129 @@ const createdMeasurementItem = {
   quantity: 5,
 };
 
+const paintMaterial = {
+  id: "material-paint-1",
+  company_id: "company-1",
+  name: "Мат боја",
+  sku: "PAINT-01",
+  description: null,
+  category_id: null,
+  manufacturer_id: null,
+  unit_id: "unit-liter",
+  coverage_value: 10,
+  coverage_unit: "m2/liter",
+  package_quantity: 1,
+  waste_percentage_default: 10,
+  is_active: true,
+  archived_at: null,
+  created_at: now,
+  updated_at: now,
+};
+
+const primerMaterial = {
+  ...paintMaterial,
+  id: "material-primer-1",
+  name: "Прајмер",
+  sku: "PRIMER-01",
+  coverage_value: 12,
+  waste_percentage_default: null,
+};
+
+const calculationEngines = [
+  { engine_type: "painting", engine_version: "painting-1", implemented: true, status: "implemented" },
+  { engine_type: "tiles", engine_version: "placeholder-1", implemented: false, status: "not_implemented" },
+  { engine_type: "knauf", engine_version: "placeholder-1", implemented: false, status: "not_implemented" },
+];
+
+const paintingCalculationRun = {
+  id: "calculation-1",
+  company_id: "company-1",
+  project_id: "project-1",
+  project_task_id: "task-1",
+  room_id: "room-1",
+  measurement_set_id: null,
+  engine_type: "painting",
+  engine_version: "painting-1",
+  status: "completed",
+  input_payload: {
+    include_walls: true,
+    include_ceiling: true,
+    coats: 2,
+    primer_coats: 1,
+    paint_material_id: "material-paint-1",
+    primer_material_id: "material-primer-1",
+    waste_percentage: 10,
+    labor_rate_per_m2: 120,
+    notes: "Проверка на дневна соба.",
+  },
+  output_payload: {
+    selected_area_m2: 65.4,
+    wall_area_net_m2: 45.4,
+    ceiling_area_m2: 20,
+    total_paintable_area_m2: 65.4,
+    coats: 2,
+    primer_coats: 1,
+    waste_percentage: 10,
+    paint_required_liters: 14.388,
+    primer_required_liters: 7.194,
+    paint_material_cost: 5100.12,
+    primer_material_cost: 1200.34,
+    labor_cost: 7848,
+    total_cost: 22222.22,
+    assumptions: ["Room-computed areas were used.", "Waste percentage is applied to paint and primer quantities."],
+    warnings: ["Не е пронајдена цена за прајмер материјалот."],
+    notes: "Проверка на дневна соба.",
+  },
+  line_items: [
+    {
+      id: "calculation-line-1",
+      company_id: "company-1",
+      calculation_run_id: "calculation-1",
+      sort_order: 1,
+      name: "Paint material",
+      description: "Мат боја",
+      unit: "liter",
+      quantity: 14.388,
+      payload: { material_id: "material-paint-1", unit_price: 354.47, total_cost: 5100.12 },
+      created_at: now,
+    },
+    {
+      id: "calculation-line-2",
+      company_id: "company-1",
+      calculation_run_id: "calculation-1",
+      sort_order: 2,
+      name: "Labor",
+      description: "Painting labor",
+      unit: "m2",
+      quantity: 65.4,
+      payload: { unit_price: 120, total_cost: 7848 },
+      created_at: now,
+    },
+  ],
+  created_by_user_id: "user-1",
+  created_at: now,
+  archived_at: null,
+};
+
+const failedCalculationRun = {
+  ...paintingCalculationRun,
+  id: "calculation-2",
+  status: "failed",
+  project_task_id: null,
+  room_id: null,
+  output_payload: {
+    error_code: "painting_area_missing",
+    message: "Не е дадена просторија или сет мерења со употреблива површина за бојадисување.",
+  },
+  line_items: [],
+};
+
+const createdPaintingCalculationRun = {
+  ...paintingCalculationRun,
+  id: "calculation-3",
+  created_at: "2026-07-08T11:00:00Z",
+};
+
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
@@ -550,6 +673,70 @@ function mockProjectFetch(token = "demo-token") {
   });
 }
 
+function mockCalculationFetch(token = "demo-token") {
+  return vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+    const url = String(input);
+    const method = init?.method ?? "GET";
+    const authorization = init?.headers instanceof Headers ? init.headers.get("Authorization") : null;
+
+    expect(authorization).toBe(`Bearer ${token}`);
+
+    if (url.endsWith("/api/v1/auth/me")) {
+      return Promise.resolve(jsonResponse(currentUser));
+    }
+
+    if (url.endsWith("/api/v1/companies/me")) {
+      return Promise.resolve(jsonResponse(currentCompany));
+    }
+
+    if (url.endsWith("/api/v1/subscription/me")) {
+      return Promise.resolve(jsonResponse(currentSubscription));
+    }
+
+    if (url.endsWith("/api/v1/projects") && method === "GET") {
+      return Promise.resolve(jsonResponse([project]));
+    }
+
+    if (url.endsWith("/api/v1/projects/project-1/tasks") && method === "GET") {
+      return Promise.resolve(jsonResponse([projectTask]));
+    }
+
+    if (url.endsWith("/api/v1/projects/project-1/rooms") && method === "GET") {
+      return Promise.resolve(jsonResponse([room]));
+    }
+
+    if (url.endsWith("/api/v1/projects/project-1/measurement-sets") && method === "GET") {
+      return Promise.resolve(jsonResponse([measurementSet]));
+    }
+
+    if (url.endsWith("/api/v1/materials") && method === "GET") {
+      return Promise.resolve(jsonResponse([paintMaterial, primerMaterial]));
+    }
+
+    if (url.endsWith("/api/v1/calculation-engines") && method === "GET") {
+      return Promise.resolve(jsonResponse(calculationEngines));
+    }
+
+    if (url.endsWith("/api/v1/calculations") && method === "GET") {
+      return Promise.resolve(jsonResponse([paintingCalculationRun, failedCalculationRun]));
+    }
+
+    if (url.endsWith("/api/v1/calculations/calculation-1") && method === "GET") {
+      return Promise.resolve(jsonResponse(paintingCalculationRun));
+    }
+
+    if (url.endsWith("/api/v1/calculations/calculation-2") && method === "GET") {
+      return Promise.resolve(jsonResponse(failedCalculationRun));
+    }
+
+    if (url.endsWith("/api/v1/calculations/run") && method === "POST") {
+      return Promise.resolve(jsonResponse(createdPaintingCalculationRun, 201));
+    }
+
+    return Promise.resolve(jsonResponse({ detail: "Not found" }, 404));
+  });
+}
+
 describe("App", () => {
   afterEach(() => {
     cleanup();
@@ -579,6 +766,15 @@ describe("App", () => {
 
   it("keeps projects protected when unauthenticated", () => {
     window.history.pushState(null, "", "/projects");
+
+    render(<App />);
+
+    expect(screen.getByRole("heading", { name: "Најава" })).toBeInTheDocument();
+    expect(window.location.pathname).toBe("/login");
+  });
+
+  it("keeps calculations protected when unauthenticated", () => {
+    window.history.pushState(null, "", "/calculations");
 
     render(<App />);
 
@@ -1126,5 +1322,119 @@ describe("App", () => {
         expect.objectContaining({ method: "POST" }),
       ),
     );
+  });
+
+  it("renders the calculations workspace with Macedonian labels and engine states", async () => {
+    vi.stubGlobal("fetch", mockCalculationFetch());
+    saveToken("demo-token");
+    window.history.pushState(null, "", "/calculations");
+
+    render(<App />);
+
+    expect(await screen.findByRole("heading", { name: "Пресметки" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Бојадисување" })).toBeInTheDocument();
+    expect(screen.getByLabelText("Проект за пресметка")).toBeInTheDocument();
+    expect(screen.getByLabelText("Вклучи ѕидови")).toBeInTheDocument();
+    expect(screen.getByLabelText("Вклучи таван")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Стартувај пресметка" })).toBeInTheDocument();
+    expect(screen.getByText("Бојадисување")).toBeInTheDocument();
+    expect(await screen.findByText("Имплементирано")).toBeInTheDocument();
+    expect((await screen.findAllByText("Во подготовка")).length).toBeGreaterThanOrEqual(2);
+    expect((await screen.findAllByText("Завршена")).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText("Неуспешна")).toBeInTheDocument();
+  });
+
+  it("submits the painting calculation payload to the backend", async () => {
+    const fetchMock = mockCalculationFetch();
+    vi.stubGlobal("fetch", fetchMock);
+    saveToken("demo-token");
+    window.history.pushState(null, "", "/calculations");
+
+    render(<App />);
+
+    fireEvent.change(await screen.findByLabelText("Проект за пресметка"), {
+      target: { value: "project-1" },
+    });
+    fireEvent.change(await screen.findByLabelText("Задача (незадолжително)"), {
+      target: { value: "task-1" },
+    });
+    fireEvent.change(screen.getByLabelText("Просторија (незадолжително)"), {
+      target: { value: "room-1" },
+    });
+    fireEvent.change(screen.getByLabelText("Сет мерења (незадолжително)"), {
+      target: { value: "measurement-set-1" },
+    });
+    fireEvent.change(screen.getByLabelText("Слоеви боја"), {
+      target: { value: "2" },
+    });
+    fireEvent.change(screen.getByLabelText("Прајмер слоеви"), {
+      target: { value: "1" },
+    });
+    fireEvent.change(screen.getByLabelText("Материјал за боја"), {
+      target: { value: "material-paint-1" },
+    });
+    fireEvent.change(screen.getByLabelText("Прајмер материјал"), {
+      target: { value: "material-primer-1" },
+    });
+    fireEvent.change(screen.getByLabelText("Отпад (%)"), {
+      target: { value: "10" },
+    });
+    fireEvent.change(screen.getByLabelText("Работна цена по m²"), {
+      target: { value: "120" },
+    });
+    fireEvent.change(screen.getByLabelText("Белешки"), {
+      target: { value: "Проверка на дневна соба." },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Стартувај пресметка" }));
+
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        expect.stringContaining("/api/v1/calculations/run"),
+        expect.objectContaining({
+          method: "POST",
+          body: JSON.stringify({
+            engine_type: "painting",
+            project_id: "project-1",
+            project_task_id: "task-1",
+            room_id: "room-1",
+            measurement_set_id: "measurement-set-1",
+            input_payload: {
+              include_walls: true,
+              include_ceiling: true,
+              coats: 2,
+              primer_coats: 1,
+              paint_material_id: "material-paint-1",
+              primer_material_id: "material-primer-1",
+              waste_percentage: 10,
+              labor_rate_per_m2: 120,
+              notes: "Проверка на дневна соба.",
+            },
+          }),
+        }),
+      ),
+    );
+    expect(await screen.findByText("Пресметката е стартувана.")).toBeInTheDocument();
+  });
+
+  it("displays backend calculation output values and line items without local totals", async () => {
+    vi.stubGlobal("fetch", mockCalculationFetch());
+    saveToken("demo-token");
+    window.history.pushState(null, "", "/calculations");
+
+    render(<App />);
+
+    expect(await screen.findByText("Избрана површина")).toBeInTheDocument();
+    expect(screen.getAllByText("65.4 m²").length).toBeGreaterThanOrEqual(2);
+    expect(screen.getByText("45.4 m²")).toBeInTheDocument();
+    expect(screen.getByText("14.388 l")).toBeInTheDocument();
+    expect(screen.getByText("7.194 l")).toBeInTheDocument();
+    expect(screen.getAllByText("5100.12 MKD").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("1200.34 MKD").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("7848 MKD").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText("22222.22 MKD")).toBeInTheDocument();
+    expect(screen.getByText("Room-computed areas were used.")).toBeInTheDocument();
+    expect(screen.getByText("Не е пронајдена цена за прајмер материјалот.")).toBeInTheDocument();
+    expect(screen.getByText("Paint material")).toBeInTheDocument();
+    expect(screen.getAllByText("Мат боја").length).toBeGreaterThanOrEqual(1);
   });
 });

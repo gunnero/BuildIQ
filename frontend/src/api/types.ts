@@ -341,3 +341,69 @@ export type MeasurementItemCreateRequest = {
 };
 
 export type MeasurementItemUpdateRequest = Partial<MeasurementItemCreateRequest>;
+
+export type MaterialResponse = {
+  id: string;
+  company_id: string;
+  name: string;
+  sku: string | null;
+  description: string | null;
+  category_id: string | null;
+  manufacturer_id: string | null;
+  unit_id: string;
+  coverage_value: number | null;
+  coverage_unit: string | null;
+  package_quantity: number | null;
+  waste_percentage_default: number | null;
+  is_active: boolean;
+  archived_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type CalculationEngineResponse = {
+  engine_type: string;
+  engine_version: string;
+  implemented: boolean;
+  status: string;
+};
+
+export type CalculationLineItemResponse = {
+  id: string;
+  company_id: string;
+  calculation_run_id: string;
+  sort_order: number;
+  name: string;
+  description: string | null;
+  unit: string | null;
+  quantity: number | null;
+  payload: Record<string, unknown> | null;
+  created_at: string;
+};
+
+export type CalculationRunResponse = {
+  id: string;
+  company_id: string;
+  project_id: string | null;
+  project_task_id: string | null;
+  room_id: string | null;
+  measurement_set_id: string | null;
+  engine_type: string;
+  engine_version: string;
+  status: string;
+  input_payload: Record<string, unknown>;
+  output_payload: Record<string, unknown>;
+  line_items: CalculationLineItemResponse[];
+  created_by_user_id: string;
+  created_at: string;
+  archived_at: string | null;
+};
+
+export type CalculationRunCreateRequest = {
+  engine_type: string;
+  project_id: string | null;
+  project_task_id: string | null;
+  room_id: string | null;
+  measurement_set_id: string | null;
+  input_payload: Record<string, unknown>;
+};

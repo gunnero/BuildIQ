@@ -4,7 +4,7 @@ React, TypeScript, Vite, and TailwindCSS frontend for BuildIQ.
 
 ## Scope
 
-Sprint 16 wires the project, room, and measurement frontend to the backend project/task/room/measurement endpoints:
+Sprint 17 wires the painting calculation frontend to the backend calculation endpoints and keeps earlier customer, property, project, room, and measurement workflows available:
 
 - React app scaffold in `frontend/`
 - TailwindCSS styling
@@ -26,9 +26,13 @@ Sprint 16 wires the project, room, and measurement frontend to the backend proje
 - Room opening list, create, edit, and archive actions from `/api/v1/rooms/{room_id}/openings` and `/api/v1/openings`
 - Measurement set list, create, and detail display from `/api/v1/projects/{project_id}/measurement-sets`
 - Measurement item list, create, edit, and archive actions from `/api/v1/measurement-sets/{measurement_set_id}/items` and `/api/v1/measurement-items`
+- Calculation engine list from `/api/v1/calculation-engines`
+- Calculation run history and detail display from `/api/v1/calculations`
+- Painting calculation submission through `POST /api/v1/calculations/run`
+- Backend-returned painting output, assumptions, warnings, and line item display
 - Macedonian layout, navigation, login page, and empty states
 
-The frontend does not calculate construction quantities, room areas, prices, payment statuses, outstanding balances, or business totals. Those values must come from backend API responses.
+The frontend does not calculate construction quantities, room areas, selected areas, liters, material costs, labor costs, prices, payment statuses, outstanding balances, or business totals. Those values must come from backend API responses.
 
 ## Local Setup
 
@@ -90,6 +94,17 @@ The `/projects` route displays a backend-backed workspace ordered as:
 The page supports project create/edit/archive, project status display, timeline and status history display, task create/edit/status/archive, room create/edit/archive, opening create/edit/archive, measurement set create/detail, and measurement item create/edit/archive.
 
 Room detail displays `floor_area`, `ceiling_area`, `wall_area_gross`, `wall_area_net`, and `total_paintable_area` returned by the backend. The frontend only formats those values for display.
+
+## Calculations
+
+The `/calculations` route displays a backend-backed workspace for:
+
+- registered calculation engines, with implemented engines shown as available and placeholders shown as in preparation
+- calculation run history with engine type, status, linked project/room, and created date
+- painting calculation submission using selected project, optional task, optional room, optional measurement set, paint options, material selections, waste percentage, labor rate, and notes
+- calculation detail with input payload, output payload, assumptions, warnings, and line items returned by the backend
+
+The painting form sends inputs to the backend with `engine_type=painting`. The frontend does not derive totals, liters, selected area, material cost, labor cost, or line item values locally.
 
 ## Authentication
 

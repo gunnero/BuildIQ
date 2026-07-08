@@ -2,6 +2,8 @@
 
 ## 2026-07-08
 
+- Implemented Sprint 17 painting calculation frontend.
+- Added backend-backed calculation run history, calculation engine status display, painting calculation submission, calculation detail output rendering, typed calculation/material API helpers, Macedonian calculation UI states, and frontend tests proving calculation values come from backend responses.
 - Implemented Sprint 16 project, room, and measurement frontend.
 - Added backend-backed project list/create/detail/edit/archive views, project status badges, timeline/status history display, task create/edit/status/archive flows, room create/edit/archive flows, opening create/edit/archive flows, measurement set/item flows, typed project/room/measurement API helpers, Macedonian UI states, and frontend tests for project/room/measurement workflows.
 - Implemented Sprint 15 customer and property frontend.
