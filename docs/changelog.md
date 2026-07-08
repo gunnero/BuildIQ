@@ -2,6 +2,9 @@
 
 ## 2026-07-08
 
+- Implemented Sprint 8 backend Procurement Engine.
+- Added company-scoped supplier, supplier contact, supplier agreement, price book, price book item, and project material price override models with Alembic migration.
+- Added tenant-isolated procurement APIs, archive endpoints, backend-owned price resolution priority, validity date handling, cross-company link validation, and tests.
 - Implemented Sprint 7 backend Material Engine.
 - Added company-scoped material category, manufacturer, material, custom unit, and consumption rule models with Alembic migration.
 - Added global default material units, tenant-isolated material catalog APIs, archive endpoints, consumption rule validation, and tests.

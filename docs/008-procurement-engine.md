@@ -24,6 +24,8 @@ Stores are supplier locations or branches.
 
 Both are company-scoped in BuildIQ because each BuildIQ company may manage its own supplier relationships.
 
+Sprint 8 represents suppliers and stores through the `suppliers` table. The `supplier_type` field distinguishes `supplier` from `store`, and a store may reference a parent supplier with `parent_supplier_id`.
+
 ### Supplier Agreements
 
 Supplier agreements store negotiated commercial terms between a BuildIQ company and a supplier.
@@ -49,6 +51,12 @@ Price books may include:
 - Supplier SKUs
 - Units
 - Validity periods
+
+Sprint 8 price books use `price_type` values:
+
+- `negotiated`
+- `retail`
+- `default`
 
 ### Retail Prices
 
@@ -76,6 +84,8 @@ Overrides must preserve:
 - Creation date
 - Supersession date when replaced
 
+Sprint 8 project material price overrides store `created_by_user_id`, `reason`, validity dates, currency, and notes. Overrides are archived rather than hard-deleted.
+
 ## Price Resolution
 
 Backend price resolution order:
@@ -86,6 +96,20 @@ Backend price resolution order:
 4. Manual backend-approved price
 
 The selected source must be written to the material list item or estimate item.
+
+Sprint 8 exposes resolved price reads before material lists and estimates exist:
+
+- `GET /api/v1/materials/{material_id}/resolved-price`
+- `GET /api/v1/projects/{project_id}/materials/{material_id}/resolved-price`
+
+The response source is one of:
+
+- `project_override`
+- `negotiated_price_book`
+- `retail_price_book`
+- `none`
+
+For price book matches, `source_id` is the selected price book item ID.
 
 ## History Rules
 

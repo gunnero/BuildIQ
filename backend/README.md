@@ -30,13 +30,15 @@ The backend currently includes:
 - Placeholder calculation engine registry and auditable calculation run endpoints
 - Material engine
 - Material category, manufacturer, unit, material, and consumption rule endpoints
+- Procurement engine
+- Supplier, supplier contact, supplier agreement, price book, price book item, project price override, and resolved price endpoints
 - Local development seed command
 
 The backend intentionally does not include:
 
 - Frontend implementation
-- Painting, tiles, knauf, flooring, concrete, facade, payment, supplier, estimate, or other business modules
-- Supplier agreements, price books, retail prices, negotiated company prices, or project price overrides
+- Painting, tiles, knauf, flooring, concrete, facade, payment, estimate, expense, or other business modules
+- Online payments or payment provider integrations
 - PDF generation
 - AI features
 - OpenAI, Anthropic, Gemini, LangChain, LlamaIndex, or other LLM/provider SDKs
@@ -186,6 +188,38 @@ Material endpoints:
 - `PATCH /api/v1/material-consumption-rules/{rule_id}`
 - `POST /api/v1/material-consumption-rules/{rule_id}/archive`
 
+Procurement endpoints:
+
+- `POST /api/v1/suppliers`
+- `GET /api/v1/suppliers`
+- `GET /api/v1/suppliers/{supplier_id}`
+- `PATCH /api/v1/suppliers/{supplier_id}`
+- `POST /api/v1/suppliers/{supplier_id}/archive`
+- `POST /api/v1/suppliers/{supplier_id}/contacts`
+- `GET /api/v1/suppliers/{supplier_id}/contacts`
+- `PATCH /api/v1/supplier-contacts/{contact_id}`
+- `POST /api/v1/supplier-contacts/{contact_id}/archive`
+- `POST /api/v1/suppliers/{supplier_id}/agreements`
+- `GET /api/v1/suppliers/{supplier_id}/agreements`
+- `GET /api/v1/supplier-agreements/{agreement_id}`
+- `PATCH /api/v1/supplier-agreements/{agreement_id}`
+- `POST /api/v1/supplier-agreements/{agreement_id}/archive`
+- `POST /api/v1/price-books`
+- `GET /api/v1/price-books`
+- `GET /api/v1/price-books/{price_book_id}`
+- `PATCH /api/v1/price-books/{price_book_id}`
+- `POST /api/v1/price-books/{price_book_id}/archive`
+- `POST /api/v1/price-books/{price_book_id}/items`
+- `GET /api/v1/price-books/{price_book_id}/items`
+- `PATCH /api/v1/price-book-items/{item_id}`
+- `POST /api/v1/price-book-items/{item_id}/archive`
+- `POST /api/v1/projects/{project_id}/material-price-overrides`
+- `GET /api/v1/projects/{project_id}/material-price-overrides`
+- `PATCH /api/v1/material-price-overrides/{override_id}`
+- `POST /api/v1/material-price-overrides/{override_id}/archive`
+- `GET /api/v1/materials/{material_id}/resolved-price`
+- `GET /api/v1/projects/{project_id}/materials/{material_id}/resolved-price`
+
 ## Run Tests
 
 ```bash
@@ -205,7 +239,8 @@ Current migration status:
 - Room and measurement tables exist.
 - Calculation framework tables exist.
 - Material catalog and material consumption rule tables exist.
-- No concrete calculator formulas, payment, supplier, supplier agreement, price book, estimate, or PDF tables exist yet.
+- Procurement tables exist.
+- No concrete calculator formulas, payment, expense, estimate, online payment, or PDF tables exist yet.
 
 Migration commands:
 

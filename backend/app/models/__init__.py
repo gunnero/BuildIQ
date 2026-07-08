@@ -27,6 +27,14 @@ from app.models.project import (
     ProjectTask,
     ProjectTimelineEvent,
 )
+from app.models.procurement import (
+    PriceBook,
+    PriceBookItem,
+    ProjectMaterialPriceOverride,
+    Supplier,
+    SupplierAgreement,
+    SupplierContact,
+)
 from app.models.subscription import Subscription, SubscriptionPlan
 
 __all__ = [
@@ -47,7 +55,10 @@ __all__ = [
     "MeasurementItem",
     "MeasurementSet",
     "Permission",
+    "PriceBook",
+    "PriceBookItem",
     "Project",
+    "ProjectMaterialPriceOverride",
     "ProjectStatusHistory",
     "ProjectTask",
     "ProjectTimelineEvent",
@@ -60,6 +71,9 @@ __all__ = [
     "RolePermission",
     "Subscription",
     "SubscriptionPlan",
+    "Supplier",
+    "SupplierAgreement",
+    "SupplierContact",
     "User",
     "UserRole",
 ]
