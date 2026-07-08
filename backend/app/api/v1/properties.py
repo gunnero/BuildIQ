@@ -35,6 +35,8 @@ def property_response(property_item: Property) -> PropertyResponse:
         note=property_item.note,
         status=property_item.status,
         archived_at=property_item.archived_at,
+        created_at=property_item.created_at,
+        updated_at=property_item.updated_at,
     )
 
 
@@ -50,6 +52,8 @@ def property_contact_response(contact: PropertyContact) -> PropertyContactRespon
         note=contact.note,
         is_primary=contact.is_primary,
         archived_at=contact.archived_at,
+        created_at=contact.created_at,
+        updated_at=contact.updated_at,
     )
 
 
@@ -61,6 +65,8 @@ def property_note_response(note: PropertyNote) -> PropertyNoteResponse:
         content=note.content,
         created_by_user_id=note.created_by_user_id,
         archived_at=note.archived_at,
+        created_at=note.created_at,
+        updated_at=note.updated_at,
     )
 
 

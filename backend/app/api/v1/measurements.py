@@ -33,6 +33,8 @@ def measurement_set_response(measurement_set: MeasurementSet) -> MeasurementSetR
         name=measurement_set.name,
         description=measurement_set.description,
         archived_at=measurement_set.archived_at,
+        created_at=measurement_set.created_at,
+        updated_at=measurement_set.updated_at,
     )
 
 
@@ -46,6 +48,8 @@ def measurement_item_response(measurement_item: MeasurementItem) -> MeasurementI
         quantity=measurement_item.quantity,
         note=measurement_item.note,
         archived_at=measurement_item.archived_at,
+        created_at=measurement_item.created_at,
+        updated_at=measurement_item.updated_at,
     )
 
 

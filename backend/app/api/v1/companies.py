@@ -18,4 +18,6 @@ def read_current_company(company: Company = Depends(get_current_company)) -> Com
         email=company.email,
         status=company.status,
         is_internal=company.is_internal,
+        created_at=company.created_at,
+        updated_at=company.updated_at,
     )

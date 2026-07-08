@@ -30,6 +30,8 @@ class CustomerResponse(BaseModel):
     note: Optional[str]
     status: str
     archived_at: Optional[datetime]
+    created_at: datetime
+    updated_at: datetime
 
 
 class CustomerContactCreate(BaseModel):
@@ -52,6 +54,8 @@ class CustomerContactResponse(BaseModel):
     note: Optional[str]
     is_primary: bool
     archived_at: Optional[datetime]
+    created_at: datetime
+    updated_at: datetime
 
 
 class PropertyCreate(BaseModel):
@@ -79,6 +83,8 @@ class PropertyResponse(BaseModel):
     note: Optional[str]
     status: str
     archived_at: Optional[datetime]
+    created_at: datetime
+    updated_at: datetime
 
 
 class PropertyContactCreate(BaseModel):
@@ -101,6 +107,8 @@ class PropertyContactResponse(BaseModel):
     note: Optional[str]
     is_primary: bool
     archived_at: Optional[datetime]
+    created_at: datetime
+    updated_at: datetime
 
 
 class PropertyNoteCreate(BaseModel):
@@ -114,3 +122,5 @@ class PropertyNoteResponse(BaseModel):
     content: str
     created_by_user_id: Optional[str]
     archived_at: Optional[datetime]
+    created_at: datetime
+    updated_at: datetime

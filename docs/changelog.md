@@ -2,6 +2,8 @@
 
 ## 2026-07-08
 
+- Implemented Sprint 12 backend stabilization and API contract.
+- Added OpenAPI tag metadata, OpenAPI export command, exported `docs/api/openapi.json`, shared error helpers, audit helper, key audit events, and additive timestamp response fields for API consistency.
 - Implemented Sprint 11 backend Payment and Expense Engine.
 - Added company-scoped payment, payment allocation, expense category, and expense models with Alembic migration.
 - Added tenant-isolated payment/expense APIs, reversal/archive endpoints, positive amount validation, project agreed-price fallback, and backend-owned project financial summaries.

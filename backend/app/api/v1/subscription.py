@@ -7,7 +7,7 @@ from app.models.identity import Company
 from app.models.subscription import Subscription
 from app.schemas.subscription import SubscriptionPlanResponse, SubscriptionResponse
 
-router = APIRouter(prefix="/subscription", tags=["subscription"])
+router = APIRouter(prefix="/subscription", tags=["subscriptions"])
 
 
 @router.get("/me", response_model=SubscriptionResponse)
@@ -31,6 +31,8 @@ def read_current_subscription(
         id=subscription.id,
         company_id=subscription.company_id,
         status=subscription.status,
+        created_at=subscription.created_at,
+        updated_at=subscription.updated_at,
         plan=SubscriptionPlanResponse(
             id=subscription.plan.id,
             key=subscription.plan.key,
@@ -38,5 +40,7 @@ def read_current_subscription(
             price_mkd=subscription.plan.price_mkd,
             billing_period=subscription.plan.billing_period,
             is_active=subscription.plan.is_active,
+            created_at=subscription.plan.created_at,
+            updated_at=subscription.plan.updated_at,
         ),
     )

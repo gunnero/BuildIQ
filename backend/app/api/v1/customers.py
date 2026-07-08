@@ -29,6 +29,8 @@ def customer_response(customer: Customer) -> CustomerResponse:
         note=customer.note,
         status=customer.status,
         archived_at=customer.archived_at,
+        created_at=customer.created_at,
+        updated_at=customer.updated_at,
     )
 
 
@@ -44,6 +46,8 @@ def customer_contact_response(contact: CustomerContact) -> CustomerContactRespon
         note=contact.note,
         is_primary=contact.is_primary,
         archived_at=contact.archived_at,
+        created_at=contact.created_at,
+        updated_at=contact.updated_at,
     )
 
 

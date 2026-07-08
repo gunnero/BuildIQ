@@ -33,6 +33,8 @@ def project_task_response(task: ProjectTask) -> ProjectTaskResponse:
         due_date=task.due_date,
         completed_at=task.completed_at,
         archived_at=task.archived_at,
+        created_at=task.created_at,
+        updated_at=task.updated_at,
     )
 
 

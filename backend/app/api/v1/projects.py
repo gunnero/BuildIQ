@@ -20,6 +20,7 @@ from app.schemas.project import (
     ProjectTimelineEventResponse,
     ProjectUpdate,
 )
+from app.services.audit import record_audit_log
 from app.services.projects import (
     add_project_timeline_event,
     archive_project,
@@ -47,6 +48,8 @@ def project_response(project: Project) -> ProjectResponse:
         start_date=project.start_date,
         due_date=project.due_date,
         archived_at=project.archived_at,
+        created_at=project.created_at,
+        updated_at=project.updated_at,
     )
 
 
@@ -62,6 +65,8 @@ def project_task_response(task: ProjectTask) -> ProjectTaskResponse:
         due_date=task.due_date,
         completed_at=task.completed_at,
         archived_at=task.archived_at,
+        created_at=task.created_at,
+        updated_at=task.updated_at,
     )
 
 
@@ -121,6 +126,15 @@ def create_project(
         project=project,
         event_type="created",
         user_id=current_user.id,
+    )
+    record_audit_log(
+        db,
+        action="project.created",
+        entity_type="project",
+        entity_id=project.id,
+        company_id=company.id,
+        acting_user_id=current_user.id,
+        after_snapshot={"name": project.name, "status": project.status},
     )
     db.commit()
     db.refresh(project)

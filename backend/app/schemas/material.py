@@ -20,6 +20,8 @@ class MaterialCategoryResponse(BaseModel):
     name: str
     description: Optional[str]
     archived_at: Optional[datetime]
+    created_at: datetime
+    updated_at: datetime
 
 
 class MaterialManufacturerCreate(BaseModel):
@@ -41,6 +43,8 @@ class MaterialManufacturerResponse(BaseModel):
     website: Optional[str]
     note: Optional[str]
     archived_at: Optional[datetime]
+    created_at: datetime
+    updated_at: datetime
 
 
 class MaterialUnitCreate(BaseModel):
@@ -57,6 +61,8 @@ class MaterialUnitResponse(BaseModel):
     description: Optional[str]
     is_default: bool
     archived_at: Optional[datetime]
+    created_at: datetime
+    updated_at: datetime
 
 
 class MaterialCreate(BaseModel):
@@ -102,6 +108,8 @@ class MaterialResponse(BaseModel):
     waste_percentage_default: Optional[float]
     is_active: bool
     archived_at: Optional[datetime]
+    created_at: datetime
+    updated_at: datetime
 
 
 class MaterialConsumptionRuleCreate(BaseModel):
@@ -135,3 +143,5 @@ class MaterialConsumptionRuleResponse(BaseModel):
     waste_percentage: Optional[float]
     description: Optional[str]
     archived_at: Optional[datetime]
+    created_at: datetime
+    updated_at: datetime

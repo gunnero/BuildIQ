@@ -21,6 +21,40 @@ V1 routes should use:
 - V1 has no AI routes.
 - Future AI routes must hand work to Kalveri OS, not an LLM provider.
 
+## OpenAPI Contract
+
+FastAPI must generate a valid OpenAPI contract for the backend.
+
+During backend development, export the contract with:
+
+```bash
+cd backend
+../.venv/bin/buildiq-export-openapi
+```
+
+The generated file is stored at:
+
+`docs/api/openapi.json`
+
+Every endpoint should have a clear OpenAPI tag and summary. V1 backend tags are:
+
+- `health`
+- `auth`
+- `companies`
+- `subscriptions`
+- `customers`
+- `properties`
+- `projects`
+- `tasks`
+- `rooms`
+- `measurements`
+- `materials`
+- `procurement`
+- `calculations`
+- `estimates`
+- `payments`
+- `expenses`
+
 ## Authentication
 
 Authentication routes:
@@ -89,6 +123,18 @@ Examples:
 
 Frontend must display these values, not recalculate them.
 
+Resource responses should use consistent field names:
+
+- `id` for the resource identifier.
+- `company_id` for company-scoped customer-owned records.
+- `created_at` and `updated_at` for mutable records with timestamp columns.
+- `created_at` for immutable history or audit rows that do not have an update timestamp.
+- `archived_at` for records that support archive workflows.
+
+List endpoints should use predictable ordering. The default order is `created_at` ascending unless a workflow-specific order is clearer, such as revision number, sort order, or latest active subscription.
+
+List endpoints should exclude archived records unless the endpoint is explicitly a history or detail view where archived records are intentionally readable.
+
 ## Validation Errors
 
 Validation error payload fields may be English, but message text must be Macedonian.
@@ -101,6 +147,16 @@ Example:
   "message": "Внесете валиден износ."
 }
 ```
+
+Backend code should use shared error helpers for common API failures:
+
+- not found
+- forbidden or cross-tenant access
+- validation failure
+- archived record access
+- invalid state transition
+
+The current API keeps existing `detail` message behavior for compatibility, with Macedonian user-facing message text.
 
 ## Pagination and Filtering
 
@@ -123,6 +179,8 @@ Examples:
 - Supplier agreement changes
 - Payment and expense void history
 - Audit logs
+
+Sensitive mutations should create audit logs without overcomplicating normal route code. Current low-risk audit events include login success, project creation, estimate status changes, payment creation, and payment reversal.
 
 ## AI Prohibition
 

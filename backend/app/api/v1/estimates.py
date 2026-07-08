@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_company
+from app.api.deps import get_current_company, get_current_user
 from app.db.session import get_db
 from app.models.estimate import Estimate, EstimateItem, EstimateRevision
-from app.models.identity import Company
+from app.models.identity import Company, User
 from app.schemas.estimate import (
     EstimateCreate,
     EstimateFromCalculationCreate,
@@ -16,6 +16,7 @@ from app.schemas.estimate import (
     EstimateStatusUpdate,
     EstimateUpdate,
 )
+from app.services.audit import record_audit_log
 from app.services.estimates import (
     archive_estimate,
     archive_estimate_item,
@@ -175,10 +176,22 @@ def change_estimate_status_endpoint(
     estimate_id: str,
     payload: EstimateStatusUpdate,
     company: Company = Depends(get_current_company),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> EstimateResponse:
     estimate = get_active_estimate_for_company(db, company_id=company.id, estimate_id=estimate_id)
+    before_status = estimate.status
     change_estimate_status(estimate, status_value=payload.status)
+    record_audit_log(
+        db,
+        action="estimate.status_changed",
+        entity_type="estimate",
+        entity_id=estimate.id,
+        company_id=company.id,
+        acting_user_id=current_user.id,
+        before_snapshot={"status": before_status},
+        after_snapshot={"status": estimate.status},
+    )
     db.add(estimate)
     db.commit()
     db.refresh(estimate)

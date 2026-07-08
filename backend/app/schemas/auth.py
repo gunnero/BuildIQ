@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel
 
 
@@ -19,3 +21,5 @@ class CurrentUserResponse(BaseModel):
     status: str
     is_hq_admin: bool
     roles: list[str]
+    created_at: datetime
+    updated_at: datetime

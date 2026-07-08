@@ -45,6 +45,8 @@ class RoomResponse(BaseModel):
     wall_area_net: float
     total_paintable_area: float
     archived_at: Optional[datetime]
+    created_at: datetime
+    updated_at: datetime
 
 
 class RoomOpeningCreate(BaseModel):
@@ -77,6 +79,8 @@ class RoomOpeningResponse(BaseModel):
     opening_area: float
     note: Optional[str]
     archived_at: Optional[datetime]
+    created_at: datetime
+    updated_at: datetime
 
 
 class MeasurementSetCreate(BaseModel):
@@ -93,6 +97,8 @@ class MeasurementSetResponse(BaseModel):
     name: str
     description: Optional[str]
     archived_at: Optional[datetime]
+    created_at: datetime
+    updated_at: datetime
 
 
 class MeasurementItemCreate(BaseModel):
@@ -118,3 +124,5 @@ class MeasurementItemResponse(BaseModel):
     quantity: float
     note: Optional[str]
     archived_at: Optional[datetime]
+    created_at: datetime
+    updated_at: datetime

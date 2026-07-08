@@ -42,6 +42,8 @@ class ProjectResponse(BaseModel):
     start_date: Optional[date]
     due_date: Optional[date]
     archived_at: Optional[datetime]
+    created_at: datetime
+    updated_at: datetime
 
 
 class ProjectStatusHistoryResponse(BaseModel):
@@ -94,3 +96,5 @@ class ProjectTaskResponse(BaseModel):
     due_date: Optional[date]
     completed_at: Optional[datetime]
     archived_at: Optional[datetime]
+    created_at: datetime
+    updated_at: datetime

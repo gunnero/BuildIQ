@@ -30,6 +30,7 @@ class CalculationLineItemResponse(BaseModel):
     unit: Optional[str]
     quantity: Optional[float]
     payload: Optional[dict[str, Any]]
+    created_at: datetime
 
 
 class CalculationRunResponse(BaseModel):

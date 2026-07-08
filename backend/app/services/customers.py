@@ -1,13 +1,14 @@
 from datetime import datetime
 
-from fastapi import HTTPException, status
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
+from app.core.errors import not_found as shared_not_found
 from app.models.customer import Customer, Property
 
 
 def not_found(message: str = "Записот не е пронајден.") -> HTTPException:
-    return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=message)
+    return shared_not_found(message)
 
 
 def get_active_customer_for_company(

@@ -40,6 +40,8 @@ class SupplierResponse(BaseModel):
     note: Optional[str]
     status: str
     archived_at: Optional[datetime]
+    created_at: datetime
+    updated_at: datetime
 
 
 class SupplierContactCreate(BaseModel):
@@ -71,6 +73,8 @@ class SupplierContactResponse(BaseModel):
     note: Optional[str]
     is_primary: bool
     archived_at: Optional[datetime]
+    created_at: datetime
+    updated_at: datetime
 
 
 class SupplierAgreementCreate(BaseModel):
@@ -102,6 +106,8 @@ class SupplierAgreementResponse(BaseModel):
     terms_snapshot: dict[str, Any]
     notes: Optional[str]
     archived_at: Optional[datetime]
+    created_at: datetime
+    updated_at: datetime
 
 
 class PriceBookCreate(BaseModel):
@@ -141,6 +147,8 @@ class PriceBookResponse(BaseModel):
     valid_until: Optional[date]
     notes: Optional[str]
     archived_at: Optional[datetime]
+    created_at: datetime
+    updated_at: datetime
 
 
 class PriceBookItemCreate(BaseModel):
@@ -178,6 +186,8 @@ class PriceBookItemResponse(BaseModel):
     valid_until: Optional[date]
     notes: Optional[str]
     archived_at: Optional[datetime]
+    created_at: datetime
+    updated_at: datetime
 
 
 class ProjectMaterialPriceOverrideCreate(BaseModel):
@@ -216,6 +226,8 @@ class ProjectMaterialPriceOverrideResponse(BaseModel):
     notes: Optional[str]
     created_by_user_id: str
     archived_at: Optional[datetime]
+    created_at: datetime
+    updated_at: datetime
 
 
 class ResolvedPriceResponse(BaseModel):

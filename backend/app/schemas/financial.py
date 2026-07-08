@@ -36,6 +36,8 @@ class PaymentAllocationResponse(BaseModel):
     amount: float
     note: Optional[str]
     archived_at: Optional[datetime]
+    created_at: datetime
+    updated_at: datetime
 
 
 class PaymentResponse(BaseModel):

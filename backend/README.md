@@ -37,6 +37,9 @@ The backend currently includes:
 - Estimate, estimate revision, estimate item, status, archive, and from-calculation endpoints
 - Payment and expense engine
 - Payment, payment allocation, expense category, expense, reversal, archive, and project financial summary endpoints
+- Backend API contract stabilization
+- OpenAPI tag metadata and export command
+- Shared error helpers and audit helper
 - Local development seed command
 
 The backend intentionally does not include:
@@ -98,6 +101,26 @@ Health check:
 
 ```bash
 curl http://127.0.0.1:8000/health
+```
+
+Interactive API documentation:
+
+- Swagger UI: `http://127.0.0.1:8000/docs`
+- ReDoc: `http://127.0.0.1:8000/redoc`
+- OpenAPI JSON: `http://127.0.0.1:8000/openapi.json`
+
+Export the OpenAPI contract to `docs/api/openapi.json`:
+
+```bash
+cd backend
+../.venv/bin/buildiq-export-openapi
+```
+
+You can also pass a custom output path:
+
+```bash
+cd backend
+../.venv/bin/buildiq-export-openapi ../docs/api/openapi.json
 ```
 
 Authentication endpoints:
@@ -308,6 +331,7 @@ Current migration status:
 - Procurement tables exist.
 - Estimate tables exist.
 - Payment and expense tables exist.
+- API contract export is available.
 - No tiles, knauf, flooring, concrete, facade, online payment, or PDF tables exist yet.
 
 Migration commands:

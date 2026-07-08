@@ -54,6 +54,8 @@ def material_category_response(category: MaterialCategory) -> MaterialCategoryRe
         name=category.name,
         description=category.description,
         archived_at=category.archived_at,
+        created_at=category.created_at,
+        updated_at=category.updated_at,
     )
 
 
@@ -67,6 +69,8 @@ def material_manufacturer_response(
         website=manufacturer.website,
         note=manufacturer.note,
         archived_at=manufacturer.archived_at,
+        created_at=manufacturer.created_at,
+        updated_at=manufacturer.updated_at,
     )
 
 
@@ -79,6 +83,8 @@ def material_unit_response(unit: MaterialUnit) -> MaterialUnitResponse:
         description=unit.description,
         is_default=unit.is_default,
         archived_at=unit.archived_at,
+        created_at=unit.created_at,
+        updated_at=unit.updated_at,
     )
 
 
@@ -98,6 +104,8 @@ def material_response(material: Material) -> MaterialResponse:
         waste_percentage_default=material.waste_percentage_default,
         is_active=material.is_active,
         archived_at=material.archived_at,
+        created_at=material.created_at,
+        updated_at=material.updated_at,
     )
 
 
@@ -115,6 +123,8 @@ def material_consumption_rule_response(
         waste_percentage=rule.waste_percentage,
         description=rule.description,
         archived_at=rule.archived_at,
+        created_at=rule.created_at,
+        updated_at=rule.updated_at,
     )
 
 

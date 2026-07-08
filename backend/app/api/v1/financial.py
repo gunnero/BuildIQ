@@ -19,6 +19,7 @@ from app.schemas.financial import (
     ProjectFinancialSummaryResponse,
     ReverseCreate,
 )
+from app.services.audit import record_audit_log
 from app.services.financial import (
     archive_expense,
     archive_payment,
@@ -34,7 +35,7 @@ from app.services.financial import (
     reverse_payment,
 )
 
-router = APIRouter(tags=["financial"])
+router = APIRouter()
 
 
 def allocation_response(allocation: PaymentAllocation) -> PaymentAllocationResponse:
@@ -47,6 +48,8 @@ def allocation_response(allocation: PaymentAllocation) -> PaymentAllocationRespo
         amount=allocation.amount,
         note=allocation.note,
         archived_at=allocation.archived_at,
+        created_at=allocation.created_at,
+        updated_at=allocation.updated_at,
     )
 
 
@@ -116,7 +119,13 @@ def expense_response(expense: Expense) -> ExpenseResponse:
     )
 
 
-@router.post("/payments", response_model=PaymentResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/payments",
+    response_model=PaymentResponse,
+    status_code=status.HTTP_201_CREATED,
+    tags=["payments"],
+    summary="Create payment",
+)
 def create_payment_endpoint(
     payload: PaymentCreate,
     company: Company = Depends(get_current_company),
@@ -129,12 +138,30 @@ def create_payment_endpoint(
         user_id=current_user.id,
         payload=payload,
     )
+    record_audit_log(
+        db,
+        action="payment.created",
+        entity_type="payment",
+        entity_id=payment.id,
+        company_id=company.id,
+        acting_user_id=current_user.id,
+        after_snapshot={
+            "amount": payment.amount,
+            "status": payment.status,
+            "project_id": payment.project_id,
+        },
+    )
     db.commit()
     db.refresh(payment)
     return payment_response(payment)
 
 
-@router.get("/payments", response_model=list[PaymentResponse])
+@router.get(
+    "/payments",
+    response_model=list[PaymentResponse],
+    tags=["payments"],
+    summary="List payments",
+)
 def list_payments(
     company: Company = Depends(get_current_company),
     db: Session = Depends(get_db),
@@ -148,7 +175,12 @@ def list_payments(
     return [payment_response(payment) for payment in payments]
 
 
-@router.get("/payments/{payment_id}", response_model=PaymentResponse)
+@router.get(
+    "/payments/{payment_id}",
+    response_model=PaymentResponse,
+    tags=["payments"],
+    summary="Read payment",
+)
 def read_payment(
     payment_id: str,
     company: Company = Depends(get_current_company),
@@ -158,7 +190,12 @@ def read_payment(
     return payment_response(payment)
 
 
-@router.post("/payments/{payment_id}/reverse", response_model=PaymentResponse)
+@router.post(
+    "/payments/{payment_id}/reverse",
+    response_model=PaymentResponse,
+    tags=["payments"],
+    summary="Reverse payment",
+)
 def reverse_payment_endpoint(
     payment_id: str,
     payload: ReverseCreate,
@@ -167,14 +204,30 @@ def reverse_payment_endpoint(
     db: Session = Depends(get_db),
 ) -> PaymentResponse:
     payment = get_active_payment_for_company(db, company_id=company.id, payment_id=payment_id)
+    before_status = payment.status
     reverse_payment(payment, reason=payload.reason, user_id=current_user.id)
+    record_audit_log(
+        db,
+        action="payment.reversed",
+        entity_type="payment",
+        entity_id=payment.id,
+        company_id=company.id,
+        acting_user_id=current_user.id,
+        before_snapshot={"status": before_status},
+        after_snapshot={"status": payment.status, "reversal_reason": payment.reversal_reason},
+    )
     db.add(payment)
     db.commit()
     db.refresh(payment)
     return payment_response(payment)
 
 
-@router.post("/payments/{payment_id}/archive", response_model=PaymentResponse)
+@router.post(
+    "/payments/{payment_id}/archive",
+    response_model=PaymentResponse,
+    tags=["payments"],
+    summary="Archive payment",
+)
 def archive_payment_endpoint(
     payment_id: str,
     company: Company = Depends(get_current_company),
@@ -191,6 +244,8 @@ def archive_payment_endpoint(
 @router.get(
     "/projects/{project_id}/financial-summary",
     response_model=ProjectFinancialSummaryResponse,
+    tags=["payments"],
+    summary="Read project financial summary",
 )
 def read_project_financial_summary(
     project_id: str,
@@ -206,6 +261,8 @@ def read_project_financial_summary(
     "/expense-categories",
     response_model=ExpenseCategoryResponse,
     status_code=status.HTTP_201_CREATED,
+    tags=["expenses"],
+    summary="Create expense category",
 )
 def create_expense_category(
     payload: ExpenseCategoryCreate,
@@ -223,7 +280,12 @@ def create_expense_category(
     return expense_category_response(category)
 
 
-@router.get("/expense-categories", response_model=list[ExpenseCategoryResponse])
+@router.get(
+    "/expense-categories",
+    response_model=list[ExpenseCategoryResponse],
+    tags=["expenses"],
+    summary="List expense categories",
+)
 def list_expense_categories(
     company: Company = Depends(get_current_company),
     db: Session = Depends(get_db),
@@ -240,7 +302,12 @@ def list_expense_categories(
     return [expense_category_response(category) for category in categories]
 
 
-@router.patch("/expense-categories/{category_id}", response_model=ExpenseCategoryResponse)
+@router.patch(
+    "/expense-categories/{category_id}",
+    response_model=ExpenseCategoryResponse,
+    tags=["expenses"],
+    summary="Update expense category",
+)
 def update_expense_category(
     category_id: str,
     payload: ExpenseCategoryUpdate,
@@ -260,7 +327,12 @@ def update_expense_category(
     return expense_category_response(category)
 
 
-@router.post("/expense-categories/{category_id}/archive", response_model=ExpenseCategoryResponse)
+@router.post(
+    "/expense-categories/{category_id}/archive",
+    response_model=ExpenseCategoryResponse,
+    tags=["expenses"],
+    summary="Archive expense category",
+)
 def archive_expense_category(
     category_id: str,
     company: Company = Depends(get_current_company),
@@ -278,7 +350,13 @@ def archive_expense_category(
     return expense_category_response(category)
 
 
-@router.post("/expenses", response_model=ExpenseResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/expenses",
+    response_model=ExpenseResponse,
+    status_code=status.HTTP_201_CREATED,
+    tags=["expenses"],
+    summary="Create expense",
+)
 def create_expense_endpoint(
     payload: ExpenseCreate,
     company: Company = Depends(get_current_company),
@@ -296,7 +374,12 @@ def create_expense_endpoint(
     return expense_response(expense)
 
 
-@router.get("/expenses", response_model=list[ExpenseResponse])
+@router.get(
+    "/expenses",
+    response_model=list[ExpenseResponse],
+    tags=["expenses"],
+    summary="List expenses",
+)
 def list_expenses(
     company: Company = Depends(get_current_company),
     db: Session = Depends(get_db),
@@ -310,7 +393,12 @@ def list_expenses(
     return [expense_response(expense) for expense in expenses]
 
 
-@router.get("/expenses/{expense_id}", response_model=ExpenseResponse)
+@router.get(
+    "/expenses/{expense_id}",
+    response_model=ExpenseResponse,
+    tags=["expenses"],
+    summary="Read expense",
+)
 def read_expense(
     expense_id: str,
     company: Company = Depends(get_current_company),
@@ -320,7 +408,12 @@ def read_expense(
     return expense_response(expense)
 
 
-@router.post("/expenses/{expense_id}/reverse", response_model=ExpenseResponse)
+@router.post(
+    "/expenses/{expense_id}/reverse",
+    response_model=ExpenseResponse,
+    tags=["expenses"],
+    summary="Reverse expense",
+)
 def reverse_expense_endpoint(
     expense_id: str,
     payload: ReverseCreate,
@@ -336,7 +429,12 @@ def reverse_expense_endpoint(
     return expense_response(expense)
 
 
-@router.post("/expenses/{expense_id}/archive", response_model=ExpenseResponse)
+@router.post(
+    "/expenses/{expense_id}/archive",
+    response_model=ExpenseResponse,
+    tags=["expenses"],
+    summary="Archive expense",
+)
 def archive_expense_endpoint(
     expense_id: str,
     company: Company = Depends(get_current_company),

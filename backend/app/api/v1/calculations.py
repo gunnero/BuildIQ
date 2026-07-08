@@ -32,6 +32,7 @@ def calculation_line_item_response(line_item: CalculationLineItem) -> Calculatio
         unit=line_item.unit,
         quantity=line_item.quantity,
         payload=line_item.payload,
+        created_at=line_item.created_at,
     )
 
 

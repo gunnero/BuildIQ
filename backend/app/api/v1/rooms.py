@@ -44,6 +44,8 @@ def room_response(room: Room, db: Session) -> RoomResponse:
         width=room.width,
         height=room.height,
         archived_at=room.archived_at,
+        created_at=room.created_at,
+        updated_at=room.updated_at,
         **computed,
     )
 
@@ -61,6 +63,8 @@ def opening_response(opening: RoomOpening) -> RoomOpeningResponse:
         opening_area=opening_area(opening),
         note=opening.note,
         archived_at=opening.archived_at,
+        created_at=opening.created_at,
+        updated_at=opening.updated_at,
     )
 
 

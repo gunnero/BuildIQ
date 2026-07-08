@@ -22,6 +22,7 @@ dev = [
 
 [project.scripts]
 buildiq-seed-dev = "app.seeds.dev:main"
+buildiq-export-openapi = "app.scripts.export_openapi:main"
 
 [build-system]
 requires = ["setuptools>=69.0"]

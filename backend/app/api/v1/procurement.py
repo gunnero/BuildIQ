@@ -79,6 +79,8 @@ def supplier_response(supplier: Supplier) -> SupplierResponse:
         note=supplier.note,
         status=supplier.status,
         archived_at=supplier.archived_at,
+        created_at=supplier.created_at,
+        updated_at=supplier.updated_at,
     )
 
 
@@ -94,6 +96,8 @@ def supplier_contact_response(contact: SupplierContact) -> SupplierContactRespon
         note=contact.note,
         is_primary=contact.is_primary,
         archived_at=contact.archived_at,
+        created_at=contact.created_at,
+        updated_at=contact.updated_at,
     )
 
 
@@ -109,6 +113,8 @@ def supplier_agreement_response(agreement: SupplierAgreement) -> SupplierAgreeme
         terms_snapshot=agreement.terms_snapshot,
         notes=agreement.notes,
         archived_at=agreement.archived_at,
+        created_at=agreement.created_at,
+        updated_at=agreement.updated_at,
     )
 
 
@@ -126,6 +132,8 @@ def price_book_response(price_book: PriceBook) -> PriceBookResponse:
         valid_until=price_book.valid_until,
         notes=price_book.notes,
         archived_at=price_book.archived_at,
+        created_at=price_book.created_at,
+        updated_at=price_book.updated_at,
     )
 
 
@@ -143,6 +151,8 @@ def price_book_item_response(item: PriceBookItem) -> PriceBookItemResponse:
         valid_until=item.valid_until,
         notes=item.notes,
         archived_at=item.archived_at,
+        created_at=item.created_at,
+        updated_at=item.updated_at,
     )
 
 
@@ -163,6 +173,8 @@ def material_price_override_response(
         notes=override.notes,
         created_by_user_id=override.created_by_user_id,
         archived_at=override.archived_at,
+        created_at=override.created_at,
+        updated_at=override.updated_at,
     )
 
 
