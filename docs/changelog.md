@@ -2,6 +2,8 @@
 
 ## 2026-07-08
 
+- Implemented Sprint 13 frontend foundation.
+- Added React, TypeScript, Vite, TailwindCSS, React Router, TanStack Query, React Hook Form, Zod, API client, auth token storage, protected route shell, Macedonian navigation, login page, empty states, frontend tests, and frontend README.
 - Implemented Sprint 12 backend stabilization and API contract.
 - Added OpenAPI tag metadata, OpenAPI export command, exported `docs/api/openapi.json`, shared error helpers, audit helper, key audit events, and additive timestamp response fields for API consistency.
 - Implemented Sprint 11 backend Payment and Expense Engine.

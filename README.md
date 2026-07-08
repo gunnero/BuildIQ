@@ -103,7 +103,8 @@ BuildIQ owns construction workflows, calculations, customers, projects, payments
 - Estimates, price books, supplier agreements, and financial records must preserve history.
 - Construction calculations must be deterministic and auditable.
 - Payment tracking must store agreed project price, total paid, remaining amount, payment history, payment date, payment method, payment note, and payment status.
-- Backend and frontend implementation will be added after this documentation scaffold.
+- Backend implementation has started under `backend/`.
+- Frontend foundation has started under `frontend/`.
 
 ## BuildIQ Blueprint v1.0
 
