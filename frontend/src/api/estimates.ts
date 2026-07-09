@@ -1,10 +1,12 @@
-import { apiRequest } from "./client";
+import { apiBlobRequest, apiRequest } from "./client";
 import type {
   EstimateCreateRequest,
+  EstimateDocumentResponse,
   EstimateFromCalculationCreateRequest,
   EstimateItemCreateRequest,
   EstimateItemResponse,
   EstimateItemUpdateRequest,
+  EstimatePdfCreateRequest,
   EstimateResponse,
   EstimateRevisionResponse,
   EstimateStatusUpdateRequest,
@@ -44,6 +46,22 @@ export function changeEstimateStatus(
 export function archiveEstimate(estimateId: string): Promise<EstimateResponse> {
   return apiRequest<EstimateResponse>(`/api/v1/estimates/${estimateId}/archive`, {
     method: "POST",
+  });
+}
+
+export function generateEstimatePdf(
+  estimateId: string,
+  payload: EstimatePdfCreateRequest,
+): Promise<EstimateDocumentResponse> {
+  return apiRequest<EstimateDocumentResponse>(`/api/v1/estimates/${estimateId}/pdf`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function downloadEstimateDocument(documentId: string): Promise<Blob> {
+  return apiBlobRequest(`/api/v1/estimate-documents/${documentId}/download`, {
+    method: "GET",
   });
 }
 

@@ -73,3 +73,29 @@ export async function apiRequest<T>(path: string, options: ApiRequestOptions = {
 
   return payload as T;
 }
+
+export async function apiBlobRequest(path: string, options: ApiRequestOptions = {}): Promise<Blob> {
+  const token = options.token === undefined ? getToken() : options.token;
+  const headers = new Headers(options.headers);
+
+  if (token) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
+
+  const response = await fetch(buildUrl(path), {
+    ...options,
+    headers,
+  });
+
+  if (!response.ok) {
+    const payload = await response.json().catch(() => null);
+    if (response.status === 401) {
+      clearToken();
+      unauthorizedHandler?.();
+    }
+
+    throw new ApiError(resolveErrorMessage(payload), response.status);
+  }
+
+  return response.blob();
+}

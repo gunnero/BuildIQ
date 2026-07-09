@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-07-09
+
+- Implemented Sprint 21 estimate PDF frontend.
+- Added estimate detail PDF generation/download actions, backend PDF endpoint helpers, returned document metadata display, Macedonian PDF UI states, and tests proving the frontend only sends the selected revision and downloads generated PDFs from backend endpoints.
+
 ## 2026-07-08
 
 - Implemented Sprint 20 estimate PDF backend.

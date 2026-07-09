@@ -1,5 +1,5 @@
 import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Archive, Check, Plus, Send, XCircle } from "lucide-react";
+import { Archive, Check, Download, FileText, Plus, Send, XCircle } from "lucide-react";
 import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent, type ReactNode } from "react";
 
 import { listCalculations } from "../api/calculations";
@@ -11,6 +11,8 @@ import {
   createEstimate,
   createEstimateFromCalculation,
   createEstimateItem,
+  downloadEstimateDocument,
+  generateEstimatePdf,
   listEstimateItems,
   listEstimateRevisions,
   listEstimates,
@@ -21,6 +23,7 @@ import { listProjects } from "../api/projects";
 import type {
   CalculationRunResponse,
   CustomerResponse,
+  EstimateDocumentResponse,
   EstimateItemCreateRequest,
   EstimateItemResponse,
   EstimateItemUpdateRequest,
@@ -137,6 +140,14 @@ function formatDate(value: string | null | undefined): string {
   return new Intl.DateTimeFormat("mk-MK", { dateStyle: "medium" }).format(new Date(value));
 }
 
+function formatDateTime(value: string | null | undefined): string {
+  if (!value) {
+    return "Не е внесено";
+  }
+
+  return new Intl.DateTimeFormat("mk-MK", { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
+}
+
 function formatStatus(status: string): string {
   return statusLabels[status] ?? status;
 }
@@ -147,6 +158,14 @@ function formatItemType(itemType: string): string {
 
 function formatEngine(engineType: string): string {
   return engineLabels[engineType] ?? engineType;
+}
+
+function formatDocumentType(documentType: string): string {
+  if (documentType === "estimate_quote_pdf") {
+    return "PDF понуда";
+  }
+
+  return documentType;
 }
 
 function localizedErrorMessage(error: unknown, fallback: string): string {
@@ -339,11 +358,13 @@ function PrimaryButton({ children, disabled = false }: { children: ReactNode; di
 
 function ActionButton({
   children,
+  disabled = false,
   icon,
   onClick,
   tone = "neutral",
 }: {
   children: ReactNode;
+  disabled?: boolean;
   icon: ReactNode;
   onClick: () => void;
   tone?: "neutral" | "success" | "danger";
@@ -359,7 +380,8 @@ function ActionButton({
     <button
       type="button"
       onClick={onClick}
-      className={`inline-flex h-10 items-center justify-center gap-2 rounded-md border bg-white px-3 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2 ${toneClass}`}
+      disabled={disabled}
+      className={`inline-flex h-10 items-center justify-center gap-2 rounded-md border bg-white px-3 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-70 ${toneClass}`}
     >
       {icon}
       {children}
@@ -403,6 +425,7 @@ export function EstimatesPage() {
   const [itemForm, setItemForm] = useState<ItemFormState>(emptyItemForm);
   const [itemEditForm, setItemEditForm] = useState<ItemFormState>(emptyItemForm);
   const [pageMessage, setPageMessage] = useState<PageMessage | null>(null);
+  const [pdfDocumentsByEstimateId, setPdfDocumentsByEstimateId] = useState<Record<string, EstimateDocumentResponse[]>>({});
 
   const customersQuery = useQuery({ queryKey: ["customers"], queryFn: listCustomers });
   const projectsQuery = useQuery({ queryKey: ["projects"], queryFn: listProjects });
@@ -440,6 +463,7 @@ export function EstimatesPage() {
   const selectedRevisions = selectedEstimate ? (revisionsByEstimateId.get(selectedEstimate.id) ?? []) : [];
   const selectedRevision =
     selectedRevisions.find((revision) => revision.id === selectedRevisionId) ?? latestRevision(selectedRevisions);
+  const selectedPdfDocuments = selectedEstimate ? (pdfDocumentsByEstimateId[selectedEstimate.id] ?? []) : [];
 
   const itemsQuery = useQuery({
     queryKey: ["estimate-items", selectedRevision?.id],
@@ -593,6 +617,46 @@ export function EstimatesPage() {
     },
   });
 
+  const generatePdfMutation = useMutation({
+    mutationFn: ({ estimateId, revisionId }: { estimateId: string; revisionId: string | null }) =>
+      generateEstimatePdf(estimateId, { revision_id: revisionId }),
+    onSuccess: (document) => {
+      setPageMessage({ text: "PDF понудата е генерирана.", tone: "success" });
+      setPdfDocumentsByEstimateId((current) => {
+        const existingDocuments = current[document.estimate_id] ?? [];
+        const withoutDuplicate = existingDocuments.filter((item) => item.id !== document.id);
+        return {
+          ...current,
+          [document.estimate_id]: [document, ...withoutDuplicate],
+        };
+      });
+    },
+    onError: (error) => {
+      setPageMessage({ text: localizedErrorMessage(error, "PDF понудата не беше генерирана."), tone: "error" });
+    },
+  });
+
+  const downloadPdfMutation = useMutation({
+    mutationFn: async (document: EstimateDocumentResponse) => ({
+      blob: await downloadEstimateDocument(document.id),
+      document,
+    }),
+    onSuccess: ({ blob, document }) => {
+      const objectUrl = URL.createObjectURL(blob);
+      const link = window.document.createElement("a");
+      link.href = objectUrl;
+      link.download = `ponuda-${document.estimate_id}-${document.revision_id}.pdf`;
+      window.document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(objectUrl);
+      setPageMessage({ text: "PDF документот е преземен.", tone: "success" });
+    },
+    onError: (error) => {
+      setPageMessage({ text: localizedErrorMessage(error, "PDF документот не може да се преземе."), tone: "error" });
+    },
+  });
+
   function handleEstimateFormField(field: keyof EstimateFormState) {
     return (event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
       setEstimateForm((current) => ({ ...current, [field]: event.target.value }));
@@ -697,6 +761,27 @@ export function EstimatesPage() {
     if (selectedItem) {
       archiveItemMutation.mutate(selectedItem.id);
     }
+  }
+
+  function handleGeneratePdf() {
+    if (!selectedEstimate) {
+      return;
+    }
+
+    generatePdfMutation.mutate({
+      estimateId: selectedEstimate.id,
+      revisionId: selectedRevision?.id ?? null,
+    });
+  }
+
+  function handleDownloadPdf(documentId: string) {
+    const document = selectedPdfDocuments.find((item) => item.id === documentId);
+    if (!document) {
+      setPageMessage({ text: "PDF документот не е достапен за преземање.", tone: "error" });
+      return;
+    }
+
+    downloadPdfMutation.mutate(document);
   }
 
   return (
@@ -821,6 +906,7 @@ export function EstimatesPage() {
               <EstimateDetail
                 canEditRevision={canEditRevision}
                 customerName={customerLabel(selectedEstimate.customer_id)}
+                downloadingDocumentId={downloadPdfMutation.isPending ? (downloadPdfMutation.variables?.id ?? null) : null}
                 estimate={selectedEstimate}
                 itemEditForm={itemEditForm}
                 itemForm={itemForm}
@@ -831,12 +917,16 @@ export function EstimatesPage() {
                 onArchiveEstimate={handleArchiveEstimate}
                 onArchiveItem={handleArchiveItem}
                 onCreateItem={handleCreateItem}
+                onDownloadPdf={handleDownloadPdf}
                 onEditItemField={handleItemEditFormField}
+                onGeneratePdf={handleGeneratePdf}
                 onItemField={handleItemFormField}
                 onRevisionSelect={setSelectedRevisionId}
                 onSelectedItemChange={setSelectedItemId}
                 onStatusChange={handleEstimateStatus}
                 onUpdateItem={handleUpdateItem}
+                pdfDocuments={selectedPdfDocuments}
+                pdfGenerating={generatePdfMutation.isPending}
                 projectName={projectLabel(selectedEstimate.project_id)}
                 revisions={selectedRevisions}
                 selectedItem={selectedItem}
@@ -855,6 +945,7 @@ export function EstimatesPage() {
 function EstimateDetail({
   canEditRevision,
   customerName,
+  downloadingDocumentId,
   estimate,
   itemEditForm,
   itemForm,
@@ -865,12 +956,16 @@ function EstimateDetail({
   onArchiveEstimate,
   onArchiveItem,
   onCreateItem,
+  onDownloadPdf,
   onEditItemField,
+  onGeneratePdf,
   onItemField,
   onRevisionSelect,
   onSelectedItemChange,
   onStatusChange,
   onUpdateItem,
+  pdfDocuments,
+  pdfGenerating,
   projectName,
   revisions,
   selectedItem,
@@ -878,6 +973,7 @@ function EstimateDetail({
 }: {
   canEditRevision: boolean;
   customerName: string;
+  downloadingDocumentId: string | null;
   estimate: EstimateResponse;
   itemEditForm: ItemFormState;
   itemForm: ItemFormState;
@@ -888,12 +984,16 @@ function EstimateDetail({
   onArchiveEstimate: () => void;
   onArchiveItem: () => void;
   onCreateItem: (event: FormEvent<HTMLFormElement>) => void;
+  onDownloadPdf: (documentId: string) => void;
   onEditItemField: (field: keyof ItemFormState) => (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+  onGeneratePdf: () => void;
   onItemField: (field: keyof ItemFormState) => (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   onRevisionSelect: (revisionId: string) => void;
   onSelectedItemChange: (itemId: string) => void;
   onStatusChange: (status: string) => void;
   onUpdateItem: (event: FormEvent<HTMLFormElement>) => void;
+  pdfDocuments: EstimateDocumentResponse[];
+  pdfGenerating: boolean;
   projectName: string;
   revisions: EstimateRevisionResponse[];
   selectedItem: EstimateItemResponse | null;
@@ -946,6 +1046,41 @@ function EstimateDetail({
         <ActionButton icon={<Archive aria-hidden="true" className="h-4 w-4" />} onClick={onArchiveEstimate} tone="danger">
           Архивирај понуда
         </ActionButton>
+        <ActionButton
+          disabled={pdfGenerating}
+          icon={<FileText aria-hidden="true" className="h-4 w-4" />}
+          onClick={onGeneratePdf}
+          tone="success"
+        >
+          {pdfGenerating ? "Се генерира PDF" : "Генерирај PDF понуда"}
+        </ActionButton>
+      </div>
+
+      <div className="rounded-md border border-line bg-slate-50 p-3">
+        <h3 className="text-sm font-bold text-ink">Генерирани PDF документи</h3>
+        {pdfDocuments.length === 0 ? (
+          <p className="mt-2 text-sm text-slate-600">Нема генерирани PDF документи за оваа понуда.</p>
+        ) : (
+          <div className="mt-3 grid gap-3 lg:grid-cols-2">
+            {pdfDocuments.map((document) => (
+              <div key={document.id} className="rounded-md border border-line bg-white p-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-bold text-ink">{formatDocumentType(document.document_type)}</p>
+                    <p className="mt-1 text-xs text-slate-500">{formatDateTime(document.generated_at)}</p>
+                  </div>
+                  <ActionButton
+                    disabled={downloadingDocumentId === document.id}
+                    icon={<Download aria-hidden="true" className="h-4 w-4" />}
+                    onClick={() => onDownloadPdf(document.id)}
+                  >
+                    {downloadingDocumentId === document.id ? "Се презема" : "Преземи PDF"}
+                  </ActionButton>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div>

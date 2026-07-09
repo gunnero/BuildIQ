@@ -530,6 +530,20 @@ const createdEstimateItem = {
   sort_order: 2,
 };
 
+const estimateDocument = {
+  id: "document-1",
+  company_id: "company-1",
+  estimate_id: "estimate-1",
+  revision_id: "revision-1",
+  document_type: "estimate_quote_pdf",
+  file_path: "estimate-documents/company-1/estimate-1/document-1.pdf",
+  generated_by_user_id: "user-1",
+  generated_at: now,
+  archived_at: null,
+  created_at: now,
+  updated_at: now,
+};
+
 const payment = {
   id: "payment-1",
   company_id: "company-1",
@@ -948,7 +962,7 @@ function mockCalculationFetch(token = "demo-token") {
   });
 }
 
-function mockEstimateFetch(token = "demo-token") {
+function mockEstimateFetch(token = "demo-token", options: { pdfError?: boolean } = {}) {
   return vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
     const url = String(input);
     const method = init?.method ?? "GET";
@@ -1013,6 +1027,14 @@ function mockEstimateFetch(token = "demo-token") {
       return Promise.resolve(jsonResponse(estimateFromCalculation, 201));
     }
 
+    if (url.endsWith("/api/v1/estimates/estimate-1/pdf") && method === "POST") {
+      if (options.pdfError) {
+        return Promise.resolve(jsonResponse({ detail: "Не може да се генерира PDF за архивирана понуда." }, 400));
+      }
+
+      return Promise.resolve(jsonResponse(estimateDocument, 201));
+    }
+
     if (url.endsWith("/api/v1/estimates/estimate-1/revisions") && method === "GET") {
       return Promise.resolve(jsonResponse([estimateRevision]));
     }
@@ -1035,6 +1057,15 @@ function mockEstimateFetch(token = "demo-token") {
 
     if (url.endsWith("/api/v1/estimate-items/estimate-item-1/archive") && method === "POST") {
       return Promise.resolve(jsonResponse({ ...estimateItem, archived_at: now }));
+    }
+
+    if (url.endsWith("/api/v1/estimate-documents/document-1/download") && method === "GET") {
+      return Promise.resolve(
+        new Response(new Blob(["%PDF-1.4"], { type: "application/pdf" }), {
+          status: 200,
+          headers: { "Content-Type": "application/pdf" },
+        }),
+      );
     }
 
     return Promise.resolve(jsonResponse({ detail: "Not found" }, 404));
@@ -2014,6 +2045,87 @@ describe("App", () => {
     expect(screen.getAllByText("28500 MKD").length).toBeGreaterThanOrEqual(2);
     expect(screen.getAllByText("Мат боја").length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText("3000 MKD").length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("shows the estimate PDF generation button", async () => {
+    vi.stubGlobal("fetch", mockEstimateFetch());
+    saveToken("demo-token");
+    window.history.pushState(null, "", "/estimates");
+
+    render(<App />);
+
+    const detailSection = await screen.findByRole("region", { name: "Детали за понуда" });
+
+    expect(within(detailSection).getByRole("button", { name: "Генерирај PDF понуда" })).toBeInTheDocument();
+  });
+
+  it("generates a PDF through the backend and displays the returned document", async () => {
+    const fetchMock = mockEstimateFetch();
+    vi.stubGlobal("fetch", fetchMock);
+    saveToken("demo-token");
+    window.history.pushState(null, "", "/estimates");
+
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole("button", { name: "Генерирај PDF понуда" }));
+
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        expect.stringContaining("/api/v1/estimates/estimate-1/pdf"),
+        expect.objectContaining({
+          method: "POST",
+          body: JSON.stringify({ revision_id: "revision-1" }),
+        }),
+      ),
+    );
+    expect(await screen.findByText("PDF понудата е генерирана.")).toBeInTheDocument();
+    expect(screen.getByText("Генерирани PDF документи")).toBeInTheDocument();
+    expect(screen.getByText("PDF понуда")).toBeInTheDocument();
+    expect(
+      screen.getByText(new Intl.DateTimeFormat("mk-MK", { dateStyle: "medium", timeStyle: "short" }).format(new Date(estimateDocument.generated_at))),
+    ).toBeInTheDocument();
+
+    const pdfRequest = fetchMock.mock.calls.find((call) => String(call[0]).endsWith("/api/v1/estimates/estimate-1/pdf"));
+    expect(String(pdfRequest?.[1]?.body)).not.toContain("total");
+  });
+
+  it("downloads the generated PDF from the backend document endpoint", async () => {
+    const fetchMock = mockEstimateFetch();
+    const createObjectUrl = vi.fn(() => "blob:buildiq-pdf");
+    const revokeObjectUrl = vi.fn();
+    const anchorClick = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => undefined);
+    Object.defineProperty(URL, "createObjectURL", { value: createObjectUrl, configurable: true });
+    Object.defineProperty(URL, "revokeObjectURL", { value: revokeObjectUrl, configurable: true });
+    vi.stubGlobal("fetch", fetchMock);
+    saveToken("demo-token");
+    window.history.pushState(null, "", "/estimates");
+
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole("button", { name: "Генерирај PDF понуда" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Преземи PDF" }));
+
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        expect.stringContaining("/api/v1/estimate-documents/document-1/download"),
+        expect.objectContaining({ method: "GET" }),
+      ),
+    );
+    expect(createObjectUrl).toHaveBeenCalled();
+    expect(anchorClick).toHaveBeenCalled();
+    expect(revokeObjectUrl).toHaveBeenCalledWith("blob:buildiq-pdf");
+  });
+
+  it("shows a Macedonian error when PDF generation is rejected", async () => {
+    vi.stubGlobal("fetch", mockEstimateFetch("demo-token", { pdfError: true }));
+    saveToken("demo-token");
+    window.history.pushState(null, "", "/estimates");
+
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole("button", { name: "Генерирај PDF понуда" }));
+
+    expect(await screen.findByText("Не може да се генерира PDF за архивирана понуда.")).toBeInTheDocument();
   });
 
   it("calls item create, edit, and archive estimate APIs", async () => {

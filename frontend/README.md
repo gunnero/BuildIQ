@@ -4,7 +4,7 @@ React, TypeScript, Vite, and TailwindCSS frontend for BuildIQ.
 
 ## Scope
 
-Sprint 19 wires the payment and expense frontend to the backend financial endpoints and keeps earlier customer, property, project, room, measurement, calculation, and estimate workflows available:
+Sprint 21 wires estimate PDF quote actions to the backend document endpoints and keeps earlier customer, property, project, room, measurement, calculation, estimate, payment, and expense workflows available:
 
 - React app scaffold in `frontend/`
 - TailwindCSS styling
@@ -35,6 +35,9 @@ Sprint 19 wires the payment and expense frontend to the backend financial endpoi
 - Estimate revision display from `/api/v1/estimates/{estimate_id}/revisions` and `/api/v1/estimate-revisions/{revision_id}`
 - Estimate item list, create, edit, and archive actions from `/api/v1/estimate-revisions/{revision_id}/items` and `/api/v1/estimate-items`
 - Backend-returned estimate totals and estimate item totals
+- Estimate PDF generation from `/api/v1/estimates/{estimate_id}/pdf`
+- Generated estimate document display from the backend response
+- Estimate PDF download from `/api/v1/estimate-documents/{document_id}/download`
 - Payment list, create, detail, reverse, and archive actions from `/api/v1/payments`
 - Expense category list, create, edit, and archive actions from `/api/v1/expense-categories`
 - Expense list, create, detail, reverse, and archive actions from `/api/v1/expenses`
@@ -42,7 +45,7 @@ Sprint 19 wires the payment and expense frontend to the backend financial endpoi
 - Backend-returned financial summary, payment, and expense values
 - Macedonian layout, navigation, login page, and empty states
 
-The frontend does not calculate construction quantities, room areas, selected areas, liters, material costs, labor costs, estimate totals, payment totals, expense totals, prices, payment statuses, outstanding balances, profit, or business totals. Those values must come from backend API responses.
+The frontend does not calculate construction quantities, room areas, selected areas, liters, material costs, labor costs, estimate totals, PDF totals, payment totals, expense totals, prices, payment statuses, outstanding balances, profit, or business totals. Those values must come from backend API responses.
 
 ## Local Setup
 
@@ -129,10 +132,13 @@ The `/estimates` route displays a backend-backed workspace for:
 - estimate metadata, revisions, selected revision detail, items, and backend totals
 - item create, edit, and archive actions when the backend allows the revision to be edited
 - status actions for sent, accepted, rejected, and archive
+- PDF quote generation and download through backend document endpoints
 
 The calculation detail page also exposes `Креирај понуда` for completed calculation runs. The action calls the backend estimate-from-calculation endpoint and does not copy, price, or total line items in the browser.
 
 Estimate totals shown in the UI come from `subtotal`, `discount_total`, `adjustment_total`, `tax_total`, and `total` on backend revision responses. Item totals come from backend `total_price` values.
+
+The estimate detail page exposes `Генерирај PDF понуда`. The action sends the selected revision ID to the backend, displays the returned document metadata, and downloads PDFs from the backend document download endpoint. The frontend does not render PDF files or calculate PDF totals.
 
 ## Payments
 

@@ -440,6 +440,24 @@ export type EstimateFromCalculationCreateRequest = {
   description: string | null;
 };
 
+export type EstimatePdfCreateRequest = {
+  revision_id: string | null;
+};
+
+export type EstimateDocumentResponse = {
+  id: string;
+  company_id: string;
+  estimate_id: string;
+  revision_id: string;
+  document_type: string;
+  file_path: string;
+  generated_by_user_id: string;
+  generated_at: string;
+  archived_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 export type EstimateStatusUpdateRequest = {
   status: string;
 };
