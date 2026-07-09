@@ -130,8 +130,16 @@ Blueprint documents:
 
 ## Deployment
 
-BuildIQ v0.9 RC1 is prepared for deployment to `web01` at `buildiq.kalveri.com`.
+BuildIQ v0.9 RC1 is prepared for controlled release-candidate validation on `web01` at `buildiq.kalveri.com`. It is not approved for a production go-live until the release checklist and audit blockers are closed.
 
-Production deployment documentation:
+Current RC1 documentation:
 
+- [PDF system](docs/030-pdf-system.md)
+- [MVP demo flow](docs/031-mvp-demo-flow.md)
+- [RC1 release checklist](docs/032-release-candidate-checklist.md)
 - [web01 production deployment guide](docs/033-production-deployment-web01.md)
+- [RC1 technical and product audit](docs/034-buildiq-v0.9-rc1-audit.md)
+- [Macedonian user guide](docs/user-guides/buildiq-user-guide-mk.md)
+- [Macedonian user guide PDF](docs/user-guides/buildiq-user-guide-mk.pdf)
+- [Changelog](docs/changelog.md)
+- [Exported OpenAPI contract](docs/api/openapi.json)

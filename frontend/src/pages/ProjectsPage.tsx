@@ -205,7 +205,6 @@ const projectStatuses = [
   { value: "active", label: "Активен" },
   { value: "paused", label: "Паузиран" },
   { value: "completed", label: "Завршен" },
-  { value: "archived", label: "Архивиран" },
   { value: "cancelled", label: "Откажан" },
 ];
 
@@ -215,7 +214,6 @@ const taskStatuses = [
   { value: "active", label: "Активна" },
   { value: "completed", label: "Завршена" },
   { value: "cancelled", label: "Откажана" },
-  { value: "archived", label: "Архивирана" },
 ];
 
 const roomTypes = [

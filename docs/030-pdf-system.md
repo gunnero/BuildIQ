@@ -2,9 +2,9 @@
 
 BuildIQ generates quote and offer PDFs in the backend from stored business data.
 
-## Sprint 20 Scope
+## Current RC1 Scope
 
-Sprint 20 implements estimate quote PDF generation only.
+Sprint 20 introduced the backend PDF system, and Sprint 21 added the current estimate PDF frontend flow.
 
 Implemented:
 
@@ -13,10 +13,12 @@ Implemented:
 - Local PDF storage under `BUILDIQ_STORAGE_PATH`.
 - Tenant-isolated metadata and download endpoints.
 - PDF download responses with `application/pdf`.
+- Frontend PDF generation and download actions on estimate detail.
+- Frontend display of document metadata returned by the generation request.
 
 Not implemented:
 
-- Frontend PDF UI.
+- A backend list endpoint for rediscovering previously generated documents after a page reload.
 - Invoices.
 - Online payment documents.
 - External document storage providers.

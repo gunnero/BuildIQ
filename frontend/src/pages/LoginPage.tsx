@@ -87,10 +87,16 @@ export function LoginPage() {
               id="email"
               type="email"
               autoComplete="email"
+              aria-invalid={Boolean(errors.email)}
+              aria-describedby={errors.email ? "email-error" : undefined}
               className="ui-input h-11"
               {...register("email")}
             />
-            {errors.email ? <p className="mt-2 text-sm text-red-700">{errors.email.message}</p> : null}
+            {errors.email ? (
+              <p id="email-error" role="alert" className="mt-2 text-sm text-red-700">
+                {errors.email.message}
+              </p>
+            ) : null}
           </div>
 
           <div>
@@ -101,14 +107,20 @@ export function LoginPage() {
               id="password"
               type="password"
               autoComplete="current-password"
+              aria-invalid={Boolean(errors.password)}
+              aria-describedby={errors.password ? "password-error" : undefined}
               className="ui-input h-11"
               {...register("password")}
             />
-            {errors.password ? <p className="mt-2 text-sm text-red-700">{errors.password.message}</p> : null}
+            {errors.password ? (
+              <p id="password-error" role="alert" className="mt-2 text-sm text-red-700">
+                {errors.password.message}
+              </p>
+            ) : null}
           </div>
 
           {visibleErrorMessage ? (
-            <div className="ui-message border-red-200 bg-red-50 text-red-800">
+            <div role="alert" className="ui-message border-red-200 bg-red-50 text-red-800">
               {visibleErrorMessage}
             </div>
           ) : null}

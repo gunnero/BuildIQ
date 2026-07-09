@@ -16,8 +16,6 @@ fi
 
 cd "$FRONTEND_DIR"
 
-if [[ ! -d node_modules ]]; then
-  npm ci
-fi
-
+# Production builds must match package-lock.json even when node_modules already exists.
+npm ci
 npm run build

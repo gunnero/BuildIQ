@@ -1,5 +1,7 @@
 # API Design
 
+> **Status: historical target-state draft.** This file is not the BuildIQ v0.9 RC1 API contract. Some routes below, including `DELETE` examples, conflict with the current archive/reversal rules and must not be implemented from this document. Use [`docs/api/openapi.json`](api/openapi.json) and [`backend/README.md`](../backend/README.md) for the current API.
+
 API route names must be English.
 
 This document defines the planned V1 REST API shape. Routes will be implemented later in FastAPI.

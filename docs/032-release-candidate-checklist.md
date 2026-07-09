@@ -56,6 +56,39 @@ This checklist describes the BuildIQ v0.9 release candidate for first real-user 
 - Open `Трошоци` and confirm the demo expense.
 - Confirm no browser console warnings or API errors appear during the flow.
 
+## Automated Validation Gates
+
+Run every gate from the repository root before handing off an RC commit:
+
+```bash
+(cd backend && ../.venv/bin/pytest)
+(cd backend && ../.venv/bin/alembic heads)
+(cd frontend && npm test)
+(cd frontend && npm run lint)
+(cd frontend && npm run build)
+git diff --check
+```
+
+The provider/runtime scan must return no matches:
+
+```bash
+rg -n -i 'openai|anthropic|gemini|langchain|llamaindex' \
+  backend/app backend/pyproject.toml frontend/src frontend/package.json
+```
+
+The old-brand and provider-secret-name scan must return no matches:
+
+```bash
+rg -n 'OneFiveFour|OFFMI|OPENAI_API_KEY|ANTHROPIC_API_KEY|GEMINI_API_KEY' . \
+  --glob '!docs/032-release-candidate-checklist.md' \
+  --glob '!frontend/node_modules/**' --glob '!frontend/dist/**' --glob '!backend/.venv/**'
+rg -n '(^|[^A-Za-z0-9])sk-[A-Za-z0-9_-]{8,}' . \
+  --glob '!docs/032-release-candidate-checklist.md' \
+  --glob '!frontend/node_modules/**' --glob '!frontend/dist/**' --glob '!backend/.venv/**'
+```
+
+Any match must be reviewed. Prohibition text in documentation is expected for provider names, but provider imports, dependencies, endpoints, or credential values are not allowed.
+
 ## Friend/User Testing Instructions
 
 - Ask testers to follow `docs/031-mvp-demo-flow.md` first without guidance.

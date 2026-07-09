@@ -1287,6 +1287,26 @@ describe("App", () => {
     expect(window.location.pathname).toBe("/login");
   });
 
+  it("associates Macedonian login validation errors with their inputs", async () => {
+    window.history.pushState(null, "", "/login");
+
+    render(<App />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Најава" }));
+
+    const emailInput = screen.getByLabelText("Е-пошта");
+    const passwordInput = screen.getByLabelText("Лозинка");
+    const emailError = await screen.findByText("Внесете валидна е-пошта.");
+    const passwordError = screen.getByText("Внесете лозинка.");
+
+    expect(emailInput).toHaveAttribute("aria-invalid", "true");
+    expect(emailInput).toHaveAttribute("aria-describedby", "email-error");
+    expect(passwordInput).toHaveAttribute("aria-invalid", "true");
+    expect(passwordInput).toHaveAttribute("aria-describedby", "password-error");
+    expect(emailError).toHaveAttribute("role", "alert");
+    expect(passwordError).toHaveAttribute("role", "alert");
+  });
+
   it("stores the token and routes to the dashboard after successful login", async () => {
     const fetchMock = vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
       const url = String(input);
@@ -1363,8 +1383,10 @@ describe("App", () => {
     expect(screen.getAllByText("Статус: Активна").length).toBeGreaterThan(0);
     expect(screen.getByText("Почетен")).toBeInTheDocument();
     expect(screen.getByText("BuildIQ v0.9 RC1")).toBeInTheDocument();
-    expect(screen.getByText("Започнете со додавање клиент.")).toBeInTheDocument();
-    expect(screen.getByText("Потоа креирајте проект и простории. Потоа направете пресметка и понуда.")).toBeInTheDocument();
+    expect(screen.getByText("Продолжете со работа во BuildIQ.")).toBeInTheDocument();
+    expect(
+      screen.getByText("Изберете модул од навигацијата за клиенти, проекти, пресметки, понуди или финансии."),
+    ).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Клиенти" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Одјава" })).toBeInTheDocument();
   });
@@ -1515,6 +1537,8 @@ describe("App", () => {
     expect(await screen.findByText("Подна површина")).toBeInTheDocument();
     expect(await screen.findByText("20 m²")).toBeInTheDocument();
     expect(await screen.findByText("65.4 m²")).toBeInTheDocument();
+    expect(screen.queryByRole("option", { name: "Архивиран" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("option", { name: "Архивирана" })).not.toBeInTheDocument();
   });
 
   it("calls the backend when creating and editing a project", async () => {

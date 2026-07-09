@@ -23,25 +23,22 @@ docker compose up -d postgres
 Migrate and seed the backend:
 
 ```bash
-cd backend
-../.venv/bin/alembic upgrade head
-../.venv/bin/buildiq-seed-dev
+(cd backend && ../.venv/bin/alembic upgrade head)
+(cd backend && ../.venv/bin/buildiq-seed-dev)
 ```
 
 Start the backend:
 
 ```bash
-cd backend
-../.venv/bin/uvicorn app.main:app --reload
+(cd backend && ../.venv/bin/uvicorn app.main:app --reload)
 ```
 
 Start the frontend in another terminal:
 
 ```bash
-cd frontend
-npm install
-cp .env.example .env
-npm run dev
+(cd frontend && npm ci)
+(cd frontend && cp .env.example .env)
+(cd frontend && npm run dev)
 ```
 
 ## Local Demo Credentials

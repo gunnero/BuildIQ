@@ -1,6 +1,6 @@
 # Production Deployment: web01
 
-This document describes the deployment plan for BuildIQ v0.9 RC1 on `web01` at `buildiq.kalveri.com`.
+This document describes the deployment plan for controlled BuildIQ v0.9 RC1 validation on `web01` at `buildiq.kalveri.com`. It is not production approval; close the blockers in `docs/034-buildiq-v0.9-rc1-audit.md` before go-live.
 
 BuildIQ V1 remains standalone and has no AI features. Do not add provider SDKs, API keys, prompts, or direct AI integrations during deployment.
 
@@ -33,6 +33,7 @@ sudo apt install -y \
   python3 \
   python3-venv \
   python3-pip \
+  fonts-dejavu-core \
   postgresql \
   postgresql-contrib \
   nodejs \
@@ -115,7 +116,7 @@ sudo rsync -a --delete /home/buildiq/BuildIQ/frontend/dist/ /var/www/buildiq/
 sudo chown -R www-data:www-data /var/www/buildiq
 ```
 
-The helper script `scripts/build-frontend.sh` runs `npm ci` when needed and then `npm run build`.
+The helper script `scripts/build-frontend.sh` always runs `npm ci` and then `npm run build` so the production build matches `package-lock.json` even when `node_modules` already exists.
 
 ## PostgreSQL Database Setup
 
@@ -151,6 +152,12 @@ chmod 600 backend/.env.production frontend/.env.production
 
 Backend production env:
 
+Generate a high-entropy signing secret on `web01` and paste the output into the server-only env file:
+
+```bash
+python3 -c 'import secrets; print(secrets.token_urlsafe(48))'
+```
+
 ```bash
 BUILDIQ_ENV=production
 BUILDIQ_DEBUG=false
@@ -169,6 +176,8 @@ VITE_API_BASE_URL=https://buildiq.kalveri.com
 Never commit `backend/.env.production`, `frontend/.env.production`, database passwords, JWT secrets, or generated PDFs.
 
 If a secret contains shell-special characters, quote it in the env file before using `source`, for example `BUILDIQ_SECRET_KEY='replace-with-real-secret'`.
+
+If the database password contains URL-reserved characters, percent-encode it before placing it in `BUILDIQ_DATABASE_URL`; do not paste an unescaped password into the SQLAlchemy URL.
 
 ## Alembic Migration Command
 
@@ -353,6 +362,7 @@ After SSL is active:
 ```bash
 curl -I https://buildiq.kalveri.com
 curl https://buildiq.kalveri.com/health
+sudo certbot renew --dry-run
 ```
 
 The frontend must call `https://buildiq.kalveri.com/api/v1`.
