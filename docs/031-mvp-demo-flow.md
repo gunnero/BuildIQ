@@ -53,12 +53,24 @@ Use these credentials only for local development:
 
 The seed command also creates the internal HQ account `hq@buildiq.local` with the same default password, but the MVP user demo should use the demo owner account.
 
+The seed command creates two additional local test-owner accounts for tenant isolation checks:
+
+| User | Local password | Company | Demo data |
+| --- | --- | --- | --- |
+| `aleksandar@kalveri.com` | `ChangeMe123!` | `Демо Градба - Александар` | Yes |
+| `hristijan@kalveri.com` | `ChangeMe123!` | `Демо Градба - Христијан` | No, intentionally empty |
+
+These are local/demo credentials only. Production test passwords must be shared outside the repository.
+
 ## Seeded Demo Data
 
 The local seed command creates:
 
 - demo company with starter subscription
 - demo owner user
+- separate Aleksandar and Hristijan test companies
+- Aleksandar test owner with the same MVP demo flow data
+- Hristijan test owner with an empty company for first-test onboarding
 - customer: Aleksandar
 - property: Skopje apartment
 - active painting project with agreed project price

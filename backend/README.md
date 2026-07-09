@@ -86,24 +86,33 @@ Default local seed accounts, for local development only:
 
 - HQ admin: `hq@buildiq.local`
 - Demo owner: `owner@demo.buildiq.local`
+- Aleksandar test owner: `aleksandar@kalveri.com` in company `Демо Градба - Александар`
+- Hristijan test owner: `hristijan@kalveri.com` in company `Демо Градба - Христијан`
 - Password: `ChangeMe123!`
 
-Do not use these credentials outside local development. The password can be overridden with:
+The demo owner and Aleksandar test owner receive MVP demo data. Hristijan's test company is intentionally empty for first-test onboarding and tenant isolation checks.
+
+Do not use these credentials outside local development. Production test passwords must be distributed outside the repository. Local passwords can be overridden with:
 
 ```bash
-BUILDIQ_SEED_HQ_PASSWORD='new-password' BUILDIQ_SEED_OWNER_PASSWORD='new-password' ../.venv/bin/buildiq-seed-dev
+BUILDIQ_SEED_HQ_PASSWORD='new-password' \
+BUILDIQ_SEED_OWNER_PASSWORD='new-password' \
+BUILDIQ_SEED_ALEKSANDAR_PASSWORD='new-password' \
+BUILDIQ_SEED_HRISTIJAN_PASSWORD='new-password' \
+../.venv/bin/buildiq-seed-dev
 ```
 
 The seed command also creates an idempotent MVP demo flow for the demo owner:
 
-- demo company and active starter subscription
-- customer Aleksandar and one Skopje apartment property
+- demo companies and active starter subscriptions
+- customer Aleksandar and one Skopje apartment property for the demo owner and Aleksandar test owner
 - active painting project with agreed project price
 - living room with door/window openings
 - paint material, supplier, retail price book, and price book item
 - completed painting calculation
 - accepted estimate copied from the calculation
 - received payment and recorded expense
+- empty Hristijan test company for first-test onboarding
 
 ## Run the App
 

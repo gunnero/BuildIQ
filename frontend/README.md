@@ -67,6 +67,13 @@ Local demo login, for local development only:
 - Email: `owner@demo.buildiq.local`
 - Password: `ChangeMe123!`
 
+Additional local seed test accounts:
+
+- `aleksandar@kalveri.com` / `ChangeMe123!` in company `Демо Градба - Александар`, with MVP demo data.
+- `hristijan@kalveri.com` / `ChangeMe123!` in company `Демо Градба - Христијан`, intentionally empty for onboarding.
+
+These credentials are local/demo credentials only. Production test passwords must be shared outside the repository.
+
 Run the backend seed command first:
 
 ```bash

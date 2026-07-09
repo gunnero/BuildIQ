@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { getCurrentUser, loginRequest } from "../api/auth";
 import { setUnauthorizedHandler } from "../api/client";
@@ -27,6 +28,7 @@ async function fetchSessionData(token: string): Promise<SessionData> {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const queryClient = useQueryClient();
   const [token, setToken] = useState<string | null>(() => getToken());
   const [currentUser, setCurrentUser] = useState<CurrentUserResponse | null>(null);
   const [company, setCompany] = useState<CompanyResponse | null>(null);
@@ -37,6 +39,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const clearSession = useCallback(() => {
     hydratedTokenRef.current = null;
+    queryClient.removeQueries();
     clearToken();
     setToken(null);
     setCurrentUser(null);
@@ -44,7 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSubscription(null);
     setSessionError(null);
     setIsLoadingSession(false);
-  }, []);
+  }, [queryClient]);
 
   const applySessionData = useCallback((nextToken: string, sessionData: SessionData) => {
     hydratedTokenRef.current = nextToken;
@@ -142,6 +145,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       subscription,
       async login(payload) {
         const response = await loginRequest(payload);
+        queryClient.removeQueries();
         saveToken(response.access_token);
         setToken(response.access_token);
         await refreshSession(response.access_token);
@@ -151,7 +155,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
       refreshSession: () => refreshSession(),
     }),
-    [clearSession, company, currentUser, isLoadingSession, refreshSession, sessionError, subscription, token],
+    [clearSession, company, currentUser, isLoadingSession, queryClient, refreshSession, sessionError, subscription, token],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

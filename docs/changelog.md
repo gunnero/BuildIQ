@@ -2,6 +2,7 @@
 
 ## 2026-07-09
 
+- Fixed demo tenant isolation for Aleksandar and Hristijan by separating seeded test companies and clearing frontend query cache on session changes.
 - Added a Macedonian BuildIQ v0.9 RC1 user guide in Markdown and PDF form for Hristijan/test-user onboarding.
 - Prepared BuildIQ v0.9 RC1 deployment materials for `web01` at `buildiq.kalveri.com`.
 - Added the web01 production deployment guide, production env examples, and safe helper scripts for frontend builds, backend migrations, and reviewed deployment execution.

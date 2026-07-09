@@ -26,7 +26,33 @@ def test_development_seed_creates_mvp_demo_flow(
     assert owner_user.company_id == company.id
     assert owner_user.name == "Демо Сопственик"
 
-    customer = db_session.query(Customer).filter(Customer.email == "aleksandar@example.test").one()
+    aleksandar_company = (
+        db_session.query(Company).filter(Company.name == "Демо Градба - Александар").one()
+    )
+    hristijan_company = (
+        db_session.query(Company).filter(Company.name == "Демо Градба - Христијан").one()
+    )
+    aleksandar_user = (
+        db_session.query(User).filter(User.email == dev_seed.ALEKSANDAR_TEST_EMAIL).one()
+    )
+    hristijan_user = (
+        db_session.query(User).filter(User.email == dev_seed.HRISTIJAN_TEST_EMAIL).one()
+    )
+
+    assert aleksandar_user.company_id == aleksandar_company.id
+    assert hristijan_user.company_id == hristijan_company.id
+    assert aleksandar_user.company_id != hristijan_user.company_id
+    assert aleksandar_user.company_id != owner_user.company_id
+    assert hristijan_user.company_id != owner_user.company_id
+
+    customer = (
+        db_session.query(Customer)
+        .filter(
+            Customer.company_id == company.id,
+            Customer.email == "aleksandar@example.test",
+        )
+        .one()
+    )
     property_record = db_session.query(Property).filter(Property.customer_id == customer.id).one()
     project = db_session.query(Project).filter(Project.property_id == property_record.id).one()
     room = db_session.query(Room).filter(Room.project_id == project.id).one()
@@ -64,3 +90,20 @@ def test_development_seed_creates_mvp_demo_flow(
     expense = db_session.query(Expense).filter(Expense.project_id == project.id).one()
     assert expense.status == "recorded"
     assert expense.amount > 0
+
+    assert db_session.query(Customer).filter(Customer.company_id == aleksandar_company.id).count() == 1
+    assert db_session.query(Project).filter(Project.company_id == aleksandar_company.id).count() == 1
+    assert db_session.query(CalculationRun).filter(CalculationRun.company_id == aleksandar_company.id).count() == 1
+    assert db_session.query(Estimate).filter(Estimate.company_id == aleksandar_company.id).count() == 1
+    assert db_session.query(Payment).filter(Payment.company_id == aleksandar_company.id).count() == 1
+    assert db_session.query(Expense).filter(Expense.company_id == aleksandar_company.id).count() == 1
+
+    assert db_session.query(Customer).filter(Customer.company_id == hristijan_company.id).count() == 0
+    assert db_session.query(Property).filter(Property.company_id == hristijan_company.id).count() == 0
+    assert db_session.query(Project).filter(Project.company_id == hristijan_company.id).count() == 0
+    assert db_session.query(Material).filter(Material.company_id == hristijan_company.id).count() == 0
+    assert db_session.query(Supplier).filter(Supplier.company_id == hristijan_company.id).count() == 0
+    assert db_session.query(CalculationRun).filter(CalculationRun.company_id == hristijan_company.id).count() == 0
+    assert db_session.query(Estimate).filter(Estimate.company_id == hristijan_company.id).count() == 0
+    assert db_session.query(Payment).filter(Payment.company_id == hristijan_company.id).count() == 0
+    assert db_session.query(Expense).filter(Expense.company_id == hristijan_company.id).count() == 0

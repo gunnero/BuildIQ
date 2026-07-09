@@ -26,10 +26,16 @@ from app.services.materials import ensure_default_material_units
 
 HQ_EMAIL = "hq@buildiq.local"
 OWNER_EMAIL = "owner@demo.buildiq.local"
+ALEKSANDAR_TEST_EMAIL = "aleksandar@kalveri.com"
+HRISTIJAN_TEST_EMAIL = "hristijan@kalveri.com"
 DEFAULT_PASSWORD = "ChangeMe123!"
 DEMO_COMPANY_NAME = "Демо Градба"
 LEGACY_DEMO_COMPANY_NAME = "Demo Build Company"
 DEMO_OWNER_NAME = "Демо Сопственик"
+ALEKSANDAR_TEST_COMPANY_NAME = "Демо Градба - Александар"
+HRISTIJAN_TEST_COMPANY_NAME = "Демо Градба - Христијан"
+ALEKSANDAR_TEST_USER_NAME = "Александар"
+HRISTIJAN_TEST_USER_NAME = "Христијан"
 
 
 def get_or_create_company(
@@ -189,6 +195,26 @@ def ensure_feature_flag(db: Session) -> None:
                 default_enabled=True,
             )
         )
+
+
+def ensure_demo_company_access(db: Session, *, company: Company, owner_user: User) -> None:
+    roles = {
+        "owner": get_or_create_role(db, company_id=company.id, key="owner", name="Owner"),
+        "manager": get_or_create_role(db, company_id=company.id, key="manager", name="Manager"),
+        "worker": get_or_create_role(db, company_id=company.id, key="worker", name="Worker"),
+    }
+
+    permissions = [
+        get_or_create_permission(db, "company:read", "Read company"),
+        get_or_create_permission(db, "subscription:read", "Read subscription"),
+        get_or_create_permission(db, "users:manage", "Manage users"),
+    ]
+    for permission in permissions:
+        ensure_role_permission(db, roles["owner"], permission)
+    ensure_user_role(db, owner_user, roles["owner"])
+
+    plan = get_or_create_plan(db)
+    ensure_subscription(db, company, plan)
 
 
 def get_or_create_customer(db: Session, *, company_id: str) -> Customer:
@@ -701,6 +727,8 @@ def ensure_mvp_demo_data(db: Session, *, demo_company: Company, owner_user: User
 def seed_development_data() -> None:
     hq_password = os.getenv("BUILDIQ_SEED_HQ_PASSWORD", DEFAULT_PASSWORD)
     owner_password = os.getenv("BUILDIQ_SEED_OWNER_PASSWORD", DEFAULT_PASSWORD)
+    aleksandar_password = os.getenv("BUILDIQ_SEED_ALEKSANDAR_PASSWORD", DEFAULT_PASSWORD)
+    hristijan_password = os.getenv("BUILDIQ_SEED_HRISTIJAN_PASSWORD", DEFAULT_PASSWORD)
 
     db = SessionLocal()
     try:
@@ -710,6 +738,8 @@ def seed_development_data() -> None:
             DEMO_COMPANY_NAME,
             legacy_names=(LEGACY_DEMO_COMPANY_NAME,),
         )
+        aleksandar_company = get_or_create_company(db, ALEKSANDAR_TEST_COMPANY_NAME)
+        hristijan_company = get_or_create_company(db, HRISTIJAN_TEST_COMPANY_NAME)
 
         get_or_create_user(
             db,
@@ -726,26 +756,31 @@ def seed_development_data() -> None:
             email=OWNER_EMAIL,
             password=owner_password,
         )
+        aleksandar_user = get_or_create_user(
+            db,
+            company_id=aleksandar_company.id,
+            name=ALEKSANDAR_TEST_USER_NAME,
+            email=ALEKSANDAR_TEST_EMAIL,
+            password=aleksandar_password,
+        )
+        hristijan_user = get_or_create_user(
+            db,
+            company_id=hristijan_company.id,
+            name=HRISTIJAN_TEST_USER_NAME,
+            email=HRISTIJAN_TEST_EMAIL,
+            password=hristijan_password,
+        )
 
-        roles = {
-            "owner": get_or_create_role(db, company_id=demo_company.id, key="owner", name="Owner"),
-            "manager": get_or_create_role(db, company_id=demo_company.id, key="manager", name="Manager"),
-            "worker": get_or_create_role(db, company_id=demo_company.id, key="worker", name="Worker"),
-        }
-
-        permissions = [
-            get_or_create_permission(db, "company:read", "Read company"),
-            get_or_create_permission(db, "subscription:read", "Read subscription"),
-            get_or_create_permission(db, "users:manage", "Manage users"),
-        ]
-        for permission in permissions:
-            ensure_role_permission(db, roles["owner"], permission)
-        ensure_user_role(db, owner_user, roles["owner"])
-
-        plan = get_or_create_plan(db)
-        ensure_subscription(db, demo_company, plan)
+        ensure_demo_company_access(db, company=demo_company, owner_user=owner_user)
+        ensure_demo_company_access(db, company=aleksandar_company, owner_user=aleksandar_user)
+        ensure_demo_company_access(db, company=hristijan_company, owner_user=hristijan_user)
         ensure_feature_flag(db)
         ensure_mvp_demo_data(db, demo_company=demo_company, owner_user=owner_user)
+        ensure_mvp_demo_data(
+            db,
+            demo_company=aleksandar_company,
+            owner_user=aleksandar_user,
+        )
 
         db.add(
             AuditLog(
@@ -753,6 +788,24 @@ def seed_development_data() -> None:
                 acting_user_id=owner_user.id,
                 entity_type="development_seed",
                 entity_id=demo_company.id,
+                action="seeded",
+            )
+        )
+        db.add(
+            AuditLog(
+                company_id=aleksandar_company.id,
+                acting_user_id=aleksandar_user.id,
+                entity_type="development_seed",
+                entity_id=aleksandar_company.id,
+                action="seeded",
+            )
+        )
+        db.add(
+            AuditLog(
+                company_id=hristijan_company.id,
+                acting_user_id=hristijan_user.id,
+                entity_type="development_seed",
+                entity_id=hristijan_company.id,
                 action="seeded",
             )
         )
@@ -764,6 +817,8 @@ def seed_development_data() -> None:
     print("MVP demo data ready.")
     print(f"HQ admin: {HQ_EMAIL}")
     print(f"Demo owner: {OWNER_EMAIL}")
+    print(f"Aleksandar test owner: {ALEKSANDAR_TEST_EMAIL}")
+    print(f"Hristijan test owner: {HRISTIJAN_TEST_EMAIL}")
 
 
 def main() -> None:

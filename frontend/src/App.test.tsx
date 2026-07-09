@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { App } from "./App";
 import { getToken, saveToken } from "./auth/tokenStorage";
 import { formatDateTime } from "./lib/format";
+import { queryClient } from "./queryClient";
 
 const now = "2026-07-08T10:00:00Z";
 
@@ -1216,6 +1217,7 @@ function mockNavigationSmokeFetch(token = "demo-token") {
 describe("App", () => {
   afterEach(() => {
     cleanup();
+    queryClient.clear();
     localStorage.clear();
     window.history.pushState(null, "", "/");
     vi.unstubAllGlobals();
@@ -1317,6 +1319,37 @@ describe("App", () => {
     expect(screen.getByText(/Претплата: Активна/)).toBeInTheDocument();
   });
 
+  it("clears cached company data when a new login succeeds", async () => {
+    queryClient.setQueryData(["customers"], [{ ...customer, id: "previous-company-customer" }]);
+    expect(queryClient.getQueryData(["customers"])).toBeDefined();
+
+    const fetchMock = vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input);
+
+      if (url.endsWith("/api/v1/auth/login")) {
+        expect(init?.method).toBe("POST");
+        return Promise.resolve(jsonResponse({ access_token: "next-login-token", token_type: "bearer" }));
+      }
+
+      return mockSessionFetch("next-login-token")(input, init);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    window.history.pushState(null, "", "/login");
+
+    render(<App />);
+
+    fireEvent.change(screen.getByLabelText("Е-пошта"), {
+      target: { value: "hristijan@example.com" },
+    });
+    fireEvent.change(screen.getByLabelText("Лозинка"), {
+      target: { value: "secret" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Најава" }));
+
+    expect(await screen.findByRole("heading", { name: "Контролна табла" })).toBeInTheDocument();
+    expect(queryClient.getQueryData(["customers"])).toBeUndefined();
+  });
+
   it("shows company and subscription data on the dashboard when authenticated", async () => {
     vi.stubGlobal("fetch", mockSessionFetch());
     saveToken("demo-token");
@@ -1338,6 +1371,7 @@ describe("App", () => {
 
   it("clears the token on logout", async () => {
     vi.stubGlobal("fetch", mockSessionFetch());
+    queryClient.setQueryData(["customers"], [customer]);
     saveToken("demo-token");
     window.history.pushState(null, "", "/dashboard");
 
@@ -1347,6 +1381,7 @@ describe("App", () => {
     fireEvent.click(logoutButton);
 
     await waitFor(() => expect(getToken()).toBeNull());
+    expect(queryClient.getQueryData(["customers"])).toBeUndefined();
     expect(screen.getByRole("heading", { name: "Најава" })).toBeInTheDocument();
   });
 
@@ -1405,7 +1440,7 @@ describe("App", () => {
     render(<App />);
 
     const customersSection = await screen.findByRole("region", { name: "Клиенти" });
-    fireEvent.click(within(customersSection).getByRole("button", { name: /Ана Стојановска/ }));
+    fireEvent.click(await within(customersSection).findByRole("button", { name: /Ана Стојановска/ }));
 
     expect(await screen.findByText("Партизанска 10")).toBeInTheDocument();
     expect(screen.getAllByText("Сака понуда по соби.").length).toBeGreaterThan(0);
@@ -1421,8 +1456,8 @@ describe("App", () => {
 
     const propertiesSection = await screen.findByRole("region", { name: "Објекти" });
 
-    expect(within(propertiesSection).getByText("Стан Центар")).toBeInTheDocument();
-    expect(within(propertiesSection).getByText("Скопје")).toBeInTheDocument();
+    expect(await within(propertiesSection).findByText("Стан Центар")).toBeInTheDocument();
+    expect(await within(propertiesSection).findByText("Скопје")).toBeInTheDocument();
   });
 
   it("calls the backend when creating a property", async () => {
@@ -1432,6 +1467,8 @@ describe("App", () => {
     window.history.pushState(null, "", "/customers");
 
     render(<App />);
+
+    await screen.findByRole("option", { name: "Ана Стојановска" });
 
     fireEvent.change(await screen.findByLabelText("Клиент за објект"), {
       target: { value: "customer-1" },
@@ -1488,6 +1525,9 @@ describe("App", () => {
 
     render(<App />);
 
+    await screen.findByRole("option", { name: "Ана Стојановска" });
+    await screen.findByRole("option", { name: "Стан Центар" });
+
     fireEvent.change(await screen.findByLabelText("Клиент за проект"), {
       target: { value: "customer-1" },
     });
@@ -1517,6 +1557,8 @@ describe("App", () => {
         }),
       ),
     );
+
+    await screen.findByDisplayValue("Реновирање стан");
 
     fireEvent.change(screen.getByLabelText("Име за уредување на проект"), {
       target: { value: "Реновирање стан - фаза 2" },
@@ -1550,10 +1592,10 @@ describe("App", () => {
     render(<App />);
 
     expect(await screen.findByText("Реновирање стан")).toBeInTheDocument();
-    expect(screen.getByText("Активен")).toBeInTheDocument();
-    expect(screen.getByText("Проектот е креиран.")).toBeInTheDocument();
-    expect(screen.getByText("Демонтажа")).toBeInTheDocument();
-    expect(screen.getByText("Почнато на терен.")).toBeInTheDocument();
+    expect(await screen.findByText("Активен")).toBeInTheDocument();
+    expect(await screen.findByText("Проектот е креиран.")).toBeInTheDocument();
+    expect(await screen.findByText("Демонтажа")).toBeInTheDocument();
+    expect(await screen.findByText("Почнато на терен.")).toBeInTheDocument();
   });
 
   it("displays project financial summary backend values without local totals", async () => {
@@ -1883,6 +1925,10 @@ describe("App", () => {
     fireEvent.change(await screen.findByLabelText("Проект за пресметка"), {
       target: { value: "project-1" },
     });
+    await screen.findByRole("option", { name: "Задача: Демонтажа" });
+    await screen.findByRole("option", { name: "Просторија: Дневна соба" });
+    await screen.findByRole("option", { name: "Сет: Главни мерења" });
+
     fireEvent.change(await screen.findByLabelText("Задача (незадолжително)"), {
       target: { value: "task-1" },
     });
@@ -1993,6 +2039,7 @@ describe("App", () => {
     render(<App />);
 
     const createSection = await screen.findByRole("region", { name: "Нова понуда" });
+    await within(createSection).findByRole("option", { name: "Реновирање стан" });
     fireEvent.change(within(createSection).getByLabelText("Проект за понуда"), {
       target: { value: "project-1" },
     });
@@ -2030,6 +2077,7 @@ describe("App", () => {
     render(<App />);
 
     const calculationSection = await screen.findByRole("region", { name: "Понуда од пресметка" });
+    await within(calculationSection).findByRole("option", { name: /Бојадисување/ });
     fireEvent.change(within(calculationSection).getByLabelText("Пресметка за понуда"), {
       target: { value: "calculation-1" },
     });
@@ -2083,14 +2131,15 @@ describe("App", () => {
 
     render(<App />);
 
+    expect((await screen.findAllByText("Понуда за бојадисување")).length).toBeGreaterThanOrEqual(1);
     expect(await screen.findByText("Меѓузбир")).toBeInTheDocument();
-    expect(screen.getByText("30000 MKD")).toBeInTheDocument();
-    expect(screen.getByText("2000 MKD")).toBeInTheDocument();
-    expect(screen.getByText("500 MKD")).toBeInTheDocument();
-    expect(screen.getByText("0 MKD")).toBeInTheDocument();
-    expect(screen.getAllByText("28500 MKD").length).toBeGreaterThanOrEqual(2);
-    expect(screen.getAllByText("Мат боја").length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText("3000 MKD").length).toBeGreaterThanOrEqual(1);
+    expect(await screen.findByText("30000 MKD")).toBeInTheDocument();
+    expect(await screen.findByText("2000 MKD")).toBeInTheDocument();
+    expect(await screen.findByText("500 MKD")).toBeInTheDocument();
+    expect(await screen.findByText("0 MKD")).toBeInTheDocument();
+    expect((await screen.findAllByText("28500 MKD")).length).toBeGreaterThanOrEqual(2);
+    expect((await screen.findAllByText("Мат боја")).length).toBeGreaterThanOrEqual(1);
+    expect((await screen.findAllByText("3000 MKD")).length).toBeGreaterThanOrEqual(1);
   });
 
   it("shows the estimate PDF generation button", async () => {
@@ -2102,7 +2151,8 @@ describe("App", () => {
 
     const detailSection = await screen.findByRole("region", { name: "Детали за понуда" });
 
-    expect(within(detailSection).getByRole("button", { name: "Генерирај PDF понуда" })).toBeInTheDocument();
+    expect(await within(detailSection).findByText("Понуда за бојадисување")).toBeInTheDocument();
+    expect(await within(detailSection).findByRole("button", { name: "Генерирај PDF понуда" })).toBeInTheDocument();
   });
 
   it("generates a PDF through the backend and displays the returned document", async () => {
@@ -2474,6 +2524,8 @@ describe("App", () => {
     render(<App />);
 
     const expenseSection = await screen.findByRole("region", { name: "Нов трошок" });
+    await within(expenseSection).findByRole("option", { name: "Реновирање стан" });
+    await within(expenseSection).findByRole("option", { name: "Транспорт" });
     fireEvent.change(within(expenseSection).getByLabelText("Проект за трошок"), {
       target: { value: "project-1" },
     });
