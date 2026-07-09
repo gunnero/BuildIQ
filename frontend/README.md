@@ -65,12 +65,12 @@ VITE_API_BASE_URL=http://127.0.0.1:8000
 Local demo login, for local development only:
 
 - Email: `owner@demo.buildiq.local`
-- Password: `ChangeMe123!`
+- Password: the unique value supplied through `BUILDIQ_SEED_OWNER_PASSWORD`
 
 Additional local seed test accounts:
 
-- `aleksandar@kalveri.com` / `ChangeMe123!` in company `Демо Градба - Александар`, with MVP demo data.
-- `hristijan@kalveri.com` / `ChangeMe123!` in company `Демо Градба - Христијан`, intentionally empty for onboarding.
+- `aleksandar@kalveri.com` / the value from `BUILDIQ_SEED_ALEKSANDAR_PASSWORD` in company `Демо Градба - Александар`, with MVP demo data.
+- `hristijan@kalveri.com` / the value from `BUILDIQ_SEED_HRISTIJAN_PASSWORD` in company `Демо Градба - Христијан`, intentionally empty for onboarding.
 
 These credentials are local/demo credentials only. Production test passwords must be shared outside the repository.
 

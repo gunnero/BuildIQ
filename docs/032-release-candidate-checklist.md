@@ -43,7 +43,7 @@ This checklist describes the BuildIQ v0.9 release candidate for first real-user 
 
 - Start PostgreSQL or an equivalent local development database.
 - Run backend migrations.
-- Run `buildiq-seed-dev`.
+- Run `buildiq-seed-dev` with four unique `BUILDIQ_SEED_*_PASSWORD` environment variables; never use committed or shared defaults.
 - Start the backend API.
 - Start the frontend with `VITE_API_BASE_URL` pointing at the backend.
 - Log in with the local demo owner account.

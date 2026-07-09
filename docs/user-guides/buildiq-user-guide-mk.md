@@ -52,9 +52,9 @@ BuildIQ е наменет за:
 
 | Корисник | Локална лозинка | Компанија | Податоци |
 | --- | --- | --- | --- |
-| owner@demo.buildiq.local | ChangeMe123! | Демо Градба | Демо податоци |
-| aleksandar@kalveri.com | ChangeMe123! | Демо Градба - Александар | Демо податоци |
-| hristijan@kalveri.com | ChangeMe123! | Демо Градба - Христијан | Празна компанија за прв тест |
+| owner@demo.buildiq.local | Вредноста од `BUILDIQ_SEED_OWNER_PASSWORD` | Демо Градба | Демо податоци |
+| aleksandar@kalveri.com | Вредноста од `BUILDIQ_SEED_ALEKSANDAR_PASSWORD` | Демо Градба - Александар | Демо податоци |
+| hristijan@kalveri.com | Вредноста од `BUILDIQ_SEED_HRISTIJAN_PASSWORD` | Демо Градба - Христијан | Празна компанија за прв тест |
 
 Не користете локални демо лозинки како продукциски лозинки. За продукциско тестирање лозинките се доставуваат одделно и не треба да се запишуваат во документација.
 

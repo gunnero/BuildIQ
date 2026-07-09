@@ -95,9 +95,9 @@ Recommended action: make a successful PostgreSQL backup plus a documented restor
 
 Recommended action: mark target-state/historical documents clearly, make exported OpenAPI plus current backend/frontend READMEs authoritative for RC1, and use one release statement: controlled RC testing only until production-hardening gates pass.
 
-### H9. The documented demo seed leaves two public test-owner passwords unchanged
+### H9. The documented demo seed left two public test-owner passwords unchanged (resolved)
 
-The RC demo command overrides only the HQ and primary owner passwords. The seed still creates the Aleksandar and Hristijan test-owner accounts with the public `ChangeMe123!` default, and rerunning the seed with stronger overrides does not rotate existing hashes. Running the demo seed against anything reachable by untrusted users therefore leaves two additional known credentials active.
+The baseline RC1 seed command overrode only the HQ and primary owner passwords. The seed also created the Aleksandar and Hristijan test-owner accounts with a shared public default, and rerunning the seed did not rotate existing hashes. Security Sprint 1 removes that default, requires four unique supplied passwords, rotates existing seeded hashes when supplied, and refuses production seeding unless explicitly overridden.
 
 Recommended action: make every seeded credential mandatory and unique for a demo environment, refuse the seed command when `BUILDIQ_ENV=production`, and add a post-seed disable/delete/rotation step before any real-user test.
 
@@ -318,6 +318,10 @@ State/session rewrites, permission enforcement, financial type migrations, deplo
 5. **Deployment contract.** Run a read-only web01 discovery, choose nginx or Apache, define operator/service-user boundaries, add backup/restore gates, harden systemd/proxy settings, and rehearse rollback.
 6. **Documentation source of truth.** Publish a docs index, label target/historical files, align financial/API/version vocabulary, and regenerate user-facing artifacts.
 7. **Final RC2 validation.** Run backend/frontend tests, lint, build, migration-head check, OpenAPI export/diff, provider/secret/brand scans, security regression checks, and an authenticated web01 smoke test including PDF generation/download and two-tenant isolation.
+
+## Security Sprint 1 Status
+
+Security Sprint 1 is implemented in `docs/035-security-sprint-1.md`. The RC1 permission matrix is now enforced at the backend authenticated-company boundary, unsafe production configuration fails closed during settings validation, demo seeding requires unique supplied credentials and refuses production by default, and inactive subscriptions cannot access business APIs. Follow-up work remains for finer per-action policy review, audit coverage, and deployment-host verification.
 
 ## Validation Record
 

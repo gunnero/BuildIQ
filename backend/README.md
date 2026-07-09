@@ -79,26 +79,30 @@ Seed initial local development data:
 
 ```bash
 cd backend
+BUILDIQ_SEED_HQ_PASSWORD='unique-local-password-1' \
+BUILDIQ_SEED_OWNER_PASSWORD='unique-local-password-2' \
+BUILDIQ_SEED_ALEKSANDAR_PASSWORD='unique-local-password-3' \
+BUILDIQ_SEED_HRISTIJAN_PASSWORD='unique-local-password-4' \
 ../.venv/bin/buildiq-seed-dev
 ```
 
-Default local seed accounts, for local development only:
+Seed accounts are local/demo-only and require four unique passwords supplied outside the repository:
 
 - HQ admin: `hq@buildiq.local`
 - Demo owner: `owner@demo.buildiq.local`
 - Aleksandar test owner: `aleksandar@kalveri.com` in company `Демо Градба - Александар`
 - Hristijan test owner: `hristijan@kalveri.com` in company `Демо Градба - Христијан`
-- Password: `ChangeMe123!`
+- Passwords are supplied through the four `BUILDIQ_SEED_*_PASSWORD` variables.
 
 The demo owner and Aleksandar test owner receive MVP demo data. Hristijan's test company is intentionally empty for first-test onboarding and tenant isolation checks.
 
-Do not use these credentials outside local development. Production test passwords must be distributed outside the repository. Local passwords can be overridden with:
+Do not use these credentials outside local development. Production test passwords must be distributed outside the repository. Run the seed with unique local values:
 
 ```bash
-BUILDIQ_SEED_HQ_PASSWORD='new-password' \
-BUILDIQ_SEED_OWNER_PASSWORD='new-password' \
-BUILDIQ_SEED_ALEKSANDAR_PASSWORD='new-password' \
-BUILDIQ_SEED_HRISTIJAN_PASSWORD='new-password' \
+BUILDIQ_SEED_HQ_PASSWORD='unique-local-password-1' \
+BUILDIQ_SEED_OWNER_PASSWORD='unique-local-password-2' \
+BUILDIQ_SEED_ALEKSANDAR_PASSWORD='unique-local-password-3' \
+BUILDIQ_SEED_HRISTIJAN_PASSWORD='unique-local-password-4' \
 ../.venv/bin/buildiq-seed-dev
 ```
 

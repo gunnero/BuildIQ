@@ -139,6 +139,7 @@ Current RC1 documentation:
 - [RC1 release checklist](docs/032-release-candidate-checklist.md)
 - [web01 production deployment guide](docs/033-production-deployment-web01.md)
 - [RC1 technical and product audit](docs/034-buildiq-v0.9-rc1-audit.md)
+- [Security Sprint 1](docs/035-security-sprint-1.md)
 - [Macedonian user guide](docs/user-guides/buildiq-user-guide-mk.md)
 - [Macedonian user guide PDF](docs/user-guides/buildiq-user-guide-mk.pdf)
 - [Changelog](docs/changelog.md)

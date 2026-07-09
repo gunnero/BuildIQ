@@ -83,15 +83,24 @@ def seeded_identity(db_session: Session) -> dict[str, str]:
         name="Worker",
         is_system_role=True,
     )
+    other_owner_role = Role(
+        company_id=other_company.id,
+        key="owner",
+        name="Owner",
+        is_system_role=True,
+    )
     view_subscription = Permission(
         key="subscription:view",
         name="View subscription",
     )
-    db_session.add_all([owner_role, manager_role, worker_role, view_subscription])
+    db_session.add_all(
+        [owner_role, manager_role, worker_role, other_owner_role, view_subscription]
+    )
     db_session.flush()
     db_session.add_all(
         [
             UserRole(user_id=owner_user.id, role_id=owner_role.id),
+            UserRole(user_id=other_user.id, role_id=other_owner_role.id),
             RolePermission(role_id=owner_role.id, permission_id=view_subscription.id),
         ]
     )
@@ -110,7 +119,12 @@ def seeded_identity(db_session: Session) -> dict[str, str]:
         plan_id=plan.id,
         status="active",
     )
-    db_session.add(subscription)
+    other_subscription = Subscription(
+        company_id=other_company.id,
+        plan_id=plan.id,
+        status="active",
+    )
+    db_session.add_all([subscription, other_subscription])
     db_session.commit()
 
     return {

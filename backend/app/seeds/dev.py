@@ -23,12 +23,12 @@ from app.services.calculations import execute_calculation_run
 from app.services.estimates import change_estimate_status, create_estimate_from_calculation
 from app.services.financial import create_expense_record, create_payment_record
 from app.services.materials import ensure_default_material_units
+from app.services.authorization import PERMISSION_KEYS, RC1_ROLE_PERMISSIONS
 
 HQ_EMAIL = "hq@buildiq.local"
 OWNER_EMAIL = "owner@demo.buildiq.local"
 ALEKSANDAR_TEST_EMAIL = "aleksandar@kalveri.com"
 HRISTIJAN_TEST_EMAIL = "hristijan@kalveri.com"
-DEFAULT_PASSWORD = "ChangeMe123!"
 DEMO_COMPANY_NAME = "Демо Градба"
 LEGACY_DEMO_COMPANY_NAME = "Demo Build Company"
 DEMO_OWNER_NAME = "Демо Сопственик"
@@ -80,6 +80,7 @@ def get_or_create_user(
             user.name = name
         if user.is_hq_admin != is_hq_admin:
             user.is_hq_admin = is_hq_admin
+        user.password_hash = hash_password(password)
         db.flush()
         return user
 
@@ -202,15 +203,32 @@ def ensure_demo_company_access(db: Session, *, company: Company, owner_user: Use
         "owner": get_or_create_role(db, company_id=company.id, key="owner", name="Owner"),
         "manager": get_or_create_role(db, company_id=company.id, key="manager", name="Manager"),
         "worker": get_or_create_role(db, company_id=company.id, key="worker", name="Worker"),
+        "accountant": get_or_create_role(
+            db,
+            company_id=company.id,
+            key="accountant",
+            name="Accountant",
+        ),
     }
 
-    permissions = [
-        get_or_create_permission(db, "company:read", "Read company"),
-        get_or_create_permission(db, "subscription:read", "Read subscription"),
-        get_or_create_permission(db, "users:manage", "Manage users"),
-    ]
-    for permission in permissions:
-        ensure_role_permission(db, roles["owner"], permission)
+    permissions = {
+        f"{domain}:{action}": get_or_create_permission(
+            db,
+            f"{domain}:{action}",
+            f"{action.title()} {domain}",
+        )
+        for domain in PERMISSION_KEYS
+        for action in ("read", "write")
+    }
+    permissions.update(
+        {
+            key: get_or_create_permission(db, key, key.replace(":", " ").title())
+            for key in ("measurements:create", "calculations:create")
+        }
+    )
+    for role_key, permission_keys in RC1_ROLE_PERMISSIONS.items():
+        for permission_key in permission_keys:
+            ensure_role_permission(db, roles[role_key], permissions[permission_key])
     ensure_user_role(db, owner_user, roles["owner"])
 
     plan = get_or_create_plan(db)
@@ -725,10 +743,27 @@ def ensure_mvp_demo_data(db: Session, *, demo_company: Company, owner_user: User
 
 
 def seed_development_data() -> None:
-    hq_password = os.getenv("BUILDIQ_SEED_HQ_PASSWORD", DEFAULT_PASSWORD)
-    owner_password = os.getenv("BUILDIQ_SEED_OWNER_PASSWORD", DEFAULT_PASSWORD)
-    aleksandar_password = os.getenv("BUILDIQ_SEED_ALEKSANDAR_PASSWORD", DEFAULT_PASSWORD)
-    hristijan_password = os.getenv("BUILDIQ_SEED_HRISTIJAN_PASSWORD", DEFAULT_PASSWORD)
+    if os.getenv("BUILDIQ_ENV", "local").lower() == "production" and os.getenv(
+        "BUILDIQ_ALLOW_DEMO_SEED_IN_PRODUCTION", "false"
+    ).lower() != "true":
+        raise RuntimeError(
+            "Refusing demo seed in production. Set "
+            "BUILDIQ_ALLOW_DEMO_SEED_IN_PRODUCTION=true only for an isolated, intentional demo."
+        )
+
+    password_keys = {
+        "hq": "BUILDIQ_SEED_HQ_PASSWORD",
+        "owner": "BUILDIQ_SEED_OWNER_PASSWORD",
+        "aleksandar": "BUILDIQ_SEED_ALEKSANDAR_PASSWORD",
+        "hristijan": "BUILDIQ_SEED_HRISTIJAN_PASSWORD",
+    }
+    passwords = {name: os.getenv(key, "") for name, key in password_keys.items()}
+    if any(len(password) < 12 for password in passwords.values()):
+        raise RuntimeError(
+            "Demo seed requires all four seed passwords to be supplied and at least 12 characters long."
+        )
+    if len(set(passwords.values())) != len(passwords):
+        raise RuntimeError("Demo seed passwords must be unique per seeded account.")
 
     db = SessionLocal()
     try:
@@ -746,7 +781,7 @@ def seed_development_data() -> None:
             company_id=hq_company.id,
             name="BuildIQ HQ Admin",
             email=HQ_EMAIL,
-            password=hq_password,
+            password=passwords["hq"],
             is_hq_admin=True,
         )
         owner_user = get_or_create_user(
@@ -754,21 +789,21 @@ def seed_development_data() -> None:
             company_id=demo_company.id,
             name=DEMO_OWNER_NAME,
             email=OWNER_EMAIL,
-            password=owner_password,
+            password=passwords["owner"],
         )
         aleksandar_user = get_or_create_user(
             db,
             company_id=aleksandar_company.id,
             name=ALEKSANDAR_TEST_USER_NAME,
             email=ALEKSANDAR_TEST_EMAIL,
-            password=aleksandar_password,
+            password=passwords["aleksandar"],
         )
         hristijan_user = get_or_create_user(
             db,
             company_id=hristijan_company.id,
             name=HRISTIJAN_TEST_USER_NAME,
             email=HRISTIJAN_TEST_EMAIL,
-            password=hristijan_password,
+            password=passwords["hristijan"],
         )
 
         ensure_demo_company_access(db, company=demo_company, owner_user=owner_user)

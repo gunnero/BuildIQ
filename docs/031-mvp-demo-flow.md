@@ -24,7 +24,12 @@ Migrate and seed the backend:
 
 ```bash
 (cd backend && ../.venv/bin/alembic upgrade head)
-(cd backend && ../.venv/bin/buildiq-seed-dev)
+(cd backend && \
+  BUILDIQ_SEED_HQ_PASSWORD='SET_UNIQUE_LOCAL_PASSWORD_1' \
+  BUILDIQ_SEED_OWNER_PASSWORD='SET_UNIQUE_LOCAL_PASSWORD_2' \
+  BUILDIQ_SEED_ALEKSANDAR_PASSWORD='SET_UNIQUE_LOCAL_PASSWORD_3' \
+  BUILDIQ_SEED_HRISTIJAN_PASSWORD='SET_UNIQUE_LOCAL_PASSWORD_4' \
+  ../.venv/bin/buildiq-seed-dev)
 ```
 
 Start the backend:
@@ -46,16 +51,16 @@ Start the frontend in another terminal:
 Use these credentials only for local development:
 
 - Email: `owner@demo.buildiq.local`
-- Password: `ChangeMe123!`
+- Password: the unique value supplied through `BUILDIQ_SEED_OWNER_PASSWORD`
 
-The seed command also creates the internal HQ account `hq@buildiq.local` with the same default password, but the MVP user demo should use the demo owner account.
+The seed command also creates the internal HQ account `hq@buildiq.local`; its password is supplied through `BUILDIQ_SEED_HQ_PASSWORD`.
 
 The seed command creates two additional local test-owner accounts for tenant isolation checks:
 
 | User | Local password | Company | Demo data |
 | --- | --- | --- | --- |
-| `aleksandar@kalveri.com` | `ChangeMe123!` | `Демо Градба - Александар` | Yes |
-| `hristijan@kalveri.com` | `ChangeMe123!` | `Демо Градба - Христијан` | No, intentionally empty |
+| `aleksandar@kalveri.com` | value supplied through `BUILDIQ_SEED_ALEKSANDAR_PASSWORD` | `Демо Градба - Александар` | Yes |
+| `hristijan@kalveri.com` | value supplied through `BUILDIQ_SEED_HRISTIJAN_PASSWORD` | `Демо Градба - Христијан` | No, intentionally empty |
 
 These are local/demo credentials only. Production test passwords must be shared outside the repository.
 
@@ -85,7 +90,7 @@ The seed is intended to be idempotent for the MVP demo records, so running it re
 ## Demo Script
 
 1. Open the frontend local URL shown by Vite.
-2. Log in with `owner@demo.buildiq.local` and `ChangeMe123!`.
+2. Log in with `owner@demo.buildiq.local` and the value supplied through `BUILDIQ_SEED_OWNER_PASSWORD`.
 3. Confirm the dashboard shows the demo company and active subscription.
 4. Open `Клиенти`.
 5. Select the demo customer and confirm the property is available.

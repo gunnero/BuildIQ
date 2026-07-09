@@ -2,6 +2,8 @@
 
 ## 2026-07-09
 
+- Implemented Security Sprint 1: RC1 role/permission enforcement, fail-closed production configuration validation, unique demo seed password requirements, and active subscription gates for business APIs.
+- Added negative coverage for zero-role, worker, accountant, suspended-subscription, and cancelled-subscription access paths.
 - Added the BuildIQ v0.9 RC1 technical/product audit, clarified controlled-RC versus production readiness, linked the current operational docs, and marked the unsafe legacy API route draft as non-authoritative.
 - Made production frontend builds deterministic with `npm ci`, documented the full RC validation/forbidden-term gates, corrected demo setup command paths, refreshed the PDF scope, and added certificate-renewal verification.
 - Removed impossible archived values from normal project/task status selectors, made dashboard guidance neutral for populated companies, and connected Macedonian login errors to accessible alert/input state.

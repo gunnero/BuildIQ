@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+import pytest
 
 import app.seeds.dev as dev_seed
 from app.models.calculation import CalculationRun
@@ -17,6 +18,13 @@ def test_development_seed_creates_mvp_demo_flow(
     monkeypatch,
 ) -> None:
     monkeypatch.setattr(dev_seed, "SessionLocal", lambda: db_session)
+    for name, value in {
+        "BUILDIQ_SEED_HQ_PASSWORD": "hq-local-test-password",
+        "BUILDIQ_SEED_OWNER_PASSWORD": "owner-local-test-password",
+        "BUILDIQ_SEED_ALEKSANDAR_PASSWORD": "aleksandar-local-test-password",
+        "BUILDIQ_SEED_HRISTIJAN_PASSWORD": "hristijan-local-test-password",
+    }.items():
+        monkeypatch.setenv(name, value)
 
     dev_seed.seed_development_data()
     dev_seed.seed_development_data()
@@ -107,3 +115,24 @@ def test_development_seed_creates_mvp_demo_flow(
     assert db_session.query(Estimate).filter(Estimate.company_id == hristijan_company.id).count() == 0
     assert db_session.query(Payment).filter(Payment.company_id == hristijan_company.id).count() == 0
     assert db_session.query(Expense).filter(Expense.company_id == hristijan_company.id).count() == 0
+
+
+def test_demo_seed_refuses_production_without_explicit_override(monkeypatch) -> None:
+    monkeypatch.setenv("BUILDIQ_ENV", "production")
+
+    with pytest.raises(RuntimeError, match="Refusing demo seed in production"):
+        dev_seed.seed_development_data()
+
+
+def test_demo_seed_requires_unique_passwords(monkeypatch) -> None:
+    monkeypatch.setenv("BUILDIQ_ENV", "demo")
+    for name in (
+        "BUILDIQ_SEED_HQ_PASSWORD",
+        "BUILDIQ_SEED_OWNER_PASSWORD",
+        "BUILDIQ_SEED_ALEKSANDAR_PASSWORD",
+        "BUILDIQ_SEED_HRISTIJAN_PASSWORD",
+    ):
+        monkeypatch.setenv(name, "same-password-for-test")
+
+    with pytest.raises(RuntimeError, match="must be unique"):
+        dev_seed.seed_development_data()
