@@ -163,7 +163,7 @@ BUILDIQ_STORAGE_PATH=/home/buildiq/storage
 Frontend production env:
 
 ```bash
-VITE_API_BASE_URL=https://buildiq.kalveri.com/api/v1
+VITE_API_BASE_URL=https://buildiq.kalveri.com
 ```
 
 Never commit `backend/.env.production`, `frontend/.env.production`, database passwords, JWT secrets, or generated PDFs.
@@ -385,7 +385,7 @@ The helper:
 - PostgreSQL database and user exist.
 - `/home/buildiq/storage` exists and is writable by the `buildiq` user.
 - `backend/.env.production` exists with real secrets and production database URL.
-- `frontend/.env.production` exists with `VITE_API_BASE_URL=https://buildiq.kalveri.com/api/v1`.
+- `frontend/.env.production` exists with `VITE_API_BASE_URL=https://buildiq.kalveri.com`.
 - Repository is clean before deployment.
 - Current deployed commit is recorded.
 - Backend dependencies install successfully.
