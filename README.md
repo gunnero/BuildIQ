@@ -8,6 +8,8 @@ BuildIQ helps construction teams calculate material needs, prepare offers, manag
 
 ## Domain
 
+Production target: `buildiq.kalveri.com`
+
 Temporary domain: `buildiq.razbudise.mk`
 
 ## Repository
@@ -125,3 +127,11 @@ Blueprint documents:
 - [Security](docs/014-security.md)
 - [Development Standards](docs/015-development-standards.md)
 - [Product Backlog](docs/018-product-backlog.md)
+
+## Deployment
+
+BuildIQ v0.9 RC1 is prepared for deployment to `web01` at `buildiq.kalveri.com`.
+
+Production deployment documentation:
+
+- [web01 production deployment guide](docs/033-production-deployment-web01.md)
