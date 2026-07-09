@@ -2,6 +2,7 @@
 
 ## 2026-07-09
 
+- Added a Macedonian BuildIQ v0.9 RC1 user guide in Markdown and PDF form for Hristijan/test-user onboarding.
 - Prepared BuildIQ v0.9 RC1 deployment materials for `web01` at `buildiq.kalveri.com`.
 - Added the web01 production deployment guide, production env examples, and safe helper scripts for frontend builds, backend migrations, and reviewed deployment execution.
 - Added production env aliases for `BUILDIQ_ENV`, `BUILDIQ_SECRET_KEY`, and `BUILDIQ_ALLOWED_ORIGINS`, including comma-separated CORS origin parsing and focused config coverage.
