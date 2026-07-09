@@ -5,6 +5,7 @@ from app.models.calculation import CalculationRun
 from app.models.customer import Customer, Property
 from app.models.estimate import Estimate
 from app.models.financial import Expense, Payment
+from app.models.identity import Company, User
 from app.models.material import Material
 from app.models.measurement import Room, RoomOpening
 from app.models.procurement import PriceBookItem, Supplier
@@ -19,6 +20,11 @@ def test_development_seed_creates_mvp_demo_flow(
 
     dev_seed.seed_development_data()
     dev_seed.seed_development_data()
+
+    company = db_session.query(Company).filter(Company.name == "Демо Градба").one()
+    owner_user = db_session.query(User).filter(User.email == dev_seed.OWNER_EMAIL).one()
+    assert owner_user.company_id == company.id
+    assert owner_user.name == "Демо Сопственик"
 
     customer = db_session.query(Customer).filter(Customer.email == "aleksandar@example.test").one()
     property_record = db_session.query(Property).filter(Property.customer_id == customer.id).one()

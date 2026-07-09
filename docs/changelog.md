@@ -2,6 +2,12 @@
 
 ## 2026-07-09
 
+- Polished BuildIQ v0.9 RC1 for first real-user testing.
+- Standardized frontend card, button, field, message, empty-state, badge, and data-tile styling across the MVP screens.
+- Added the visible `BuildIQ v0.9 RC1` version label to the app shell.
+- Improved Macedonian labels, demo seed copy, date formatting, subscription plan display, unit display, and first-run empty states without moving calculations or totals into the frontend.
+- Added local frontend CORS support for Vite development ports and a focused backend preflight test.
+- Added `docs/032-release-candidate-checklist.md` with RC scope, limitations, manual test checklist, and friend/user testing instructions.
 - Implemented Sprint 22 MVP QA, demo data, and demo flow polish.
 - Expanded the local development seed command with idempotent MVP demo data covering customer, property, project, room openings, paint material, supplier price book item, completed painting calculation, estimate, payment, and expense.
 - Documented local-only demo credentials in backend and frontend READMEs, added the MVP demo flow guide, and added backend seed plus frontend navigation smoke coverage.

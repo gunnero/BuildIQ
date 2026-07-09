@@ -27,6 +27,9 @@ from app.services.materials import ensure_default_material_units
 HQ_EMAIL = "hq@buildiq.local"
 OWNER_EMAIL = "owner@demo.buildiq.local"
 DEFAULT_PASSWORD = "ChangeMe123!"
+DEMO_COMPANY_NAME = "Демо Градба"
+LEGACY_DEMO_COMPANY_NAME = "Demo Build Company"
+DEMO_OWNER_NAME = "Демо Сопственик"
 
 
 def get_or_create_company(
@@ -34,10 +37,19 @@ def get_or_create_company(
     name: str,
     *,
     is_internal: bool = False,
+    legacy_names: tuple[str, ...] = (),
 ) -> Company:
     company = db.query(Company).filter(Company.name == name).one_or_none()
     if company is not None:
         return company
+
+    if legacy_names:
+        company = db.query(Company).filter(Company.name.in_(legacy_names)).one_or_none()
+        if company is not None:
+            company.name = name
+            company.is_internal = is_internal
+            db.flush()
+            return company
 
     company = Company(name=name, status="active", is_internal=is_internal)
     db.add(company)
@@ -56,6 +68,13 @@ def get_or_create_user(
 ) -> User:
     user = db.query(User).filter(User.email == email).one_or_none()
     if user is not None:
+        if user.company_id != company_id:
+            user.company_id = company_id
+        if user.name != name:
+            user.name = name
+        if user.is_hq_admin != is_hq_admin:
+            user.is_hq_admin = is_hq_admin
+        db.flush()
         return user
 
     user = User(
@@ -129,11 +148,14 @@ def ensure_role_permission(db: Session, role: Role, permission: Permission) -> N
 def get_or_create_plan(db: Session) -> SubscriptionPlan:
     plan = db.query(SubscriptionPlan).filter(SubscriptionPlan.key == "starter").one_or_none()
     if plan is not None:
+        if plan.name != "Почетен":
+            plan.name = "Почетен"
+            db.flush()
         return plan
 
     plan = SubscriptionPlan(
         key="starter",
-        name="Starter",
+        name="Почетен",
         price_mkd=0,
         billing_period="monthly",
         is_active=True,
@@ -182,7 +204,7 @@ def get_or_create_customer(db: Session, *, company_id: str) -> Customer:
             phone="+38970111222",
             email="aleksandar@example.test",
             address="ул. Македонија 12, Скопје",
-            note="Demo customer for the local MVP flow.",
+            note="Демо клиент за локалниот MVP приказ.",
             status="active",
         )
         db.add(customer)
@@ -207,7 +229,7 @@ def get_or_create_property(db: Session, *, company_id: str, customer: Customer) 
             name="Стан Центар",
             address="ул. Македонија 12",
             city="Скопје",
-            note="Demo apartment used for the MVP walkthrough.",
+            note="Демо стан за локалниот MVP приказ.",
             status="active",
         )
         db.add(property_record)
@@ -246,7 +268,7 @@ def get_or_create_project(
             customer_id=customer.id,
             property_id=property_record.id,
             name="Бојадисување стан Центар",
-            description="Demo MVP painting project.",
+            description="Демо проект за бојадисување во MVP приказот.",
             address=property_record.address,
             status="active",
             agreed_project_price=40000,
@@ -262,7 +284,7 @@ def get_or_create_project(
                 project_id=project.id,
                 from_status=None,
                 to_status="active",
-                note="Demo project seeded for local MVP walkthrough.",
+                note="Демо проект креиран за локалниот MVP приказ.",
                 changed_by_user_id=owner_user.id,
                 created_at=now,
             )
@@ -272,7 +294,7 @@ def get_or_create_project(
                 company_id=company_id,
                 project_id=project.id,
                 event_type="created",
-                message="Demo project created by the local seed command.",
+                message="Демо проект креиран преку локалната seed команда.",
                 created_by_user_id=owner_user.id,
                 created_at=now,
             )
@@ -297,7 +319,7 @@ def get_or_create_demo_room(db: Session, *, company_id: str, project: Project) -
             name="Дневна соба",
             room_type="living_room",
             floor="1",
-            note="Demo room with one door and two windows.",
+            note="Демо просторија со една врата и два прозорци.",
             length=5.0,
             width=4.0,
             height=2.7,
@@ -340,7 +362,7 @@ def get_or_create_paint_material(db: Session, *, company_id: str) -> Material:
         category = MaterialCategory(
             company_id=company_id,
             name="Бои",
-            description="Demo paint materials.",
+            description="Демо материјали за бојадисување.",
         )
         db.add(category)
         db.flush()
@@ -355,7 +377,7 @@ def get_or_create_paint_material(db: Session, *, company_id: str) -> Material:
             company_id=company_id,
             name="Внатрешна бела боја",
             sku="DEMO-PAINT-WHITE",
-            description="Demo paint with m2/liter coverage.",
+            description="Демо боја со покривност m2/liter.",
             category_id=category.id,
             unit_id=liter_unit.id,
             coverage_value=10.0,
@@ -383,7 +405,7 @@ def get_or_create_supplier(db: Session, *, company_id: str) -> Supplier:
             phone="+38970111333",
             email="supplier@example.test",
             address="бул. Партизански Одреди 20, Скопје",
-            note="Demo supplier for local MVP data.",
+            note="Демо добавувач за локалните MVP податоци.",
             status="active",
         )
         db.add(supplier)
@@ -416,7 +438,7 @@ def ensure_price_book_item(
             status="active",
             currency="MKD",
             valid_from=date(2026, 1, 1),
-            notes="Demo retail price book for MVP walkthrough.",
+            notes="Демо малопродажен ценовник за MVP приказ.",
         )
         db.add(price_book)
         db.flush()
@@ -440,7 +462,7 @@ def ensure_price_book_item(
             unit_price=450.0,
             currency="MKD",
             valid_from=date(2026, 1, 1),
-            notes="Demo price per liter.",
+            notes="Демо цена по литар.",
         )
         db.add(item)
         db.flush()
@@ -482,7 +504,7 @@ def get_or_create_painting_calculation(
             "paint_material_id": material.id,
             "waste_percentage": 10,
             "labor_rate_per_m2": 520,
-            "notes": "Demo painting calculation for the MVP walkthrough.",
+            "notes": "Демо пресметка за бојадисување во MVP приказот.",
         },
     )
     calculation = execute_calculation_run(
@@ -516,7 +538,7 @@ def get_or_create_estimate_from_calculation(
             calculation_run_id=calculation.id,
             payload=EstimateFromCalculationCreate(
                 title="Понуда за бојадисување",
-                description="Demo estimate copied from a completed painting calculation.",
+                description="Демо понуда копирана од завршена пресметка за бојадисување.",
             ),
         )
         db.flush()
@@ -541,10 +563,13 @@ def get_or_create_payment(
             Payment.company_id == company_id,
             Payment.project_id == project.id,
             Payment.estimate_id == estimate.id,
-            Payment.note == "Demo received payment.",
+            Payment.note.in_(("Демо примена уплата.", "Demo received payment.")),
         )
         .one_or_none()
     )
+    if payment is not None and payment.note != "Демо примена уплата.":
+        payment.note = "Демо примена уплата."
+        db.flush()
     if payment is None:
         payment = create_payment_record(
             db,
@@ -558,7 +583,7 @@ def get_or_create_payment(
                 payment_method="bank_transfer",
                 payment_date=date(2026, 7, 3),
                 status="received",
-                note="Demo received payment.",
+                note="Демо примена уплата.",
             ),
         )
         db.flush()
@@ -583,7 +608,7 @@ def get_or_create_expense(
         category = ExpenseCategory(
             company_id=company_id,
             name="Материјали",
-            description="Demo material expenses.",
+            description="Демо трошоци за материјали.",
         )
         db.add(category)
         db.flush()
@@ -612,7 +637,7 @@ def get_or_create_expense(
                 expense_date=date(2026, 7, 2),
                 payment_method="cash",
                 status="recorded",
-                note="Demo expense for MVP walkthrough.",
+                note="Демо трошок за MVP приказ.",
             ),
         )
         db.flush()
@@ -680,7 +705,11 @@ def seed_development_data() -> None:
     db = SessionLocal()
     try:
         hq_company = get_or_create_company(db, "BuildIQ HQ", is_internal=True)
-        demo_company = get_or_create_company(db, "Demo Build Company")
+        demo_company = get_or_create_company(
+            db,
+            DEMO_COMPANY_NAME,
+            legacy_names=(LEGACY_DEMO_COMPANY_NAME,),
+        )
 
         get_or_create_user(
             db,
@@ -693,7 +722,7 @@ def seed_development_data() -> None:
         owner_user = get_or_create_user(
             db,
             company_id=demo_company.id,
-            name="Demo Owner",
+            name=DEMO_OWNER_NAME,
             email=OWNER_EMAIL,
             password=owner_password,
         )

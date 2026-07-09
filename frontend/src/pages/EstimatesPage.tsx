@@ -32,6 +32,7 @@ import type {
   MaterialResponse,
   ProjectResponse,
 } from "../api/types";
+import { formatDate, formatDateTime, formatUnit } from "../lib/format";
 
 type MessageTone = "neutral" | "error" | "success";
 
@@ -132,20 +133,8 @@ function formatMoney(value: number | null | undefined): string {
   return `${formatNumber(value)} MKD`;
 }
 
-function formatDate(value: string | null | undefined): string {
-  if (!value) {
-    return "Не е внесено";
-  }
-
-  return new Intl.DateTimeFormat("mk-MK", { dateStyle: "medium" }).format(new Date(value));
-}
-
-function formatDateTime(value: string | null | undefined): string {
-  if (!value) {
-    return "Не е внесено";
-  }
-
-  return new Intl.DateTimeFormat("mk-MK", { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
+function formatQuantity(value: number, unit: string | null | undefined): string {
+  return [formatNumber(value), formatUnit(unit)].filter(Boolean).join(" ");
 }
 
 function formatStatus(status: string): string {
@@ -232,8 +221,8 @@ function selectLabel<T extends { id: string }>(
 
 function Panel({ children, title }: { children: ReactNode; title: string }) {
   return (
-    <section aria-label={title} className="rounded-md border border-line bg-white p-4 shadow-sm">
-      <h2 className="text-base font-bold tracking-normal text-ink">{title}</h2>
+    <section aria-label={title} className="ui-card">
+      <h2 className="ui-card-title">{title}</h2>
       <div className="mt-4">{children}</div>
     </section>
   );
@@ -255,7 +244,7 @@ function FormField({
   value: string;
 }) {
   return (
-    <label htmlFor={name} className="block text-sm font-semibold text-slate-700">
+    <label htmlFor={name} className="ui-field-label">
       {label}
       <input
         id={name}
@@ -264,7 +253,7 @@ function FormField({
         value={value}
         required={required}
         onChange={onChange}
-        className="mt-2 h-10 w-full rounded-md border border-line px-3 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
+        className="ui-input"
       />
     </label>
   );
@@ -282,7 +271,7 @@ function TextAreaField({
   value: string;
 }) {
   return (
-    <label htmlFor={name} className="block text-sm font-semibold text-slate-700">
+    <label htmlFor={name} className="ui-field-label">
       {label}
       <textarea
         id={name}
@@ -290,7 +279,7 @@ function TextAreaField({
         value={value}
         onChange={onChange}
         rows={3}
-        className="mt-2 w-full rounded-md border border-line px-3 py-2 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
+        className="ui-textarea"
       />
     </label>
   );
@@ -312,7 +301,7 @@ function SelectField({
   value: string;
 }) {
   return (
-    <label htmlFor={name} className="block text-sm font-semibold text-slate-700">
+    <label htmlFor={name} className="ui-field-label">
       {label}
       <select
         id={name}
@@ -320,7 +309,7 @@ function SelectField({
         value={value}
         required={required}
         onChange={onChange}
-        className="mt-2 h-10 w-full rounded-md border border-line bg-white px-3 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
+        className="ui-select"
       >
         {children}
       </select>
@@ -336,11 +325,11 @@ function Message({ children, tone = "neutral" }: { children: ReactNode; tone?: M
         ? "border-emerald-200 bg-emerald-50 text-emerald-800"
         : "border-line bg-slate-50 text-slate-700";
 
-  return <p className={`rounded-md border px-3 py-2 text-sm ${toneClass}`}>{children}</p>;
+  return <p className={`ui-message ${toneClass}`}>{children}</p>;
 }
 
 function EmptyState({ children }: { children: ReactNode }) {
-  return <p className="rounded-md border border-dashed border-line bg-slate-50 px-3 py-4 text-sm text-slate-600">{children}</p>;
+  return <p className="ui-empty-inline">{children}</p>;
 }
 
 function PrimaryButton({ children, disabled = false }: { children: ReactNode; disabled?: boolean }) {
@@ -348,7 +337,7 @@ function PrimaryButton({ children, disabled = false }: { children: ReactNode; di
     <button
       type="submit"
       disabled={disabled}
-      className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-brand px-3 text-sm font-bold text-white transition hover:bg-teal-800 focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-70"
+      className="ui-button-primary"
     >
       <Plus aria-hidden="true" className="h-4 w-4" />
       {children}
@@ -381,7 +370,7 @@ function ActionButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`inline-flex h-10 items-center justify-center gap-2 rounded-md border bg-white px-3 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-70 ${toneClass}`}
+      className={`ui-button-secondary ${toneClass}`}
     >
       {icon}
       {children}
@@ -400,7 +389,7 @@ function StatusBadge({ status }: { status: string }) {
           : "border-line bg-slate-50 text-slate-700";
 
   return (
-    <span className={`inline-flex items-center rounded-md border px-2 py-1 text-xs font-bold ${statusClass}`}>
+    <span className={`ui-status-badge ${statusClass}`}>
       {formatStatus(status)}
     </span>
   );
@@ -408,7 +397,7 @@ function StatusBadge({ status }: { status: string }) {
 
 function TotalTile({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-md border border-line bg-slate-50 px-3 py-3">
+    <div className="ui-data-tile">
       <p className="text-xs font-semibold uppercase text-slate-500">{label}</p>
       <p className="mt-1 text-lg font-bold tracking-normal text-ink">{value}</p>
     </div>
@@ -1092,7 +1081,7 @@ function EstimateDetail({
               type="button"
               onClick={() => onRevisionSelect(revision.id)}
               className={[
-                "rounded-md border px-3 py-2 text-sm font-semibold transition",
+                "ui-message font-semibold transition",
                 selectedRevision?.id === revision.id ? "border-brand bg-brand/10 text-brand" : "border-line bg-white text-slate-700",
               ].join(" ")}
             >
@@ -1191,7 +1180,7 @@ function EstimateDetail({
                         <td className="px-3 py-2 text-slate-700">{formatItemType(item.item_type)}</td>
                         <td className="px-3 py-2 text-slate-700">{materialLabel(item.material_id)}</td>
                         <td className="px-3 py-2 text-slate-700">
-                          {formatNumber(item.quantity)} {item.unit ?? ""}
+                          {formatQuantity(item.quantity, item.unit)}
                         </td>
                         <td className="px-3 py-2 text-slate-700">{formatMoney(item.unit_price)}</td>
                         <td className="px-3 py-2 text-slate-700">{formatMoney(item.total_price)}</td>

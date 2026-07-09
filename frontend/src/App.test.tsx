@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { App } from "./App";
 import { getToken, saveToken } from "./auth/tokenStorage";
+import { formatDateTime } from "./lib/format";
 
 const now = "2026-07-08T10:00:00Z";
 
@@ -1327,7 +1328,8 @@ describe("App", () => {
     expect(screen.getAllByText("Александар Димовски").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Демо Градба").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Статус: Активна").length).toBeGreaterThan(0);
-    expect(screen.getByText("Starter")).toBeInTheDocument();
+    expect(screen.getByText("Почетен")).toBeInTheDocument();
+    expect(screen.getByText("BuildIQ v0.9 RC1")).toBeInTheDocument();
     expect(screen.getByText("Започнете со додавање клиент.")).toBeInTheDocument();
     expect(screen.getByText("Потоа креирајте проект и простории. Потоа направете пресметка и понуда.")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Клиенти" })).toBeInTheDocument();
@@ -2125,9 +2127,7 @@ describe("App", () => {
     expect(await screen.findByText("PDF понудата е генерирана.")).toBeInTheDocument();
     expect(screen.getByText("Генерирани PDF документи")).toBeInTheDocument();
     expect(screen.getByText("PDF понуда")).toBeInTheDocument();
-    expect(
-      screen.getByText(new Intl.DateTimeFormat("mk-MK", { dateStyle: "medium", timeStyle: "short" }).format(new Date(estimateDocument.generated_at))),
-    ).toBeInTheDocument();
+    expect(screen.getByText(formatDateTime(estimateDocument.generated_at))).toBeInTheDocument();
 
     const pdfRequest = fetchMock.mock.calls.find((call) => String(call[0]).endsWith("/api/v1/estimates/estimate-1/pdf"));
     expect(String(pdfRequest?.[1]?.body)).not.toContain("total");

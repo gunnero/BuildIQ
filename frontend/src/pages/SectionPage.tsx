@@ -13,8 +13,8 @@ export function SectionPage({ title, description }: SectionPageProps) {
         <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">{description}</p>
       </div>
       <EmptyState
-        title="Сè уште нема записи."
-        description="Екраните за внес и уредување ќе бидат додадени во следен спринт. Овој приказ не користи лажни пресметки или фиксни деловни суми."
+        title="Оваа област е во подготовка."
+        description="Во оваа верзија нема внес и уредување за овој дел. Приказот не користи лажни пресметки или фиксни деловни суми."
       />
     </section>
   );

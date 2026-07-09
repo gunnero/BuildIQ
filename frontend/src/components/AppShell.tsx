@@ -29,6 +29,8 @@ const navigationItems = [
   { to: "/settings", label: "Поставки", icon: Settings },
 ];
 
+const RELEASE_LABEL = "BuildIQ v0.9 RC1";
+
 export function AppShell() {
   const { company, currentUser, logout, subscription } = useAuth();
   const navigate = useNavigate();
@@ -43,7 +45,7 @@ export function AppShell() {
   return (
     <div className="min-h-screen bg-paper text-ink">
       <div className="grid min-h-screen lg:grid-cols-[280px_1fr]">
-        <aside className="border-b border-line bg-white lg:border-b-0 lg:border-r">
+        <aside className="flex flex-col border-b border-line bg-white lg:border-b-0 lg:border-r">
           <div className="flex min-h-16 items-center justify-between gap-4 border-b border-line px-5">
             <div>
               <p className="text-lg font-bold tracking-normal">{companyName}</p>
@@ -72,6 +74,9 @@ export function AppShell() {
               );
             })}
           </nav>
+          <div className="mt-auto border-t border-line px-5 py-4">
+            <p className="text-xs font-semibold text-slate-500">{RELEASE_LABEL}</p>
+          </div>
         </aside>
 
         <div className="flex min-w-0 flex-col">
@@ -85,7 +90,7 @@ export function AppShell() {
             <button
               type="button"
               onClick={handleLogout}
-              className="inline-flex h-10 items-center gap-2 rounded-md border border-line bg-white px-3 text-sm font-semibold text-slate-700 transition hover:border-brand hover:text-brand focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2"
+              className="ui-button-secondary"
             >
               <LogOut aria-hidden="true" className="h-4 w-4" />
               Одјава

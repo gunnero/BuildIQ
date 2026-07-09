@@ -2,6 +2,60 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .ui-card {
+    @apply rounded-md border border-line bg-white p-4 shadow-sm;
+  }
+
+  .ui-card-title {
+    @apply text-base font-bold tracking-normal text-ink;
+  }
+
+  .ui-field-label {
+    @apply block text-sm font-semibold text-slate-700;
+  }
+
+  .ui-input {
+    @apply mt-2 h-10 w-full rounded-md border border-line px-3 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20;
+  }
+
+  .ui-select {
+    @apply mt-2 h-10 w-full rounded-md border border-line bg-white px-3 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20;
+  }
+
+  .ui-textarea {
+    @apply mt-2 w-full rounded-md border border-line px-3 py-2 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20;
+  }
+
+  .ui-button-primary {
+    @apply inline-flex h-10 items-center justify-center gap-2 rounded-md bg-brand px-3 text-sm font-bold text-white transition hover:bg-teal-800 focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-70;
+  }
+
+  .ui-button-secondary {
+    @apply inline-flex h-10 items-center justify-center gap-2 rounded-md border border-line bg-white px-3 text-sm font-semibold text-slate-700 transition hover:border-brand hover:text-brand focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .ui-message {
+    @apply rounded-md border px-3 py-2 text-sm;
+  }
+
+  .ui-empty-inline {
+    @apply rounded-md border border-dashed border-line bg-slate-50 px-3 py-4 text-sm text-slate-600;
+  }
+
+  .ui-empty-card {
+    @apply rounded-md border border-dashed border-line bg-white p-8 text-center shadow-sm;
+  }
+
+  .ui-status-badge {
+    @apply inline-flex items-center rounded-md border px-2 py-1 text-xs font-bold;
+  }
+
+  .ui-data-tile {
+    @apply rounded-md border border-line bg-slate-50 px-3 py-3;
+  }
+}
+
 :root {
   color: #17212b;
   background: #f7f4ef;

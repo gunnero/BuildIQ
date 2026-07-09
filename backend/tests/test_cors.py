@@ -1,0 +1,15 @@
+from fastapi.testclient import TestClient
+
+
+def test_local_frontend_preflight_is_allowed(client: TestClient) -> None:
+    response = client.options(
+        "/api/v1/auth/login",
+        headers={
+            "Origin": "http://127.0.0.1:5174",
+            "Access-Control-Request-Method": "POST",
+            "Access-Control-Request-Headers": "content-type",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.headers["access-control-allow-origin"] == "http://127.0.0.1:5174"
