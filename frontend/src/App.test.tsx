@@ -384,7 +384,10 @@ const paintingCalculationRun = {
     primer_material_cost: 1200.34,
     labor_cost: 7848,
     total_cost: 22222.22,
-    assumptions: ["Room-computed areas were used.", "Waste percentage is applied to paint and primer quantities."],
+    assumptions: [
+      "Користени се пресметаните површини од просторијата.",
+      "Процентот за отпад се применува на количините за боја и прајмер.",
+    ],
     warnings: ["Не е пронајдена цена за прајмер материјалот."],
     notes: "Проверка на дневна соба.",
   },
@@ -394,11 +397,11 @@ const paintingCalculationRun = {
       company_id: "company-1",
       calculation_run_id: "calculation-1",
       sort_order: 1,
-      name: "Paint material",
+      name: "Боја",
       description: "Мат боја",
       unit: "liter",
       quantity: 14.388,
-      payload: { material_id: "material-paint-1", unit_price: 354.47, total_cost: 5100.12 },
+      payload: { item_type: "material", material_id: "material-paint-1", unit_price: 354.47, total_cost: 5100.12 },
       created_at: now,
     },
     {
@@ -406,11 +409,11 @@ const paintingCalculationRun = {
       company_id: "company-1",
       calculation_run_id: "calculation-1",
       sort_order: 2,
-      name: "Labor",
-      description: "Painting labor",
+      name: "Работна рака",
+      description: "Бојадисерска работа",
       unit: "m2",
       quantity: 65.4,
-      payload: { unit_price: 120, total_cost: 7848 },
+      payload: { item_type: "labor", unit_price: 120, total_cost: 7848 },
       created_at: now,
     },
   ],
@@ -1168,6 +1171,47 @@ function mockFinancialFetch(token = "demo-token") {
   });
 }
 
+function mockNavigationSmokeFetch(token = "demo-token") {
+  return vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+    const url = String(input);
+    const authorization = init?.headers instanceof Headers ? init.headers.get("Authorization") : null;
+
+    expect(authorization).toBe(`Bearer ${token}`);
+
+    if (url.endsWith("/api/v1/auth/me")) {
+      return Promise.resolve(jsonResponse(currentUser));
+    }
+
+    if (url.endsWith("/api/v1/companies/me")) {
+      return Promise.resolve(jsonResponse(currentCompany));
+    }
+
+    if (url.endsWith("/api/v1/subscription/me")) {
+      return Promise.resolve(jsonResponse(currentSubscription));
+    }
+
+    if (url.endsWith("/api/v1/calculation-engines")) {
+      return Promise.resolve(jsonResponse(calculationEngines));
+    }
+
+    if (
+      url.endsWith("/api/v1/customers") ||
+      url.endsWith("/api/v1/properties") ||
+      url.endsWith("/api/v1/projects") ||
+      url.endsWith("/api/v1/materials") ||
+      url.endsWith("/api/v1/calculations") ||
+      url.endsWith("/api/v1/estimates") ||
+      url.endsWith("/api/v1/payments") ||
+      url.endsWith("/api/v1/expense-categories") ||
+      url.endsWith("/api/v1/expenses")
+    ) {
+      return Promise.resolve(jsonResponse([]));
+    }
+
+    return Promise.resolve(jsonResponse({ detail: "Not found" }, 404));
+  });
+}
+
 describe("App", () => {
   afterEach(() => {
     cleanup();
@@ -1914,9 +1958,9 @@ describe("App", () => {
     expect(screen.getAllByText("1200.34 MKD").length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText("7848 MKD").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("22222.22 MKD")).toBeInTheDocument();
-    expect(screen.getByText("Room-computed areas were used.")).toBeInTheDocument();
+    expect(screen.getByText("Користени се пресметаните површини од просторијата.")).toBeInTheDocument();
     expect(screen.getByText("Не е пронајдена цена за прајмер материјалот.")).toBeInTheDocument();
-    expect(screen.getByText("Paint material")).toBeInTheDocument();
+    expect(screen.getByText("Боја")).toBeInTheDocument();
     expect(screen.getAllByText("Мат боја").length).toBeGreaterThanOrEqual(1);
   });
 
@@ -2490,5 +2534,33 @@ describe("App", () => {
       expect.stringContaining("/api/v1/expenses/expense-1/archive"),
       expect.objectContaining({ method: "POST" }),
     );
+  });
+
+  it("navigates the main protected sections with Macedonian labels", async () => {
+    vi.stubGlobal("fetch", mockNavigationSmokeFetch());
+    saveToken("demo-token");
+    window.history.pushState(null, "", "/dashboard");
+
+    render(<App />);
+
+    expect(await screen.findByRole("heading", { name: "Контролна табла" })).toBeInTheDocument();
+
+    const routes = [
+      { label: "Клиенти", path: "/customers", heading: "Клиенти" },
+      { label: "Проекти", path: "/projects", heading: "Проекти" },
+      { label: "Материјали", path: "/materials", heading: "Материјали" },
+      { label: "Добавувачи", path: "/suppliers", heading: "Добавувачи" },
+      { label: "Пресметки", path: "/calculations", heading: "Пресметки" },
+      { label: "Понуди", path: "/estimates", heading: "Понуди" },
+      { label: "Уплати", path: "/payments", heading: "Уплати" },
+      { label: "Трошоци", path: "/expenses", heading: "Трошоци" },
+      { label: "Поставки", path: "/settings", heading: "Поставки" },
+    ];
+
+    for (const route of routes) {
+      fireEvent.click(screen.getByRole("link", { name: route.label }));
+      await waitFor(() => expect(window.location.pathname).toBe(route.path));
+      expect(await screen.findByRole("heading", { name: route.heading })).toBeInTheDocument();
+    }
   });
 });

@@ -177,8 +177,8 @@ class PaintingCalculationEngine(BaseCalculationEngine):
             "total_cost": rounded(total_cost),
             "assumptions": [
                 areas["source"],
-                "Paint and primer coverage are interpreted as m2/liter.",
-                "Waste percentage is applied to paint and primer quantities.",
+                "Покривноста на бојата и прајмерот се толкува како m2/liter.",
+                "Процентот за отпад се применува на количините за боја и прајмер.",
             ],
             "warnings": warnings,
             "notes": parsed["notes"],
@@ -316,7 +316,7 @@ class PaintingCalculationEngine(BaseCalculationEngine):
                 "wall_area_net_m2": computed["wall_area_net"],
                 "ceiling_area_m2": computed["ceiling_area"],
                 "total_paintable_area_m2": computed["total_paintable_area"],
-                "source": "Room-computed areas were used.",
+                "source": "Користени се пресметаните површини од просторијата.",
             }
 
         if context.measurement_set_id is not None:
@@ -361,7 +361,7 @@ class PaintingCalculationEngine(BaseCalculationEngine):
                 "wall_area_net_m2": wall_area,
                 "ceiling_area_m2": ceiling_area,
                 "total_paintable_area_m2": total_paintable_area,
-                "source": "Measurement-set areas were used.",
+                "source": "Користени се површините од сетот мерења.",
             }
 
         return failure_result(
@@ -472,11 +472,12 @@ class PaintingCalculationEngine(BaseCalculationEngine):
         if paint_material is not None:
             line_items.append(
                 CalculationLineItemResult(
-                    name="Paint material",
+                    name="Боја",
                     description=paint_material.name,
                     unit="liter",
                     quantity=rounded(paint_required_liters),
                     payload={
+                        "item_type": "material",
                         "material_id": paint_material.id,
                         "total_cost": rounded(paint_cost),
                         **paint_price_payload,
@@ -486,11 +487,12 @@ class PaintingCalculationEngine(BaseCalculationEngine):
         if primer_material is not None:
             line_items.append(
                 CalculationLineItemResult(
-                    name="Primer material",
+                    name="Прајмер",
                     description=primer_material.name,
                     unit="liter",
                     quantity=rounded(primer_required_liters),
                     payload={
+                        "item_type": "material",
                         "material_id": primer_material.id,
                         "total_cost": rounded(primer_cost),
                         **primer_price_payload,
@@ -500,11 +502,12 @@ class PaintingCalculationEngine(BaseCalculationEngine):
         if labor_rate_per_m2 is not None:
             line_items.append(
                 CalculationLineItemResult(
-                    name="Labor",
-                    description="Painting labor",
+                    name="Работна рака",
+                    description="Бојадисерска работа",
                     unit="m2",
                     quantity=rounded(selected_area),
                     payload={
+                        "item_type": "labor",
                         "unit_price": rounded(labor_rate_per_m2),
                         "total_cost": rounded(labor_cost),
                     },

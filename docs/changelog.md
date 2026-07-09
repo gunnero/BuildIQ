@@ -2,6 +2,9 @@
 
 ## 2026-07-09
 
+- Implemented Sprint 22 MVP QA, demo data, and demo flow polish.
+- Expanded the local development seed command with idempotent MVP demo data covering customer, property, project, room openings, paint material, supplier price book item, completed painting calculation, estimate, payment, and expense.
+- Documented local-only demo credentials in backend and frontend READMEs, added the MVP demo flow guide, and added backend seed plus frontend navigation smoke coverage.
 - Implemented Sprint 21 estimate PDF frontend.
 - Added estimate detail PDF generation/download actions, backend PDF endpoint helpers, returned document metadata display, Macedonian PDF UI states, and tests proving the frontend only sends the selected revision and downloads generated PDFs from backend endpoints.
 

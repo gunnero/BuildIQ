@@ -361,7 +361,8 @@ def test_create_estimate_from_completed_painting_calculation(
     items_response = client.get(f"/api/v1/estimate-revisions/{revision['id']}/items", headers=headers)
     assert items_response.status_code == 200
     items = items_response.json()
-    assert [item["name"] for item in items] == ["Paint material", "Labor"]
+    assert [item["name"] for item in items] == ["Боја", "Работна рака"]
+    assert [item["item_type"] for item in items] == ["material", "labor"]
     assert all(item["source_calculation_run_id"] == calculation["id"] for item in items)
     assert_rounded(revision["total"], calculation["output_payload"]["total_cost"])
 

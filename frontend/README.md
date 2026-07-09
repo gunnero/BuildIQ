@@ -4,7 +4,7 @@ React, TypeScript, Vite, and TailwindCSS frontend for BuildIQ.
 
 ## Scope
 
-Sprint 21 wires estimate PDF quote actions to the backend document endpoints and keeps earlier customer, property, project, room, measurement, calculation, estimate, payment, and expense workflows available:
+Sprint 22 keeps the MVP frontend connected to backend demo data and smoke-tested navigation while preserving the earlier customer, property, project, room, measurement, calculation, estimate, PDF, payment, and expense workflows:
 
 - React app scaffold in `frontend/`
 - TailwindCSS styling
@@ -60,6 +60,18 @@ Default backend URL:
 
 ```bash
 VITE_API_BASE_URL=http://127.0.0.1:8000
+```
+
+Local demo login, for local development only:
+
+- Email: `owner@demo.buildiq.local`
+- Password: `ChangeMe123!`
+
+Run the backend seed command first:
+
+```bash
+cd ../backend
+../.venv/bin/buildiq-seed-dev
 ```
 
 ## Scripts

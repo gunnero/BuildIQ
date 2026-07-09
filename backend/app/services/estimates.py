@@ -440,6 +440,8 @@ def payload_float(payload: dict[str, Any], *keys: str) -> Optional[float]:
 
 def infer_item_type(line_item: CalculationLineItem) -> str:
     payload = line_item.payload or {}
+    if payload.get("item_type") in ESTIMATE_ITEM_TYPES:
+        return payload["item_type"]
     if payload.get("material_id"):
         return "material"
     if "labor" in line_item.name.lower():

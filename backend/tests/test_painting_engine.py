@@ -125,7 +125,7 @@ def test_valid_room_based_painting_run_completes_and_stores_line_items(
     assert_rounded(output["total_cost"], 8880.0)
     assert output["warnings"] == ["Не е пронајдена цена за материјалот за боја."]
     assert len(created["line_items"]) == 2
-    assert [item["name"] for item in created["line_items"]] == ["Paint material", "Labor"]
+    assert [item["name"] for item in created["line_items"]] == ["Боја", "Работна рака"]
     assert created["line_items"][0]["unit"] == "liter"
     assert_rounded(created["line_items"][0]["quantity"], 16.28)
     assert created["line_items"][0]["payload"]["material_id"] == paint["id"]
@@ -375,7 +375,7 @@ def test_labor_cost_calculates_correctly(
     assert created["status"] == "completed"
     assert_rounded(created["output_payload"]["labor_cost"], 7400.0)
     assert_rounded(created["output_payload"]["total_cost"], 7400.0)
-    assert created["line_items"][0]["name"] == "Labor"
+    assert created["line_items"][0]["name"] == "Работна рака"
 
 
 def test_tenant_isolation_still_holds_for_painting_calculations(

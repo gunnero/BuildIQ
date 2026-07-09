@@ -42,7 +42,7 @@ The backend currently includes:
 - Backend API contract stabilization
 - OpenAPI tag metadata and export command
 - Shared error helpers and audit helper
-- Local development seed command
+- Local development seed command with MVP demo data
 
 The backend intentionally does not include:
 
@@ -82,16 +82,28 @@ cd backend
 ../.venv/bin/buildiq-seed-dev
 ```
 
-Default local seed accounts:
+Default local seed accounts, for local development only:
 
 - HQ admin: `hq@buildiq.local`
 - Demo owner: `owner@demo.buildiq.local`
+- Password: `ChangeMe123!`
 
-Both use `ChangeMe123!` unless overridden with:
+Do not use these credentials outside local development. The password can be overridden with:
 
 ```bash
 BUILDIQ_SEED_HQ_PASSWORD='new-password' BUILDIQ_SEED_OWNER_PASSWORD='new-password' ../.venv/bin/buildiq-seed-dev
 ```
+
+The seed command also creates an idempotent MVP demo flow for the demo owner:
+
+- demo company and active starter subscription
+- customer Aleksandar and one Skopje apartment property
+- active painting project with agreed project price
+- living room with door/window openings
+- paint material, supplier, retail price book, and price book item
+- completed painting calculation
+- accepted estimate copied from the calculation
+- received payment and recorded expense
 
 ## Run the App
 
