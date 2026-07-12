@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This plan records the dependency audit observed during GitHub Professionalization 002. It does not change dependency declarations or lockfiles. Versions below are the minimum fixed versions reported by the audit tools on 13 July 2026; compatibility must be confirmed against the current direct dependency ranges before adoption.
+This plan records the dependency audit observed during GitHub Professionalization 002. Program 003 completed the plan in independently reviewed commits; the original baseline versions remain below for traceability. Final evidence is in `docs/036-dependency-remediation-review.md` and compatibility analysis is in `docs/037-dependency-upgrade-compatibility.md`.
 
 ## Python production dependencies
 
@@ -51,3 +51,7 @@ All reported npm packages are development, test, or build-tool dependencies. The
 9. Re-run `pip check`, `pip-audit`, `npm audit`, Gitleaks, and the complete CI matrix before review.
 
 Production dependency remediation should be reviewed before development-only tooling because it affects the deployed request, document, and configuration paths. Each major upgrade should remain independently reviewable; do not combine it with application features.
+
+## Completion status
+
+All listed advisories are resolved. Final `pip-audit --local` and `npm audit --audit-level=high` results contain zero known vulnerabilities. No exception, suppression, or accepted residual advisory remains.

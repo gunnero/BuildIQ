@@ -3,7 +3,7 @@ name = "buildiq-backend"
 version = "0.1.0"
 description = "BuildIQ FastAPI backend kernel scaffold."
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.12"
 dependencies = [
     "alembic>=1.13,<2.0",
     "fastapi>=0.139,<1.0",

@@ -4,6 +4,13 @@ All notable public changes to BuildIQ are recorded here. The project is in relea
 
 ## Unreleased
 
+### Dependency remediation
+
+- Resolved the reviewed Python and frontend dependency advisories without audit exclusions or forced upgrades.
+- Upgraded the FastAPI/Starlette, ReportLab/Pillow, pytest, Vite, Vitest, and related toolchain within tested compatibility boundaries.
+- Added route-level code splitting, reducing the primary JavaScript entry from approximately 520 kB to 367.94 kB.
+- Expanded CI with Python auditing and repository documentation/configuration validation.
+
 ### Added
 
 - Flagship repository presentation and explicit implementation-status boundaries

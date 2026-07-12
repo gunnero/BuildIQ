@@ -103,7 +103,7 @@ Worker management and permission management do not yet have dedicated frontend s
 
 ## Local installation
 
-Prerequisites: Python 3.9+, Node.js 20+, npm, Docker with Compose, and Git.
+Prerequisites: Python 3.12+, Node.js 20.19+ (or 22.12+), npm, Docker with Compose, and Git.
 
 ```bash
 python3 -m venv .venv
@@ -167,6 +167,8 @@ This repository is Python/FastAPI plus React; Composer and Artisan commands do n
 - [Generic deployment principles](docs/033-deployment-principles.md)
 - [RC1 audit](docs/034-buildiq-v0.9-rc1-audit.md)
 - [Security Sprint 1](docs/035-security-sprint-1.md)
+- [Dependency remediation review](docs/036-dependency-remediation-review.md)
+- [Dependency upgrade compatibility](docs/037-dependency-upgrade-compatibility.md)
 - [OpenAPI contract](docs/api/openapi.json)
 - [User guide](docs/user-guides/buildiq-user-guide-mk.md)
 - [Changelog](CHANGELOG.md)

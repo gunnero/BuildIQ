@@ -78,7 +78,7 @@ The owner must explicitly choose between a proprietary/public-source posture and
 6. Improve the mobile navigation presentation; it reflows without content clipping but remains visually long.
 7. Decide whether historical topology references warrant a coordinated history rewrite. Do not rewrite history casually.
 8. Require the new CI checks through branch protection after the workflow is reviewed on GitHub.
-9. Resolve dependency-audit findings before release: the current environment reports Python advisories affecting Pillow, pip, pytest, python-dotenv, setuptools, and Starlette, while npm reports five advisories across the Vite/Vitest/esbuild toolchain. The available npm remediation is breaking and must be reviewed rather than force-applied.
+9. Dependency advisories identified by this review were resolved in Program 003. Continue enforcing `pip-audit` and `npm audit --audit-level=high` in CI and review future major upgrades separately.
 
 ## Validation interpretation
 
