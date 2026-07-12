@@ -1,26 +1,29 @@
 import { QueryClientProvider } from "@tanstack/react-query";
+import { lazy, Suspense } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import { AuthProvider } from "./auth/AuthContext";
 import { ProtectedRoute } from "./auth/ProtectedRoute";
 import { AppShell } from "./components/AppShell";
-import { CalculationsPage } from "./pages/CalculationsPage";
-import { CustomersPage } from "./pages/CustomersPage";
-import { DashboardPage } from "./pages/DashboardPage";
-import { EstimatesPage } from "./pages/EstimatesPage";
-import { ExpensesPage } from "./pages/ExpensesPage";
 import { LoginPage } from "./pages/LoginPage";
-import { PaymentsPage } from "./pages/PaymentsPage";
-import { ProjectsPage } from "./pages/ProjectsPage";
 import { SectionPage } from "./pages/SectionPage";
 import { queryClient } from "./queryClient";
+
+const CalculationsPage = lazy(() => import("./pages/CalculationsPage").then(({ CalculationsPage }) => ({ default: CalculationsPage })));
+const CustomersPage = lazy(() => import("./pages/CustomersPage").then(({ CustomersPage }) => ({ default: CustomersPage })));
+const DashboardPage = lazy(() => import("./pages/DashboardPage").then(({ DashboardPage }) => ({ default: DashboardPage })));
+const EstimatesPage = lazy(() => import("./pages/EstimatesPage").then(({ EstimatesPage }) => ({ default: EstimatesPage })));
+const ExpensesPage = lazy(() => import("./pages/ExpensesPage").then(({ ExpensesPage }) => ({ default: ExpensesPage })));
+const PaymentsPage = lazy(() => import("./pages/PaymentsPage").then(({ PaymentsPage }) => ({ default: PaymentsPage })));
+const ProjectsPage = lazy(() => import("./pages/ProjectsPage").then(({ ProjectsPage }) => ({ default: ProjectsPage })));
 
 export function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <BrowserRouter>
-          <Routes>
+          <Suspense fallback={<main className="p-6" aria-live="polite">Се вчитува…</main>}>
+            <Routes>
             <Route path="/login" element={<LoginPage />} />
             <Route element={<ProtectedRoute />}>
               <Route element={<AppShell />}>
@@ -47,7 +50,8 @@ export function App() {
               </Route>
             </Route>
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
-          </Routes>
+            </Routes>
+          </Suspense>
         </BrowserRouter>
       </AuthProvider>
     </QueryClientProvider>
