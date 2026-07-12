@@ -9,7 +9,7 @@ Scope: documentation, backend, frontend, local product flow, production deployme
 
 BuildIQ v0.9 RC1 has a coherent backend-owned domain model, consistent company scoping on the reviewed business APIs, a usable Macedonian demo flow, tenant-isolated PDF metadata/download paths, and broad automated happy-path coverage. The local audit confirmed that the seeded populated and empty companies remain isolated during a normal same-tab logout/login flow. No direct AI/provider SDK, provider credential, committed production secret, raw-SQL injection sink, arbitrary outbound request surface, unsafe upload/parser surface, or runtime hard-delete endpoint was found.
 
-The release candidate is suitable for controlled local or isolated RC testing, but it is not ready for a production go-live. The release-blocking work is concentrated rather than architectural: backend roles and permissions are modeled but are not enforced by any route; production startup does not reject the known development JWT secret or an empty replacement; cross-tab browser token changes can mix stale tenant UI state with another tenant's token; the project screen can retain child selections across a project switch; financial values are persisted as binary floating-point numbers; and the web01 runbook lacks a workable privilege model, a database-backup gate, and a single deterministic reverse-proxy path.
+The release candidate is suitable for controlled local or isolated RC testing, but it is not ready for a production go-live. The release-blocking work is concentrated rather than architectural: backend roles and permissions are modeled but are not enforced by any route; production startup does not reject the known development JWT secret or an empty replacement; cross-tab browser token changes can mix stale tenant UI state with another tenant's token; the project screen can retain child selections across a project switch; financial values are persisted as binary floating-point numbers; and the private deployment runbook lacks a workable privilege model, a database-backup gate, and a single deterministic reverse-proxy path.
 
 This pass deliberately does not redesign architecture, change tenant-isolation rules, add major features, add AI/provider SDKs, deploy, or make the high-risk state/session/database/deployment changes above. Safe documentation, copy, UI-state, test, and deterministic-build corrections are listed under the improvement pass and are kept separate from the next-sprint blockers.
 
@@ -25,7 +25,7 @@ This pass deliberately does not redesign architecture, change tenant-isolation r
 
 **RC1 decision: conditional pass for controlled RC testing; fail for production go-live.**
 
-The current application can support the documented friend/test-user walkthrough on isolated demo data. Production deployment should wait until all High items marked as go-live blockers are resolved and the web01 preflight, backup/restore, configuration validation, and smoke tests are executed on the actual host.
+The current application can support the documented friend/test-user walkthrough on isolated demo data. Production deployment should wait until all High items marked as go-live blockers are resolved and the private environment preflight, backup/restore, configuration validation, and smoke tests are executed on the target host.
 
 ## Critical Issues
 
@@ -77,7 +77,7 @@ Several accepted `float` inputs only reject values below or equal to zero. `Infi
 
 Recommended action: add finite-number guards at the schema/service boundary, reject non-finite JSON values consistently, add regression tests for every money/quantity family, and plan the fixed-precision migration separately.
 
-### H6. web01 deployment flow has incompatible privilege and web-server assumptions
+### H6. Deployment flow has incompatible privilege and web-server assumptions
 
 The runbook creates `buildiq` as a system/service user and later tells that account to run a helper that calls privileged `sudo` operations. No sudoers policy or privileged-operator handoff is defined. The prerequisites unconditionally install nginx and nginx Certbot while Apache is also presented as supported; the helper will choose nginx whenever its unit exists, and rollback always reloads nginx.
 
@@ -167,13 +167,13 @@ Recommended action: add a documentation index with `current`, `target-state`, `h
 
 The systemd example lacks a restrictive `UMask`, `NoNewPrivileges`, `PrivateTmp`, filesystem protections, and resource limits. Proxy examples lack a full security-header and rate-limit policy. These omissions align with the checklist statement that production hardening is not included.
 
-Recommended action: harden and verify the actual web01 unit and proxy after discovering the host's real OS, service user, active web server, port use, DNS, and existing vhosts.
+Recommended action: harden and verify the private service and proxy definitions after discovering the target environment through an access-controlled runbook.
 
 ### M11. PDF Cyrillic support depends on a host font and silently falls back
 
 The PDF renderer searches common DejaVu/Arial paths and silently falls back to Helvetica. Helvetica does not provide the required Macedonian Cyrillic coverage, so a minimal server image can produce unreadable or missing glyphs without failing the request.
 
-This pass adds `fonts-dejavu-core` to the web01 prerequisites. A later hardening step should make the Unicode font an explicit packaged/runtime dependency and fail generation clearly when it is unavailable.
+This pass adds `fonts-dejavu-core` to the private environment prerequisites. A later hardening step should make the Unicode font an explicit packaged/runtime dependency and fail generation clearly when it is unavailable.
 
 ## Low Priority Polish
 
@@ -284,7 +284,7 @@ Confirmed good assumptions:
 
 Go-live blockers:
 
-- No actual web01 preflight verifies OS, active web server, service user/group, Node/Python versions, port 8000, DNS, vhosts, storage, or PostgreSQL connectivity.
+- No private target-environment preflight verifies runtime, service ownership, reverse proxy, storage, or PostgreSQL connectivity.
 - Service-user and sudo assumptions conflict.
 - nginx and Apache paths conflict.
 - Frontend helper can reuse stale `node_modules` instead of running deterministic `npm ci`.
@@ -315,9 +315,9 @@ State/session rewrites, permission enforcement, financial type migrations, deplo
 2. **Session and state integrity.** Fix cross-tab token synchronization, transient bootstrap errors, and project descendant resets with focused regression tests.
 3. **Financial precision plan.** Approve fixed-precision money rules and an additive, verified migration plan; do not mix this with unrelated UI work.
 4. **Audit and abuse controls.** Complete sensitive mutation audit coverage, failed-login telemetry, and a proxy/application rate-limit design.
-5. **Deployment contract.** Run a read-only web01 discovery, choose nginx or Apache, define operator/service-user boundaries, add backup/restore gates, harden systemd/proxy settings, and rehearse rollback.
+5. **Deployment contract.** Run a read-only private environment discovery, define operator/service-user boundaries, add backup/restore gates, harden service/proxy settings, and rehearse rollback.
 6. **Documentation source of truth.** Publish a docs index, label target/historical files, align financial/API/version vocabulary, and regenerate user-facing artifacts.
-7. **Final RC2 validation.** Run backend/frontend tests, lint, build, migration-head check, OpenAPI export/diff, provider/secret/brand scans, security regression checks, and an authenticated web01 smoke test including PDF generation/download and two-tenant isolation.
+7. **Final RC2 validation.** Run backend/frontend tests, lint, build, migration-head check, OpenAPI export/diff, provider/secret/brand scans, security regression checks, and an authenticated target-environment smoke test including PDF generation/download and two-tenant isolation.
 
 ## Security Sprint 1 Status
 

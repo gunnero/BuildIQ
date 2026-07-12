@@ -44,7 +44,7 @@ class Settings(BaseSettings):
             "http://localhost:5174",
             "http://127.0.0.1:5175",
             "http://localhost:5175",
-            "https://buildiq.razbudise.mk",
+            "https://app.example.invalid",
         ],
         validation_alias=AliasChoices("BUILDIQ_ALLOWED_ORIGINS", "BUILDIQ_CORS_ALLOWED_ORIGINS"),
     )

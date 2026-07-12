@@ -8,7 +8,7 @@ def test_production_env_aliases_are_supported(monkeypatch) -> None:
     monkeypatch.setenv("BUILDIQ_SECRET_KEY", "production-secret-value-with-at-least-32-chars")
     monkeypatch.setenv(
         "BUILDIQ_ALLOWED_ORIGINS",
-        "https://buildiq.kalveri.com,https://admin.buildiq.kalveri.com",
+        "https://app.example.invalid,https://admin.example.invalid",
     )
 
     settings = Settings(_env_file=None)
@@ -16,8 +16,8 @@ def test_production_env_aliases_are_supported(monkeypatch) -> None:
     assert settings.environment == "production"
     assert settings.jwt_secret_key == "production-secret-value-with-at-least-32-chars"
     assert settings.cors_allowed_origins == [
-        "https://buildiq.kalveri.com",
-        "https://admin.buildiq.kalveri.com",
+        "https://app.example.invalid",
+        "https://admin.example.invalid",
     ]
 
 
@@ -34,8 +34,8 @@ def test_production_rejects_unsafe_defaults(monkeypatch) -> None:
 
 
 def test_legacy_cors_origin_env_name_accepts_json_list(monkeypatch) -> None:
-    monkeypatch.setenv("BUILDIQ_CORS_ALLOWED_ORIGINS", '["https://buildiq.kalveri.com"]')
+    monkeypatch.setenv("BUILDIQ_CORS_ALLOWED_ORIGINS", '["https://app.example.invalid"]')
 
     settings = Settings(_env_file=None)
 
-    assert settings.cors_allowed_origins == ["https://buildiq.kalveri.com"]
+    assert settings.cors_allowed_origins == ["https://app.example.invalid"]

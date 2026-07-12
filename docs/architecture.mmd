@@ -1,0 +1,15 @@
+flowchart TB
+    Browser[React and TypeScript client]
+    Api[FastAPI application]
+    Auth[Authentication and authorization services]
+    Domain[Domain services and calculation engines]
+    Database[(PostgreSQL)]
+    Files[(Private document storage)]
+
+    Browser -->|JSON over authenticated API| Api
+    Api --> Auth
+    Auth --> Database
+    Api --> Domain
+    Domain --> Database
+    Domain --> Files
+    Api -->|Protected download| Browser

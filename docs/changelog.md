@@ -9,8 +9,8 @@
 - Removed impossible archived values from normal project/task status selectors, made dashboard guidance neutral for populated companies, and connected Macedonian login errors to accessible alert/input state.
 - Fixed demo tenant isolation for Aleksandar and Hristijan by separating seeded test companies and clearing frontend query cache on session changes.
 - Added a Macedonian BuildIQ v0.9 RC1 user guide in Markdown and PDF form for Hristijan/test-user onboarding.
-- Prepared BuildIQ v0.9 RC1 deployment materials for `web01` at `buildiq.kalveri.com`.
-- Added the web01 production deployment guide, production env examples, and safe helper scripts for frontend builds, backend migrations, and reviewed deployment execution.
+- Prepared BuildIQ v0.9 RC1 deployment principles and production configuration gates.
+- Added generic production environment examples and safe helper scripts for frontend builds and backend migrations.
 - Added production env aliases for `BUILDIQ_ENV`, `BUILDIQ_SECRET_KEY`, and `BUILDIQ_ALLOWED_ORIGINS`, including comma-separated CORS origin parsing and focused config coverage.
 - Polished BuildIQ v0.9 RC1 for first real-user testing.
 - Standardized frontend card, button, field, message, empty-state, badge, and data-tile styling across the MVP screens.

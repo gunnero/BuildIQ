@@ -1,0 +1,34 @@
+name: Bug report
+description: Report a reproducible BuildIQ defect without private or production data.
+title: "[Bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: Do not include credentials, customer data, private URLs, logs, or production topology.
+  - type: input
+    id: revision
+    attributes:
+      label: Revision or version
+      placeholder: Commit SHA or release candidate
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Describe expected and observed behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+      description: Use sanitized local demonstration data only.
+    validations:
+      required: true
+  - type: textarea
+    id: validation
+    attributes:
+      label: Additional evidence
+      description: Add sanitized screenshots or test output if useful.

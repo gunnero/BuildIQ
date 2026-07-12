@@ -29,9 +29,19 @@ coverage/
 *.sqlite
 *.sqlite3
 *.db
+*.sql
+*.sql.gz
+*.dump
+*.bak
+*.backup
 storage/*
 !storage/.gitkeep
 
 # Logs
 *.log
 logs/
+
+# Public review artifacts
+.playwright-cli/
+output/
+tmp/

@@ -2,7 +2,7 @@
 set -Eeuo pipefail
 
 # Build the BuildIQ frontend for production.
-# Run from any directory after reviewing docs/033-production-deployment-web01.md.
+# Run from any directory after reviewing docs/033-deployment-principles.md.
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 FRONTEND_DIR="$ROOT_DIR/frontend"
