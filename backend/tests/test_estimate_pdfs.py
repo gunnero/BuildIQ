@@ -82,6 +82,9 @@ def test_generate_pdf_for_estimate_and_download_returns_pdf(
     assert download_response.status_code == 200
     assert download_response.headers["content-type"] == "application/pdf"
     assert download_response.content.startswith(b"%PDF")
+    assert download_response.content.rstrip().endswith(b"%%EOF")
+    assert len(download_response.content) > 1_000
+    assert b"/Type /Page" in download_response.content
 
 
 def test_generated_document_metadata_is_company_scoped(
