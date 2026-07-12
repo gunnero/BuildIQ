@@ -10,6 +10,7 @@ dependencies = [
     "PyJWT>=2.8,<3.0",
     "psycopg[binary]>=3.2,<4.0",
     "pydantic-settings>=2.4,<3.0",
+    "python-dotenv>=1.2.2,<2.0",
     "reportlab>=4.2,<5.0",
     "SQLAlchemy>=2.0,<3.0",
     "uvicorn[standard]>=0.30,<1.0",
@@ -18,7 +19,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "httpx>=0.27,<1.0",
-    "pytest>=8.0,<9.0",
+    "pytest>=9.0.3,<10.0",
 ]
 
 [project.scripts]
@@ -26,7 +27,7 @@ buildiq-seed-dev = "app.seeds.dev:main"
 buildiq-export-openapi = "app.scripts.export_openapi:main"
 
 [build-system]
-requires = ["setuptools>=69.0"]
+requires = ["setuptools>=78.1.1", "wheel>=0.46"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
