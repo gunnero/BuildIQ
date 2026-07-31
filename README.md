@@ -1,5 +1,7 @@
 # BuildIQ
 
+[![CI](https://github.com/gunnero/BuildIQ/actions/workflows/ci.yml/badge.svg)](https://github.com/gunnero/BuildIQ/actions/workflows/ci.yml)
+
 ## Status
 
 **Release candidate in active development.** BuildIQ currently supports controlled local and isolated review environments. It is not represented as generally available or production-ready.
@@ -13,6 +15,10 @@
 BuildIQ is a Macedonian-first construction management platform built around deterministic calculations and backend-owned business rules. It combines project and room data, construction measurements, material and supplier information, estimates, payments, expenses, and generated documents inside explicit company boundaries.
 
 The repository is an engineering case study in domain modelling, tenant isolation, authorization, financial workflow design, document generation, API contracts, product interfaces, testing, and release discipline.
+
+## What I built personally
+
+I designed and implemented the public repository: the FastAPI backend, React/TypeScript interface, tenant-scoped domain model, authorization boundaries, deterministic calculation engine, procurement and financial workflows, PDF generation, local demonstration environment, test suites, and engineering documentation. Product direction, architecture, implementation, and repository documentation are my work unless a file explicitly attributes another source.
 
 ## Why BuildIQ exists
 
@@ -151,6 +157,12 @@ Dependency review:
 ```
 
 This repository is Python/FastAPI plus React; Composer and Artisan commands do not apply.
+
+The latest verified `main` CI run passed **127 backend tests** and **45 frontend tests** (**172 total**), plus repository validation, lint, production build, dependency checks, audits, and secret scanning. Counts describe a recorded `main` CI run and may grow; the workflow badge above is the current source of truth.
+
+## Release status
+
+The latest tagged milestone is [`v0.3.0`](https://github.com/gunnero/BuildIQ/tree/v0.3.0). It represents a release-candidate engineering snapshot, not general availability or production readiness.
 
 ## Documentation map
 
