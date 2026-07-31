@@ -158,7 +158,7 @@ Dependency review:
 
 This repository is Python/FastAPI plus React; Composer and Artisan commands do not apply.
 
-The latest verified `main` CI run passed **127 backend tests** and **45 frontend tests** (**172 total**), plus repository validation, lint, production build, dependency checks, audits, and secret scanning. Counts describe the tagged code line and may grow; the workflow badge above is the current source of truth.
+The latest verified `main` CI run passed **127 backend tests** and **45 frontend tests** (**172 total**), plus repository validation, lint, production build, dependency checks, audits, and secret scanning. Counts describe a recorded `main` CI run and may grow; the workflow badge above is the current source of truth.
 
 ## Release status
 

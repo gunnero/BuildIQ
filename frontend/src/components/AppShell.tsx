@@ -11,7 +11,7 @@ import {
   WalletCards,
   Warehouse,
 } from "lucide-react";
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router";
 
 import { useAuth } from "../auth/useAuth";
 import { formatSubscriptionStatus } from "../utils/statusLabels";
