@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 from sqlalchemy import func
@@ -16,11 +16,18 @@ def get_user_by_email(db: Session, email: str) -> Optional[User]:
     )
 
 
+def user_access_active(user: User) -> bool:
+    expires = user.access_expires_at
+    if expires is not None and expires.tzinfo is None:
+        expires = expires.replace(tzinfo=timezone.utc)
+    return user.status == "active" and (expires is None or expires > datetime.now(timezone.utc))
+
+
 def authenticate_user(db: Session, email: str, password: str) -> Optional[User]:
     user = get_user_by_email(db, email)
     if user is None:
         return None
-    if user.status != "active":
+    if not user_access_active(user):
         return None
     if not verify_password(password, user.password_hash):
         return None

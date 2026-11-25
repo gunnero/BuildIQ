@@ -3,6 +3,7 @@ import {
   Calculator,
   ClipboardList,
   CreditCard,
+  Inbox,
   LayoutDashboard,
   LogOut,
   ReceiptText,
@@ -36,6 +37,9 @@ export function AppShell() {
   const navigate = useNavigate();
   const companyName = company?.name ?? "BuildIQ";
   const subscriptionLabel = formatSubscriptionStatus(subscription?.status);
+  const items = currentUser?.is_hq_admin
+    ? [...navigationItems, { to: "/admin/demo-requests", label: "Демо барања", icon: Inbox }]
+    : navigationItems;
 
   function handleLogout() {
     logout();
@@ -53,7 +57,7 @@ export function AppShell() {
             </div>
           </div>
           <nav aria-label="Главна навигација" className="grid gap-1 p-3">
-            {navigationItems.map((item) => {
+            {items.map((item) => {
               const Icon = item.icon;
               return (
                 <NavLink

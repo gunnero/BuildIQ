@@ -2,8 +2,9 @@ import json
 from functools import lru_cache
 from pathlib import Path
 from typing import Annotated, Union
+from urllib.parse import urlsplit
 
-from pydantic import AliasChoices, Field, field_validator, model_validator
+from pydantic import AliasChoices, Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 BACKEND_DIR = Path(__file__).resolve().parents[2]
@@ -36,6 +37,15 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60
     storage_path: str = str(REPO_ROOT / "storage")
+    demo_requests_enabled: bool = False
+    demo_public_url: str = ""
+    demo_reviewer_email: str = ""
+    demo_mail_host: str = ""
+    demo_mail_port: int = Field(default=587, ge=1, le=65535)
+    demo_mail_security: str = "starttls"
+    demo_mail_sender: str = ""
+    demo_mail_username: str = ""
+    demo_mail_password: SecretStr = SecretStr("")
     cors_allowed_origins: Annotated[list[str], NoDecode] = Field(
         default=[
             "http://127.0.0.1:5173",
@@ -62,6 +72,26 @@ class Settings(BaseSettings):
             return [origin.strip() for origin in value.split(",") if origin.strip()]
 
         return value
+
+    @model_validator(mode="after")
+    def validate_demo_mail(self) -> "Settings":
+        if not self.demo_requests_enabled:
+            return self
+        url = urlsplit(self.demo_public_url)
+        if (url.scheme != "https" or not url.hostname or url.username or url.password
+                or url.query or url.fragment or url.path not in ("", "/")):
+            raise ValueError("BuildIQ demo requests require a public HTTPS origin")
+        for address in (self.demo_reviewer_email, self.demo_mail_sender):
+            if not address or "@" not in address or any(char.isspace() for char in address):
+                raise ValueError("BuildIQ demo requests require reviewer and sender addresses")
+        if not (self.demo_mail_host and self.demo_mail_username
+                and self.demo_mail_password.get_secret_value()):
+            raise ValueError("BuildIQ demo requests require authenticated SMTP")
+        if self.demo_mail_security not in ("starttls", "tls", "loopback"):
+            raise ValueError("Unknown BuildIQ demo SMTP transport")
+        if self.demo_mail_security == "loopback" and self.demo_mail_host not in ("127.0.0.1", "::1"):
+            raise ValueError("Unencrypted BuildIQ mail submission requires a loopback SMTP relay")
+        return self
 
     @model_validator(mode="after")
     def validate_production_gate(self) -> "Settings":

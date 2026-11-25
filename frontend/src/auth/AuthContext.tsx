@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import { useQueryClient } from "@tanstack/react-query";
 
 import { getCurrentUser, loginRequest } from "../api/auth";
-import { setUnauthorizedHandler } from "../api/client";
+import { ApiError, setUnauthorizedHandler } from "../api/client";
 import { getCurrentCompany } from "../api/company";
 import { getCurrentSubscription } from "../api/subscription";
 import type { CompanyResponse, CurrentUserResponse, SubscriptionResponse } from "../api/types";
@@ -12,7 +12,7 @@ import { clearToken, getToken, saveToken } from "./tokenStorage";
 type SessionData = {
   currentUser: CurrentUserResponse;
   company: CompanyResponse;
-  subscription: SubscriptionResponse;
+  subscription: SubscriptionResponse | null;
 };
 
 const SESSION_EXPIRED_MESSAGE = "Сесијата истече. Најавете се повторно.";
@@ -21,8 +21,14 @@ async function fetchSessionData(token: string): Promise<SessionData> {
   const [currentUser, company, subscription] = await Promise.all([
     getCurrentUser(token),
     getCurrentCompany(token),
-    getCurrentSubscription(token),
+    getCurrentSubscription(token).catch((error: unknown) => {
+      if (error instanceof ApiError && error.status === 404) return null;
+      throw error;
+    }),
   ]);
+  if (!subscription && !currentUser.is_hq_admin) {
+    throw new Error("Subscription not found");
+  }
 
   return { currentUser, company, subscription };
 }
@@ -97,7 +103,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return undefined;
     }
 
-    if (hydratedTokenRef.current === token && currentUser && company && subscription) {
+    if (hydratedTokenRef.current === token && currentUser && company) {
       setIsLoadingSession(false);
       return undefined;
     }
@@ -132,7 +138,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       isActive = false;
     };
-  }, [applySessionData, clearSession, company, currentUser, subscription, token]);
+  }, [applySessionData, clearSession, company, currentUser, token]);
 
   const value = useMemo<AuthContextValue>(
     () => ({
@@ -145,17 +151,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       subscription,
       async login(payload) {
         const response = await loginRequest(payload);
+        const data = await fetchSessionData(response.access_token);
         queryClient.removeQueries();
         saveToken(response.access_token);
+        applySessionData(response.access_token, data);
         setToken(response.access_token);
-        await refreshSession(response.access_token);
       },
       logout() {
         clearSession();
       },
       refreshSession: () => refreshSession(),
     }),
-    [clearSession, company, currentUser, isLoadingSession, queryClient, refreshSession, sessionError, subscription, token],
+    [applySessionData, clearSession, company, currentUser, isLoadingSession, queryClient, refreshSession, sessionError, subscription, token],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

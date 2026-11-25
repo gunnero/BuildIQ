@@ -34,6 +34,7 @@ class User(IdMixin, TimestampMixin, Base):
     status = Column(String(50), nullable=False, default="active")
     is_hq_admin = Column(Boolean, nullable=False, default=False)
     last_login_at = Column(DateTime(timezone=True), nullable=True)
+    access_expires_at = Column(DateTime(timezone=True), nullable=True)
 
     company = relationship("Company", back_populates="users")
     user_roles = relationship("UserRole", back_populates="user", cascade="all, delete-orphan")

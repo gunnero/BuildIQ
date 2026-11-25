@@ -10,6 +10,7 @@ from app.core.security import decode_access_token
 from app.db.session import get_db
 from app.models.identity import Company, User
 from app.models.subscription import Subscription
+from app.services.auth import user_access_active
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login", auto_error=False)
 
@@ -40,7 +41,7 @@ def get_current_user(
         raise authentication_error()
 
     user = db.query(User).filter(User.id == user_id, User.status == "active").one_or_none()
-    if user is None or user.company_id != company_id:
+    if user is None or user.company_id != company_id or not user_access_active(user):
         raise authentication_error()
 
     return user

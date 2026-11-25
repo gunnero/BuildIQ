@@ -12,6 +12,7 @@ from app.models.customer import (
     PropertyNote,
 )
 from app.models.estimate import Estimate, EstimateDocument, EstimateItem, EstimateRevision
+from app.models.demo_request import DemoRequest
 from app.models.financial import Expense, ExpenseCategory, Payment, PaymentAllocation
 from app.models.identity import Company, Permission, Role, RolePermission, User, UserRole
 from app.models.kernel import AuditLog, FeatureFlag
@@ -48,6 +49,7 @@ __all__ = [
     "Company",
     "Customer",
     "CustomerContact",
+    "DemoRequest",
     "Estimate",
     "EstimateDocument",
     "EstimateItem",
