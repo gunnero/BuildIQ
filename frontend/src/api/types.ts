@@ -15,6 +15,7 @@ export type CurrentUserResponse = {
   email: string;
   status: string;
   is_hq_admin: boolean;
+  can_review_demo_requests?: boolean;
   roles: string[];
   created_at: string;
   updated_at: string;

@@ -37,7 +37,7 @@ export function AppShell() {
   const navigate = useNavigate();
   const companyName = company?.name ?? "BuildIQ";
   const subscriptionLabel = formatSubscriptionStatus(subscription?.status);
-  const items = currentUser?.is_hq_admin
+  const items = currentUser?.can_review_demo_requests
     ? [...navigationItems, { to: "/admin/demo-requests", label: "Демо барања", icon: Inbox }]
     : navigationItems;
 

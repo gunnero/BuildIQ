@@ -93,6 +93,6 @@ function DemoRequestQueue() {
 export function DemoReviewPage() {
   const { currentUser } = useAuth();
   const { requestId } = useParams();
-  if (!currentUser?.is_hq_admin) return <p role="alert">Немате пристап до демо барањата.</p>;
+  if (!currentUser?.can_review_demo_requests) return <p role="alert">Немате пристап до демо барањата.</p>;
   return requestId ? <DemoRequestReview key={requestId} id={requestId} /> : <DemoRequestQueue />;
 }

@@ -21,8 +21,10 @@ def enabled_settings(settings: Settings = Depends(get_settings)) -> Settings:
     return settings
 
 
-def reviewer(user: User = Depends(get_current_user)) -> User:
-    if not user.is_hq_admin:
+def reviewer(
+    user: User = Depends(get_current_user), settings: Settings = Depends(get_settings),
+) -> User:
+    if not demo_requests.can_review_requests(settings, user):
         raise HTTPException(403, "Немате дозвола за оваа акција.")
     return user
 

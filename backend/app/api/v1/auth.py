@@ -2,17 +2,19 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user
+from app.core.config import Settings, get_settings
 from app.core.security import create_access_token
 from app.db.session import get_db
 from app.models.identity import User
 from app.schemas.auth import CurrentUserResponse, LoginRequest, TokenResponse
 from app.services.audit import record_audit_log
 from app.services.auth import authenticate_user
+from app.services.demo_requests import can_review_requests
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
-def build_current_user_response(user: User) -> CurrentUserResponse:
+def build_current_user_response(user: User, settings: Settings) -> CurrentUserResponse:
     return CurrentUserResponse(
         id=user.id,
         company_id=user.company_id,
@@ -20,6 +22,7 @@ def build_current_user_response(user: User) -> CurrentUserResponse:
         email=user.email,
         status=user.status,
         is_hq_admin=user.is_hq_admin,
+        can_review_demo_requests=can_review_requests(settings, user),
         roles=[user_role.role.key for user_role in user.user_roles],
         created_at=user.created_at,
         updated_at=user.updated_at,
@@ -56,5 +59,7 @@ def login(
 
 
 @router.get("/me", response_model=CurrentUserResponse, summary="Read current user")
-def read_current_user(current_user: User = Depends(get_current_user)) -> CurrentUserResponse:
-    return build_current_user_response(current_user)
+def read_current_user(
+    current_user: User = Depends(get_current_user), settings: Settings = Depends(get_settings),
+) -> CurrentUserResponse:
+    return build_current_user_response(current_user, settings)
