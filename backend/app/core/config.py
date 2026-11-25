@@ -40,6 +40,7 @@ class Settings(BaseSettings):
     demo_requests_enabled: bool = False
     demo_public_url: str = ""
     demo_reviewer_email: str = ""
+    demo_approver_email: str = ""
     demo_mail_host: str = ""
     demo_mail_port: int = Field(default=587, ge=1, le=65535)
     demo_mail_security: str = "starttls"

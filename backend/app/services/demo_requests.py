@@ -20,6 +20,20 @@ INVITE_LIFETIME = timedelta(days=7)
 TRIAL_LIFETIME = timedelta(days=14)
 
 
+def can_review_requests(settings: Settings, user: User) -> bool:
+    configured = settings.demo_approver_email.strip().lower()
+    designated = (
+        bool(configured)
+        and user.email.lower() == configured
+        and user.access_expires_at is None
+    )
+    return (
+        settings.demo_requests_enabled
+        and (user.is_hq_admin or designated)
+        and user.company.status == "active"
+    )
+
+
 def utc_now() -> datetime:
     return datetime.now(timezone.utc)
 

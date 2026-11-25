@@ -20,6 +20,7 @@ class CurrentUserResponse(BaseModel):
     email: str
     status: str
     is_hq_admin: bool
+    can_review_demo_requests: bool
     roles: list[str]
     created_at: datetime
     updated_at: datetime

@@ -117,3 +117,22 @@ def test_existing_user_and_abuse_limits(client, db_session, seeded_identity, mon
         assert item.email_attempts == 1
         assert item.notified_at is None
         assert item.next_email_at is not None
+
+
+def test_configured_reviewer_can_approve_without_hq_role(client, db_session, seeded_identity, monkeypatch):
+    settings, _ = configure(client, monkeypatch)
+    settings.demo_approver_email = seeded_identity["owner_email"].upper()
+    reviewer = db_session.get(User, seeded_identity["owner_user_id"])
+    headers = bearer(reviewer.id, reviewer.company_id)
+    assert client.post(BASE, json=REQUEST).status_code == 202
+    item = db_session.scalars(select(DemoRequest)).one()
+
+    profile = client.get("/api/v1/auth/me", headers=headers).json()
+    assert profile["can_review_demo_requests"] is True
+    assert profile["is_hq_admin"] is False
+    assert client.post(f"{BASE}/{item.id}/approve", headers=headers).status_code == 200
+
+    reviewer.access_expires_at = utc_now() + timedelta(days=1)
+    db_session.commit()
+    assert client.get("/api/v1/auth/me", headers=headers).json()["can_review_demo_requests"] is False
+    assert client.get(BASE, headers=headers).status_code == 403
