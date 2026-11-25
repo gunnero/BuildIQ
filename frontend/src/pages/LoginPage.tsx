@@ -1,11 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { LogIn } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { Navigate, useLocation, useNavigate } from "react-router";
+import { Link, Navigate, useLocation } from "react-router";
 import { z } from "zod";
 
 import { ApiError } from "../api/client";
+import { demoAvailability } from "../api/demoRequests";
 import { useAuth } from "../auth/useAuth";
 
 const loginSchema = z.object({
@@ -23,10 +24,15 @@ type LocationState = {
 
 export function LoginPage() {
   const { isAuthenticated, isLoadingSession, login, sessionError } = useAuth();
-  const navigate = useNavigate();
   const location = useLocation();
   const state = location.state as LocationState | null;
   const destination = state?.from?.pathname ?? "/dashboard";
+  const demo = useQuery({
+    queryKey: ["demo-availability"],
+    queryFn: demoAvailability,
+    enabled: !isAuthenticated,
+    retry: false,
+  });
 
   const {
     formState: { errors },
@@ -42,9 +48,6 @@ export function LoginPage() {
 
   const loginMutation = useMutation({
     mutationFn: (values: LoginFormValues) => login(values),
-    onSuccess: () => {
-      navigate(destination, { replace: true });
-    },
   });
 
   if (isAuthenticated && !isLoadingSession) {
@@ -134,6 +137,11 @@ export function LoginPage() {
             {loginMutation.isPending ? "Се најавувате..." : "Најава"}
           </button>
         </form>
+        {demo.data?.enabled === true && (
+          <Link to="/demo/request" className="ui-button-secondary mt-4 w-full">
+            Побарајте демо
+          </Link>
+        )}
       </section>
     </main>
   );

@@ -12,6 +12,9 @@ import { queryClient } from "./queryClient";
 const CalculationsPage = lazy(() => import("./pages/CalculationsPage").then(({ CalculationsPage }) => ({ default: CalculationsPage })));
 const CustomersPage = lazy(() => import("./pages/CustomersPage").then(({ CustomersPage }) => ({ default: CustomersPage })));
 const DashboardPage = lazy(() => import("./pages/DashboardPage").then(({ DashboardPage }) => ({ default: DashboardPage })));
+const DemoRequestPage = lazy(() => import("./pages/DemoAccessPage").then(({ DemoRequestPage }) => ({ default: DemoRequestPage })));
+const DemoActivationPage = lazy(() => import("./pages/DemoAccessPage").then(({ DemoActivationPage }) => ({ default: DemoActivationPage })));
+const DemoReviewPage = lazy(() => import("./pages/DemoReviewPage").then(({ DemoReviewPage }) => ({ default: DemoReviewPage })));
 const EstimatesPage = lazy(() => import("./pages/EstimatesPage").then(({ EstimatesPage }) => ({ default: EstimatesPage })));
 const ExpensesPage = lazy(() => import("./pages/ExpensesPage").then(({ ExpensesPage }) => ({ default: ExpensesPage })));
 const PaymentsPage = lazy(() => import("./pages/PaymentsPage").then(({ PaymentsPage }) => ({ default: PaymentsPage })));
@@ -25,6 +28,8 @@ export function App() {
           <Suspense fallback={<main className="p-6" aria-live="polite">Се вчитува…</main>}>
             <Routes>
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/demo/request" element={<DemoRequestPage />} />
+            <Route path="/demo/activate" element={<DemoActivationPage />} />
             <Route element={<ProtectedRoute />}>
               <Route element={<AppShell />}>
                 <Route index element={<Navigate to="/dashboard" replace />} />
@@ -43,6 +48,7 @@ export function App() {
                 <Route path="/estimates" element={<EstimatesPage />} />
                 <Route path="/payments" element={<PaymentsPage />} />
                 <Route path="/expenses" element={<ExpensesPage />} />
+                <Route path="/admin/demo-requests/:requestId?" element={<DemoReviewPage />} />
                 <Route
                   path="/settings"
                   element={<SectionPage title="Поставки" description="Овде ќе се прикажуваат поставките за компанијата и профилот." />}
